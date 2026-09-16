@@ -1,0 +1,4042 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月庭 · 時間與任務</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --champagne: #D4AF37;
+            --champagne-line: rgba(212, 175, 55, 0.35);
+            --warm-beige: #E4D9C8;
+            --brown: #2C2825;
+            --brown-soft: #6B6358;
+            --brown-mute: #A89B88;
+            --red: #C0392B;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+            background: #E8E4DE;
+            color: var(--brown);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 20%, rgba(123, 168, 160, 0.55) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 25%, rgba(140, 180, 175, 0.45) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 85%, rgba(100, 150, 160, 0.35) 0%, transparent 55%),
+                linear-gradient(165deg, #C8C0B4 0%, #D9D2C6 25%, #CFD8D4 55%, #C0CCC8 80%, #B8C4C0 100%);
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -15%; left: 5%;
+            width: 70%; height: 70%;
+            background: radial-gradient(ellipse at 45% 25%, rgba(255, 250, 235, 0.5) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            padding: 2.5rem 1.2rem 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .brand { margin-bottom: 2.5rem; }
+
+        .brand .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'Noto Serif TC', 'Georgia', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: var(--brown);
+        }
+
+        .brand .logo .moon-icon {
+            font-size: 1.2rem;
+            color: var(--champagne);
+            filter: drop-shadow(0 1px 3px rgba(212, 175, 55, 0.5));
+        }
+
+        .brand .tagline {
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            color: var(--brown-mute);
+            margin-top: 0.4rem;
+            padding-left: 2px;
+        }
+
+        .nav-group { margin-bottom: 1.4rem; }
+
+        .nav-group-label {
+            font-size: 0.55rem;
+            letter-spacing: 0.35em;
+            color: var(--brown-mute);
+            margin-bottom: 0.4rem;
+            padding-left: 0.9rem;
+        }
+
+        .nav-item {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--brown-mute);
+            padding: 0.6rem 0 0.6rem 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-family: inherit;
+            display: block;
+            width: 100%;
+        }
+
+        .nav-item:hover { color: var(--brown); }
+
+        .nav-item.active {
+            color: var(--brown);
+            font-weight: 500;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 14px;
+            background: var(--champagne);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+
+        .areas-sublist {
+            margin-left: 1.2rem;
+            margin-bottom: 0.8rem;
+            border-left: 1px solid var(--champagne-line);
+            padding-left: 0.6rem;
+        }
+
+        .areas-sublabel {
+            font-size: 0.5rem;
+            letter-spacing: 0.3em;
+            color: var(--brown-mute);
+            padding: 0.3rem 0 0.3rem 0.4rem;
+            opacity: 0.7;
+        }
+
+        .area-item {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--brown-mute);
+            padding: 0.45rem 0 0.45rem 0.6rem;
+            cursor: grab;
+            transition: all 0.25s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            user-select: none;
+        }
+
+        .area-item:active { cursor: grabbing; }
+        .area-item:hover { color: var(--brown); }
+
+        .area-item.active {
+            color: var(--brown);
+            font-weight: 500;
+        }
+
+        .area-item.active::before {
+            content: '';
+            position: absolute;
+            left: -0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 12px;
+            background: var(--champagne);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+
+        .area-item.dragging { opacity: 0.4; }
+        .area-item.drag-over { border-top: 2px solid var(--champagne); }
+
+        .area-item .area-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .area-item .area-edit-icon {
+            font-size: 0.6rem;
+            opacity: 0;
+            padding: 0.1rem 0.25rem;
+            border-radius: 1rem;
+            transition: 0.1s;
+            color: var(--brown-mute);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .area-item:hover .area-edit-icon { opacity: 1; }
+        .area-item .area-edit-icon:hover { background: rgba(212, 175, 55, 0.2); color: var(--brown); }
+
+        .area-item.all-areas {
+            font-size: 0.6rem;
+            opacity: 0.7;
+            margin-bottom: 0.2rem;
+        }
+
+        .area-add-inline {
+            font-size: 0.6rem;
+            color: var(--brown-mute);
+            padding: 0.4rem 0.6rem;
+            cursor: pointer;
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            border-radius: 0.4rem;
+            margin-top: 0.3rem;
+            text-align: center;
+            transition: 0.15s;
+        }
+        .area-add-inline:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--brown);
+        }
+
+        .main {
+            padding: 2.5rem 2.5rem 2rem 1.5rem;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .topbar-date {
+            font-family: 'Noto Serif TC', 'Georgia', serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--brown);
+            margin-bottom: 0.3rem;
+        }
+
+        .topbar-welcome {
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            color: var(--brown-mute);
+        }
+
+        .topbar-right { display: flex; align-items: center; gap: 0.8rem; }
+
+        .topbar-weather {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            color: var(--brown-soft);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            background: rgba(255, 252, 245, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            border: 1px solid var(--champagne-line);
+        }
+
+        .topbar-icon {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 252, 245, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--champagne-line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: var(--brown-soft);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .topbar-icon:hover { background: rgba(255, 252, 245, 0.85); border-color: var(--champagne); color: var(--brown); }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .area-header {
+            margin-bottom: 2.2rem;
+            position: relative;
+        }
+
+        .area-header .kicker {
+            font-size: 0.6rem;
+            letter-spacing: 0.4em;
+            color: var(--champagne);
+            margin-bottom: 0.6rem;
+        }
+
+        .area-header h1 {
+            font-family: 'Noto Serif TC', 'Georgia', serif;
+            font-size: 2.6rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            line-height: 1.1;
+            color: var(--brown);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .area-header .deco-moon {
+            position: absolute;
+            top: 0; right: 0;
+            font-size: 2rem;
+            color: var(--champagne);
+            opacity: 0.35;
+        }
+
+        .area-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .area-stat { display: flex; flex-direction: column; gap: 0.2rem; }
+        .area-stat .stat-value {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--brown);
+            line-height: 1;
+        }
+        .area-stat .stat-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--brown-mute);
+        }
+
+        .section { margin-bottom: 2.5rem; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--champagne-line);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: var(--brown-soft);
+        }
+
+        .section-action {
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            color: var(--champagne);
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            transition: 0.15s;
+        }
+        .section-action:hover { background: rgba(212, 175, 55, 0.15); color: #8a6d3a; }
+
+        .attention-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+            flex-wrap: wrap;
+            transition: 0.15s;
+        }
+        .attention-item:last-child { border-bottom: none; }
+        .attention-item:hover {
+            background: rgba(255, 252, 245, 0.3);
+            margin: 0 -0.6rem;
+            padding-left: 1.6rem;
+            padding-right: 1.6rem;
+            border-radius: 0.6rem;
+        }
+
+        .at-icon { font-size: 1.1rem; line-height: 1.3; flex-shrink: 0; width: 22px; text-align: center; }
+        .at-icon.warning { color: var(--red); }
+        .at-icon.progress { color: var(--champagne); }
+
+        .at-body { flex: 1; min-width: 200px; }
+
+        .at-title {
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--brown);
+            margin-bottom: 0.3rem;
+            cursor: pointer;
+        }
+        .at-title:hover { color: #8a6d3a; }
+
+        .at-meta {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--brown-mute);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .at-meta .sep { opacity: 0.4; }
+
+        .at-due {
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            color: var(--brown-soft);
+            text-align: right;
+            flex-shrink: 0;
+            min-width: 90px;
+        }
+        .at-due.overdue, .at-due.today { color: var(--red); font-weight: 500; }
+
+        .track-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .track-card {
+            background: rgba(255, 252, 245, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.2rem;
+            padding: 1.3rem 1.5rem;
+            border: 1px solid var(--champagne-line);
+            transition: all 0.25s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .track-card:hover {
+            box-shadow: 0 8px 28px rgba(140, 120, 90, 0.12);
+            border-color: rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .track-card .tc-name {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            color: var(--brown);
+            margin-bottom: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .track-card .tc-name .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tc-progress-label { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--brown-mute); margin-bottom: 0.3rem; }
+        .tc-bar-bg {
+            height: 5px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0.4rem;
+        }
+        .tc-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.4s;
+        }
+        .tc-progress-num { font-size: 0.85rem; font-weight: 600; color: #b89b6e; margin-bottom: 0.6rem; }
+        .tc-next { font-size: 0.7rem; color: var(--brown-soft); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+        .tc-next .label { color: var(--brown-mute); font-size: 0.6rem; letter-spacing: 0.1em; margin-right: 0.3rem; }
+        .tc-stats {
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            color: var(--brown-mute);
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .roadmap-container {
+            background: rgba(255, 252, 245, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 1.4rem;
+            padding: 2rem 1.8rem 1.6rem;
+            border: 1px solid var(--champagne-line);
+            box-shadow: 0 8px 32px rgba(140, 120, 90, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .roadmap-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 2rem; right: 2rem;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+        }
+        .roadmap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .roadmap-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: var(--brown-soft);
+        }
+        .roadmap-legend {
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            color: var(--brown-mute);
+            display: flex;
+            gap: 1rem;
+        }
+        .roadmap-legend span { display: flex; align-items: center; gap: 0.3rem; }
+        .roadmap-legend .lg-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            background: rgba(255, 252, 245, 0.8);
+        }
+        .roadmap-legend .lg-dot.achieved { background: linear-gradient(135deg, #d4c4aa, var(--champagne)); border-color: var(--champagne); }
+        .roadmap-legend .lg-dot.in-progress { border-color: var(--champagne); background: linear-gradient(135deg, #e0d0b8, var(--champagne)); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15); }
+
+        .roadmap-track { margin-bottom: 2rem; position: relative; }
+        .roadmap-track:last-child { margin-bottom: 0; }
+        .roadmap-track-name {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.85rem;
+            color: var(--brown);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .roadmap-track-name .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .roadmap-track-name .area-tag {
+            font-size: 0.55rem;
+            letter-spacing: 0.15em;
+            color: var(--champagne);
+            margin-left: 0.3rem;
+        }
+        .roadmap-line {
+            display: flex;
+            align-items: flex-start;
+            min-width: fit-content;
+            padding: 0.5rem 0;
+        }
+        .roadmap-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex-shrink: 0;
+            min-width: 120px;
+            cursor: pointer;
+        }
+        .roadmap-node.dragging { opacity: 0.4; }
+        .roadmap-node.drag-over { border-left: 2px solid var(--champagne); }
+        .roadmap-circle {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.35);
+            background: rgba(255, 252, 245, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            color: transparent;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(180, 155, 110, 0.1);
+        }
+        .roadmap-node.achieved .roadmap-circle {
+            background: linear-gradient(135deg, #d4c4aa, var(--champagne));
+            border-color: var(--champagne);
+            color: #fffcf5;
+            box-shadow: 0 2px 12px rgba(212, 175, 55, 0.3);
+        }
+        .roadmap-node.in-progress .roadmap-circle {
+            border-color: var(--champagne);
+            box-shadow: 0 0 0 5px rgba(212, 175, 55, 0.2), 0 2px 12px rgba(212, 175, 55, 0.25);
+            background: linear-gradient(135deg, #e0d0b8, var(--champagne));
+            color: #fffcf5;
+        }
+        .roadmap-node:hover .roadmap-circle { transform: scale(1.15); }
+
+        .roadmap-label {
+            margin-top: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            color: var(--brown-soft);
+            text-align: center;
+            max-width: 120px;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        .roadmap-node.achieved .roadmap-label { color: #8a7a62; }
+        .roadmap-node.in-progress .roadmap-label { color: var(--brown); font-weight: 600; }
+        .roadmap-meta {
+            font-size: 0.58rem;
+            color: var(--brown-mute);
+            margin-top: 0.15rem;
+            letter-spacing: 0.05em;
+            text-align: center;
+        }
+        .roadmap-connector {
+            flex: 1;
+            min-width: 50px;
+            height: 2px;
+            background: rgba(212, 175, 55, 0.15);
+            margin-top: 13px;
+            position: relative;
+            z-index: 1;
+        }
+        .roadmap-connector.done { background: linear-gradient(90deg, #d4c4aa, var(--champagne)); box-shadow: 0 0 4px rgba(212, 175, 55, 0.3); }
+        .roadmap-connector.current { background: linear-gradient(90deg, var(--champagne) 0%, var(--champagne) 40%, rgba(212, 175, 55, 0.15) 40%, rgba(212, 175, 55, 0.15) 100%); }
+        .roadmap-empty-track {
+            padding: 0.8rem 0;
+            font-size: 0.75rem;
+            color: var(--brown-mute);
+            letter-spacing: 0.05em;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 0.6rem 1rem;
+            background: rgba(255, 252, 245, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid var(--champagne-line);
+            font-size: 0.75rem;
+        }
+        .filter-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--brown-mute);
+        }
+        .filter-bar select {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--champagne-line);
+            border-radius: 0.5rem;
+            padding: 0.3rem 0.6rem;
+            font-family: inherit;
+            font-size: 0.72rem;
+            color: var(--brown);
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-tab {
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            color: var(--brown-mute);
+            border: 1px solid transparent;
+            transition: 0.15s;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            background: transparent;
+            font-family: inherit;
+        }
+        .filter-tab:hover { color: var(--brown); }
+        .filter-tab.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
+            color: var(--brown);
+        }
+
+        .task-list-flat { display: flex; flex-direction: column; gap: 0.6rem; }
+
+        .flat-task {
+            background: rgba(255, 252, 245, 0.45);
+            border-radius: 0.9rem;
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .flat-task:hover {
+            background: rgba(255, 252, 245, 0.75);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        .flat-task .breadcrumb {
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            color: var(--brown-mute);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.3rem;
+        }
+        .flat-task .breadcrumb .sep { opacity: 0.5; }
+        .flat-task .task-name {
+            flex: 1 1 200px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--brown);
+        }
+        .flat-task.completed .task-name { text-decoration: line-through; color: var(--brown-mute); }
+        .flat-task .task-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+            font-size: 0.68rem;
+            color: var(--brown-mute);
+        }
+
+        .task-checkbox {
+            width: 17px; height: 17px;
+            cursor: pointer;
+            flex-shrink: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            border: 1.5px solid rgba(212, 175, 55, 0.6);
+            border-radius: 4px;
+            background: rgba(255, 252, 245, 0.8);
+            position: relative;
+            transition: all 0.2s;
+            margin-top: 0.15rem;
+        }
+        .task-checkbox:checked {
+            background: linear-gradient(135deg, #d4c4aa, var(--champagne));
+            border-color: var(--champagne);
+        }
+        .task-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            color: #fffcf5;
+            font-weight: 700;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .project-card {
+            background: rgba(255, 252, 245, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.2rem;
+            padding: 1.3rem 1.5rem;
+            border: 1px solid var(--champagne-line);
+            transition: all 0.25s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .project-card:hover {
+            box-shadow: 0 8px 28px rgba(140, 120, 90, 0.12);
+            border-color: rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+        .project-card .pc-area {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--champagne);
+            margin-bottom: 0.4rem;
+        }
+        .project-card .pc-name {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            color: var(--brown);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .project-card .pc-name .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .project-card .pc-bar-bg {
+            height: 4px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .project-card .pc-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.4s;
+        }
+        .project-card .pc-stats {
+            font-size: 0.65rem;
+            color: var(--brown-mute);
+            letter-spacing: 0.05em;
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .track-detail-header {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .track-detail-back {
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--champagne);
+            cursor: pointer;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+        }
+        .track-detail-back:hover { color: #8a6d3a; }
+        .track-detail-header h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: var(--brown);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+        .track-detail-header h1 .color-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .track-detail-meta {
+            font-size: 0.7rem;
+            color: var(--brown-mute);
+            letter-spacing: 0.1em;
+        }
+        .track-detail-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .track-detail-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 1.5rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid var(--champagne-line);
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--brown-soft);
+        }
+        .track-detail-btn:hover { background: rgba(255, 255, 255, 0.9); border-color: var(--champagne); color: var(--brown); }
+        .track-detail-btn.danger:hover { background: rgba(200, 130, 130, 0.15); border-color: rgba(200, 130, 130, 0.5); color: var(--red); }
+
+        .color-picker-row {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.4rem;
+        }
+        .color-swatch {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.15s;
+            position: relative;
+        }
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.selected {
+            border-color: var(--brown);
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--champagne);
+        }
+
+        .timeline-wrapper {
+            background: rgba(255, 252, 245, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 1.4rem;
+            padding: 1.5rem 1.8rem;
+            border: 1px solid var(--champagne-line);
+            box-shadow: 0 8px 32px rgba(140, 120, 90, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .timeline-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 2rem; right: 2rem;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+        }
+        .timeline-scroll { overflow-x: auto; padding-bottom: 0.5rem; }
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 0;
+        }
+        .timeline-header-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            margin-bottom: 0.5rem;
+        }
+        .timeline-header-days { display: grid; gap: 0; }
+        .timeline-day-header {
+            text-align: center;
+            font-size: 0.6rem;
+            letter-spacing: 0.05em;
+            color: var(--brown-mute);
+            padding: 0.4rem 0;
+            border-left: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .timeline-day-header.today { color: var(--champagne); font-weight: 600; }
+        .timeline-day-header .day-name { font-size: 0.5rem; opacity: 0.7; display: block; }
+        .timeline-day-header .day-num { font-family: 'Noto Serif TC', serif; font-size: 0.78rem; display: block; margin-top: 0.1rem; }
+
+        .timeline-track-row { display: contents; }
+        .timeline-track-name {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0.6rem 0.8rem 0;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.75rem;
+            color: var(--brown);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+        }
+        .timeline-track-name .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: 0.4rem;
+            flex-shrink: 0;
+        }
+        .timeline-track-name .area-tag {
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            color: var(--champagne);
+            margin-left: 0.3rem;
+        }
+        .timeline-track-bars {
+            position: relative;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+            min-height: 50px;
+            display: grid;
+            align-items: center;
+        }
+        .timeline-task-bar {
+            position: relative;
+            height: 20px;
+            border-radius: 1rem;
+            margin: 3px 0;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            font-size: 0.6rem;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: 0.15s;
+            z-index: 2;
+        }
+        .timeline-task-bar:hover {
+            filter: brightness(0.92);
+        }
+        .timeline-task-bar.completed {
+            filter: brightness(0.7);
+            text-decoration: line-through;
+        }
+        .timeline-task-bar.continued-left {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .timeline-task-bar.continued-right {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .timeline-today-line {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: rgba(192, 57, 43, 0.5);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .timeline-day-grid {
+            position: absolute;
+            top: 0; bottom: 0;
+            display: grid;
+            width: 100%;
+            pointer-events: none;
+        }
+        .timeline-day-grid > div { border-left: 1px solid rgba(212, 175, 55, 0.08); }
+        .timeline-day-grid > div.today { background: rgba(212, 175, 55, 0.05); }
+
+        .timeline-month-label {
+            grid-column: 1 / -1;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            color: var(--brown);
+            padding: 0.6rem 0 0.3rem;
+            border-bottom: 1px solid var(--champagne-line);
+            margin-bottom: 0.5rem;
+        }
+
+        .unscheduled-area {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--champagne-line);
+        }
+        .unscheduled-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.25em;
+            color: var(--brown-soft);
+            margin-bottom: 0.8rem;
+        }
+        .unscheduled-list { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .unscheduled-item {
+            background: rgba(255, 252, 245, 0.6);
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+            border-radius: 0.8rem;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.75rem;
+            color: var(--brown-soft);
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .unscheduled-item:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--champagne);
+            color: var(--brown);
+        }
+
+        .capacity-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--champagne-line);
+        }
+        .capacity-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.25em;
+            color: var(--brown-soft);
+            margin-bottom: 0.3rem;
+        }
+        .capacity-note {
+            font-size: 0.6rem;
+            color: var(--brown-mute);
+            font-style: italic;
+            margin-bottom: 0.8rem;
+            opacity: 0.8;
+        }
+        .capacity-rows { display: flex; flex-direction: column; gap: 0.4rem; }
+        .capacity-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 100px;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.7rem;
+            color: var(--brown-soft);
+        }
+        .capacity-bar-bg {
+            height: 8px;
+            background: rgba(212, 175, 55, 0.12);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .capacity-bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, var(--warm-beige), var(--champagne));
+            transition: width 0.4s;
+        }
+        .capacity-bar-fill.over { background: linear-gradient(90deg, #e0a0a0, var(--red)); }
+        .capacity-label { font-size: 0.65rem; text-align: right; }
+        .capacity-label.over { color: var(--red); font-weight: 600; }
+
+        .calendar-wrapper {
+            background: rgba(255, 252, 245, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 1.4rem;
+            padding: 1.5rem 1.8rem;
+            border: 1px solid var(--champagne-line);
+            box-shadow: 0 8px 32px rgba(140, 120, 90, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .calendar-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 2rem; right: 2rem;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+        }
+
+        .cal-day-grid {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 0;
+            position: relative;
+        }
+        .cal-hour-label {
+            font-size: 0.65rem;
+            color: var(--brown-mute);
+            text-align: right;
+            padding-right: 0.8rem;
+            height: 48px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding-top: 0.2rem;
+            letter-spacing: 0.05em;
+        }
+        .cal-hour-cell {
+            height: 48px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .cal-hour-cell:hover { background: rgba(212, 175, 55, 0.05); }
+
+        .cal-time-block {
+            position: absolute;
+            left: 0.3rem;
+            right: 0.3rem;
+            border-radius: 0.5rem;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.15s;
+            z-index: 2;
+            overflow: hidden;
+        }
+        .cal-time-block:hover { filter: brightness(0.92); }
+        .cal-time-block.completed { filter: brightness(0.7); text-decoration: line-through; }
+        .cal-now-line {
+            position: absolute;
+            left: 60px; right: 0;
+            height: 2px;
+            background: var(--red);
+            z-index: 5;
+            pointer-events: none;
+        }
+        .cal-now-line::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: -4px;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--red);
+        }
+
+        .cal-week-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            gap: 0;
+        }
+        .cal-week-header {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--brown-mute);
+            text-align: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--champagne-line);
+        }
+        .cal-week-header.today { color: var(--champagne); font-weight: 600; }
+        .cal-week-header .day-name { display: block; font-size: 0.55rem; opacity: 0.7; }
+        .cal-week-header .day-num { font-family: 'Noto Serif TC', serif; font-size: 0.85rem; }
+        .cal-week-cell {
+            height: 40px;
+            border-top: 1px solid rgba(212, 175, 55, 0.08);
+            border-left: 1px solid rgba(212, 175, 55, 0.08);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .cal-week-cell:hover { background: rgba(212, 175, 55, 0.05); }
+        .cal-week-block {
+            position: absolute;
+            left: 2px; right: 2px;
+            border-radius: 0.3rem;
+            padding: 0.1rem 0.3rem;
+            font-size: 0.55rem;
+            color: #fff;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+        .cal-month-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.4rem;
+        }
+        .cal-month-header {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            color: var(--brown-mute);
+            text-align: center;
+            padding: 0.5rem 0;
+        }
+        .cal-month-day {
+            min-height: 80px;
+            background: rgba(255, 252, 245, 0.35);
+            border-radius: 0.7rem;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            padding: 0.4rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.15s;
+            position: relative;
+        }
+        .cal-month-day:hover { background: rgba(255, 252, 245, 0.7); }
+        .cal-month-day.today { border-color: var(--champagne); background: rgba(212, 175, 55, 0.1); }
+        .cal-month-day .day-num {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.85rem;
+            color: var(--brown);
+        }
+        .cal-month-task {
+            font-size: 0.55rem;
+            color: #5a4f40;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 0.15rem;
+        }
+        .cal-month-ms {
+            font-size: 0.55rem;
+            color: var(--champagne);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 0.15rem;
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .insight-card {
+            background: rgba(255, 252, 245, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.2rem;
+            padding: 1.4rem 1.6rem;
+            border: 1px solid var(--champagne-line);
+            text-align: center;
+        }
+        .insight-card .ic-value {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2rem;
+            color: var(--champagne);
+            line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+        .insight-card .ic-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--brown-mute);
+        }
+        .chart-container {
+            background: rgba(255, 252, 245, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.2rem;
+            padding: 1.5rem 1.8rem;
+            border: 1px solid var(--champagne-line);
+            margin-bottom: 1.5rem;
+        }
+        .chart-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.25em;
+            color: var(--brown-soft);
+            margin-bottom: 1rem;
+        }
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.6rem;
+            height: 120px;
+            padding: 0 0.5rem;
+        }
+        .bar-chart-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .bar-chart-bar {
+            width: 100%;
+            max-width: 40px;
+            background: linear-gradient(180deg, var(--champagne), var(--warm-beige));
+            border-radius: 0.3rem 0.3rem 0 0;
+            transition: height 0.4s;
+            min-height: 2px;
+        }
+        .bar-chart-label { font-size: 0.6rem; color: var(--brown-mute); letter-spacing: 0.05em; }
+        .bar-chart-value { font-size: 0.6rem; color: var(--brown-soft); font-weight: 600; }
+
+        .empty-section {
+            padding: 1.5rem 0;
+            font-size: 0.78rem;
+            color: var(--brown-mute);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .empty-section .empty-text { font-style: italic; opacity: 0.8; }
+        .empty-add-btn {
+            background: transparent;
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+            color: var(--brown-soft);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            padding: 0.4rem 0.9rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .empty-add-btn:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--champagne);
+            color: var(--brown);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 0.6rem 1rem;
+            background: rgba(255, 252, 245, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid var(--champagne-line);
+        }
+        .view-tab {
+            padding: 0.3rem 0.9rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            color: var(--brown-mute);
+            border: 1px solid transparent;
+            transition: 0.15s;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            background: transparent;
+            font-family: inherit;
+        }
+        .view-tab:hover { color: var(--brown); }
+        .view-tab.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.5);
+            color: var(--brown);
+        }
+        .toolbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-left: auto;
+        }
+        .nav-arrow {
+            background: transparent;
+            border: 1px solid var(--champagne-line);
+            border-radius: 50%;
+            width: 28px; height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--brown-soft);
+            font-size: 0.8rem;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .nav-arrow:hover { background: rgba(212, 175, 55, 0.15); border-color: var(--champagne); color: var(--brown); }
+        .toolbar-date {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.85rem;
+            color: var(--brown);
+            letter-spacing: 0.05em;
+            min-width: 130px;
+            text-align: center;
+        }
+        .btn-today {
+            padding: 0.3rem 0.9rem;
+            border-radius: 1rem;
+            border: 1px solid var(--champagne-line);
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--brown-soft);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-today:hover { background: rgba(212, 175, 55, 0.15); border-color: var(--champagne); color: var(--brown); }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(44, 40, 37, 0.35);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .drawer-overlay.show { display: block; opacity: 1; }
+        .drawer {
+            position: fixed;
+            top: 0; right: 0;
+            width: 440px;
+            max-width: 92vw;
+            height: 100vh;
+            background: rgba(250, 247, 240, 0.97);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--champagne-line);
+            box-shadow: -8px 0 40px rgba(140, 120, 90, 0.15);
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .drawer.show { transform: translateX(0); }
+        .drawer-header {
+            padding: 1.5rem 1.8rem 1rem;
+            border-bottom: 1px solid var(--champagne-line);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .drawer-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.2rem;
+            color: var(--brown);
+            flex: 1;
+            word-break: break-word;
+        }
+        .drawer-close {
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--brown-mute);
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            transition: 0.15s;
+        }
+        .drawer-close:hover { background: rgba(212, 175, 55, 0.15); color: var(--brown); }
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 1.8rem;
+        }
+        .drawer-field { margin-bottom: 1.2rem; }
+        .drawer-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--brown-mute);
+            margin-bottom: 0.4rem;
+        }
+        .drawer-input, .drawer-select, .drawer-textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--champagne-line);
+            border-radius: 0.6rem;
+            background: rgba(255, 255, 255, 0.8);
+            font-family: inherit;
+            font-size: 0.82rem;
+            color: var(--brown);
+            outline: none;
+            transition: 0.15s;
+        }
+        .drawer-input:focus, .drawer-select:focus, .drawer-textarea:focus {
+            border-color: var(--champagne);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+        }
+        .drawer-textarea { resize: vertical; min-height: 60px; }
+        .autosave-note {
+            font-size: 0.65rem;
+            color: var(--brown-mute);
+            font-style: italic;
+            text-align: right;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .progress-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 20px;
+            background: rgba(212, 175, 55, 0.15);
+            outline: none;
+            margin-top: 0.4rem;
+        }
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4c4aa, var(--champagne));
+            border: 2px solid var(--champagne);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
+        }
+        .progress-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4c4aa, var(--champagne));
+            border: 2px solid var(--champagne);
+            cursor: pointer;
+        }
+        .progress-value {
+            font-size: 0.75rem;
+            color: var(--champagne);
+            font-weight: 600;
+            text-align: right;
+            margin-top: 0.2rem;
+        }
+        .calc-note {
+            font-size: 0.6rem;
+            color: var(--brown-mute);
+            margin-top: 0.3rem;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .subtask-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.3rem;
+        }
+        .subtask-row .st-title { flex: 1; font-size: 0.82rem; }
+        .subtask-row.completed .st-title { text-decoration: line-through; color: var(--brown-mute); }
+        .subtask-row .st-del {
+            background: transparent; border: none;
+            color: var(--brown-mute); cursor: pointer;
+            font-size: 0.75rem; padding: 0.1rem 0.4rem; border-radius: 1rem;
+        }
+        .subtask-row .st-del:hover { background: rgba(200, 130, 130, 0.15); color: var(--red); }
+
+        .milestone-checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.3rem;
+            font-size: 0.8rem;
+        }
+        .milestone-checkbox-row input { flex-shrink: 0; }
+
+        .drawer-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--champagne-line);
+        }
+        .drawer-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid var(--champagne-line);
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--brown-soft);
+        }
+        .drawer-btn:hover { background: rgba(255, 255, 255, 0.9); border-color: var(--champagne); color: var(--brown); }
+        .drawer-btn.primary { background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.6); color: #8a6d3a; }
+        .drawer-btn.primary:hover { background: rgba(212, 175, 55, 0.35); }
+        .drawer-btn.danger:hover { background: rgba(200, 130, 130, 0.15); border-color: rgba(200, 130, 130, 0.5); color: var(--red); }
+
+        .inline-edit-input {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--champagne);
+            border-radius: 0.6rem;
+            padding: 0.2rem 0.6rem;
+            font-size: inherit;
+            font-family: inherit;
+            color: var(--brown);
+            outline: none;
+            min-width: 100px;
+            max-width: 320px;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        .inline-add-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .inline-add-row input,
+        .inline-add-row select {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--champagne);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: inherit;
+            font-size: 0.8rem;
+            color: var(--brown);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+        }
+        .inline-add-row input[type="text"] { flex: 1; min-width: 150px; }
+        .inline-add-row input[type="date"],
+        .inline-add-row input[type="time"] { font-size: 0.75rem; }
+        .inline-add-row button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--champagne);
+            background: rgba(212, 175, 55, 0.2);
+            color: #8a6d3a;
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .inline-add-row button:hover { background: rgba(212, 175, 55, 0.35); }
+        .inline-add-row .row-cancel {
+            background: transparent;
+            border-color: var(--champagne-line);
+            color: var(--brown-mute);
+        }
+        .inline-add-row .row-cancel:hover { background: rgba(200, 130, 130, 0.1); color: var(--red); }
+
+        .add-task-panel {
+            background: rgba(255, 252, 245, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--champagne);
+            border-radius: 1rem;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+        .add-task-panel .atp-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            color: var(--brown-soft);
+            margin-bottom: 1rem;
+        }
+        .add-task-panel .atp-row {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .add-task-panel .atp-row label {
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--brown-mute);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+        .add-task-panel .atp-row .atp-field {
+            flex: 1;
+            min-width: 140px;
+        }
+        .add-task-panel input,
+        .add-task-panel select {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            border: 1px solid var(--champagne-line);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.85);
+            font-family: inherit;
+            font-size: 0.78rem;
+            color: var(--brown);
+            outline: none;
+        }
+        .add-task-panel input:focus,
+        .add-task-panel select:focus {
+            border-color: var(--champagne);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+        }
+        .add-task-panel .atp-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .add-task-panel .atp-actions button {
+            padding: 0.5rem 1.2rem;
+            border-radius: 1.5rem;
+            font-family: inherit;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid var(--champagne-line);
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--brown-soft);
+        }
+        .add-task-panel .atp-actions button.primary {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.6);
+            color: #8a6d3a;
+        }
+        .add-task-panel .atp-actions button.primary:hover { background: rgba(212, 175, 55, 0.35); }
+
+        .welcome-panel {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .welcome-panel .wp-moon {
+            font-size: 3rem;
+            color: var(--champagne);
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+        .welcome-panel h2 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.6rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            color: var(--brown);
+            margin-bottom: 0.8rem;
+        }
+        .welcome-panel p {
+            font-size: 0.82rem;
+            color: var(--brown-mute);
+            letter-spacing: 0.05em;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 800px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar {
+                padding: 1.2rem 1.2rem 0.8rem;
+                flex-direction: row;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+            .brand { margin-bottom: 0; }
+            .nav-group { display: flex; flex-wrap: wrap; gap: 0.15rem; margin-bottom: 0; }
+            .nav-group-label { display: none; }
+            .nav-item { padding: 0.35rem 0.6rem; font-size: 0.58rem; width: auto; }
+            .nav-item.active::before { display: none; }
+            .areas-sublist { width: 100%; margin-left: 0; border-left: none; padding-left: 0; display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0; }
+            .areas-sublabel { display: none; }
+            .area-item { display: inline-flex; padding: 0.3rem 0.55rem; font-size: 0.58rem; width: auto; }
+            .area-item.active::before { display: none; }
+            .main { padding: 1.2rem; max-height: none; }
+            .area-header h1 { font-size: 1.8rem; }
+            .area-header .deco-moon { display: none; }
+            .area-stats { gap: 1.2rem; }
+            .roadmap-container { padding: 1.2rem 0.8rem 0.8rem; }
+            .roadmap-node { min-width: 90px; }
+            .roadmap-label { font-size: 0.65rem; max-width: 90px; }
+            .timeline-grid { grid-template-columns: 70px 1fr; }
+            .timeline-header-row { grid-template-columns: 70px 1fr; }
+            .cal-week-grid { grid-template-columns: 40px repeat(7, 1fr); }
+            .cal-day-grid { grid-template-columns: 40px 1fr; }
+            .cal-now-line { left: 40px; }
+            .drawer { width: 100vw; max-width: 100vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <span class="moon-icon">☽</span>
+                    <span>月庭</span>
+                </div>
+                <div class="tagline">時間與任務</div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-item active" data-page="overview">總覽</button>
+                <div class="areas-sublist" id="areasSublist">
+                    <div class="areas-sublabel">領域</div>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">工作</div>
+                <button class="nav-item" data-page="mytasks">我的任務</button>
+                <button class="nav-item" data-page="projects">專案</button>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">規劃</div>
+                <button class="nav-item" data-page="timeline">時間軸</button>
+                <button class="nav-item" data-page="calendar">日曆</button>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">分析</div>
+                <button class="nav-item" data-page="insights">洞察</button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="topbar-welcome" id="topbarWelcome">晚安</div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-weather">☀ 晴 26°C</div>
+                    <div class="topbar-icon" title="搜尋">⌕</div>
+                    <div class="topbar-icon" title="設定">⚙</div>
+                </div>
+            </div>
+
+            <div class="page active" id="page-overview"><div id="overviewContent"></div></div>
+            <div class="page" id="page-mytasks">
+                <div class="filter-bar">
+                    <span class="filter-label">領域</span>
+                    <select id="mytasksAreaFilter"><option value="all">全部領域</option></select>
+                    <span style="width:1px;height:16px;background:var(--champagne-line);"></span>
+                    <button class="filter-tab active" data-filter="all">全部</button>
+                    <button class="filter-tab" data-filter="active">進行中</button>
+                    <button class="filter-tab" data-filter="completed">已完成</button>
+                    <button class="filter-tab" data-filter="overdue">逾期</button>
+                    <button class="filter-tab" data-filter="today">今天</button>
+                    <button class="filter-tab" data-filter="unscheduled">未排程</button>
+                </div>
+                <div id="mytasksContent"></div>
+            </div>
+            <div class="page" id="page-projects">
+                <div class="filter-bar">
+                    <span class="filter-label">領域</span>
+                    <select id="projectsAreaFilter"><option value="all">全部領域</option></select>
+                </div>
+                <div id="projectsContent"></div>
+            </div>
+            <div class="page" id="page-trackdetail"><div id="trackDetailContent"></div></div>
+            <div class="page" id="page-timeline">
+                <div class="toolbar">
+                    <span class="filter-label">檢視</span>
+                    <button class="view-tab active" data-tl-view="week">週</button>
+                    <button class="view-tab" data-tl-view="month">月</button>
+                    <span class="filter-label" id="tlCountLabel" style="margin-left:1rem;">週數</span>
+                    <select id="tlCountSelect">
+                        <option value="1">1 週</option>
+                        <option value="2">2 週</option>
+                        <option value="3">3 週</option>
+                        <option value="4">4 週</option>
+                        <option value="5">5 週</option>
+                        <option value="6">6 週</option>
+                    </select>
+                    <span class="filter-label" style="margin-left:1rem;">領域</span>
+                    <select id="timelineAreaFilter"><option value="all">全部領域</option></select>
+                    <div class="toolbar-nav">
+                        <button class="nav-arrow" id="tlPrev">‹</button>
+                        <span class="toolbar-date" id="tlDateRange"></span>
+                        <button class="nav-arrow" id="tlNext">›</button>
+                        <button class="btn-today" id="tlToday">今天</button>
+                    </div>
+                </div>
+                <div id="timelineContent"></div>
+            </div>
+            <div class="page" id="page-calendar">
+                <div class="toolbar">
+                    <span class="filter-label">檢視</span>
+                    <button class="view-tab active" data-cal-view="day">日</button>
+                    <button class="view-tab" data-cal-view="week">週</button>
+                    <button class="view-tab" data-cal-view="month">月</button>
+                    <span class="filter-label" style="margin-left:1rem;">領域</span>
+                    <select id="calendarAreaFilter"><option value="all">全部領域</option></select>
+                    <div class="toolbar-nav">
+                        <button class="nav-arrow" id="calPrev">‹</button>
+                        <span class="toolbar-date" id="calDateRange"></span>
+                        <button class="nav-arrow" id="calNext">›</button>
+                        <button class="btn-today" id="calToday">今天</button>
+                    </div>
+                </div>
+                <div id="calendarContent"></div>
+            </div>
+            <div class="page" id="page-insights">
+                <div class="filter-bar">
+                    <span class="filter-label">領域</span>
+                    <select id="insightsAreaFilter"><option value="all">全部領域</option></select>
+                </div>
+                <div id="insightsContent"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <div class="drawer-title" id="drawerTitle">任務詳情</div>
+            <button class="drawer-close" id="drawerClose">✕</button>
+        </div>
+        <div class="drawer-body" id="drawerBody"></div>
+    </div>
+
+    <script>
+        (function() {
+            let areas = [];
+            let activeAreaId = null;
+            let currentPage = 'overview';
+            let filterContext = { areaId: 'all', status: 'all' };
+            let insightsAreaId = 'all';
+
+            let tlView = 'week';
+            let tlWeekCount = 1;
+            let tlMonthCount = 1;
+            let tlAnchor = new Date();
+            let tlAreaId = 'all';
+
+            let calView = 'day';
+            let calAnchor = new Date();
+            let calAreaId = 'all';
+
+            let currentTrackId = null;
+            let addTaskPanelOpen = false;
+
+            const TRACK_COLORS = [
+                '#D4AF37', '#7BA8A0', '#B08D57', '#8E9AAF', '#C9886E',
+                '#A8B89A', '#C9A6B8', '#8B9DC3', '#D4A5A5', '#9CB4A8'
+            ];
+
+            // 固定 key，不再改版本號
+            const STORAGE_KEY = 'luneAppData';
+
+            function generateId() {
+                return Date.now() + Math.random().toString(36).substring(2, 9);
+            }
+
+            function getSampleAreas() { return []; }
+
+            function migrateData() {
+                areas.forEach(area => {
+                    const migrateTask = (t) => {
+                        if (t.milestoneId !== undefined && t.milestoneIds === undefined) {
+                            t.milestoneIds = t.milestoneId ? [t.milestoneId] : [];
+                            delete t.milestoneId;
+                        } else if (t.milestoneIds === undefined) t.milestoneIds = [];
+                        if (!t.schedule) t.schedule = [];
+                        if (!t.tags) t.tags = [];
+                        if (!t.subtasks) t.subtasks = [];
+                    };
+                    area.tracks.forEach((track, i) => {
+                        if (!track.color) track.color = TRACK_COLORS[i % TRACK_COLORS.length];
+                        (track.tasks || []).forEach(migrateTask);
+                        (track.milestones || []).forEach(ms => {
+                            (ms.tasks || []).forEach(migrateTask);
+                            if (!ms.tasks) ms.tasks = [];
+                        });
+                    });
+                    (area.unassignedTasks || []).forEach(migrateTask);
+                });
+            }
+
+            function cleanupMilestoneTasks() {
+                areas.forEach(area => {
+                    area.tracks.forEach(track => {
+                        (track.milestones || []).forEach(ms => {
+                            ms.tasks = [];
+                        });
+                    });
+                });
+            }
+
+            function init() {
+                // 先嘗試讀舊 key（V12），如果沒有再讀新的固定 key
+                let saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) {
+                    // 嘗試讀舊版 key 並遷移
+                    const oldKeys = ['luneAppV12', 'luneAppV11', 'luneAppV10', 'luneAppV9', 'luneAppV8', 'luneAppV7'];
+                    for (const k of oldKeys) {
+                        const old = localStorage.getItem(k);
+                        if (old) {
+                            saved = old;
+                            localStorage.setItem(STORAGE_KEY, old);
+                            break;
+                        }
+                    }
+                }
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        areas = parsed.areas || getSampleAreas();
+                        activeAreaId = parsed.activeAreaId !== undefined ? parsed.activeAreaId : (areas[0] ? areas[0].id : null);
+                    } catch (e) {
+                        areas = getSampleAreas();
+                        activeAreaId = null;
+                    }
+                } else {
+                    areas = getSampleAreas();
+                    activeAreaId = null;
+                }
+                migrateData();
+                cleanupMilestoneTasks();
+                if (activeAreaId !== null && !areas.find(a => a.id === activeAreaId)) {
+                    activeAreaId = areas[0] ? areas[0].id : null;
+                }
+                renderTopbarDate();
+                renderAll();
+            }
+
+            function save() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({ areas, activeAreaId }));
+            }
+
+            function renderTopbarDate() {
+                const now = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+                document.getElementById('topbarDate').textContent = now.toLocaleDateString('zh-TW', options);
+                const hour = now.getHours();
+                let greeting = '早安';
+                if (hour >= 12 && hour < 18) greeting = '午安';
+                else if (hour >= 18) greeting = '晚安';
+                document.getElementById('topbarWelcome').textContent = greeting;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text == null ? '' : text;
+                return div.innerHTML;
+            }
+
+            function dateKey(d) {
+                const dt = new Date(d);
+                return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+            }
+            function parseDate(str) {
+                if (!str) return null;
+                const d = new Date(str);
+                if (isNaN(d.getTime())) return null;
+                return d;
+            }
+            function addDays(date, n) {
+                const d = new Date(date);
+                d.setDate(d.getDate() + n);
+                return d;
+            }
+            function startOfWeek(date) {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+                d.setDate(diff);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            }
+
+            function startInlineEdit(element, currentValue, onSave) {
+                if (element.querySelector('.inline-edit-input')) return;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'inline-edit-input';
+                input.value = currentValue;
+                const original = element.textContent;
+                element.textContent = '';
+                element.appendChild(input);
+                input.focus();
+                input.select();
+                let finished = false;
+                function finish(saveIt) {
+                    if (finished) return;
+                    finished = true;
+                    const newValue = input.value.trim();
+                    if (saveIt && newValue && newValue !== currentValue) onSave(newValue);
+                    else element.textContent = original;
+                }
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+                    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+                });
+                input.addEventListener('blur', function() { finish(true); });
+            }
+
+            function getTaskProgress(task) {
+                if (!task.subtasks || task.subtasks.length === 0) return task.completed ? 100 : 0;
+                const done = task.subtasks.filter(st => st.completed).length;
+                return Math.round((done / task.subtasks.length) * 100);
+            }
+
+            function getMilestoneProgress(ms) {
+                if (ms.type === 'numeric') {
+                    if (ms.status === 'achieved') return 100;
+                    if (ms.start !== undefined && ms.current !== undefined && ms.target !== undefined) {
+                        const total = Math.abs(ms.start - ms.target);
+                        if (total === 0) return 100;
+                        const done = Math.abs(ms.start - ms.current);
+                        const auto = Math.round((done / total) * 100);
+                        if (ms.manualProgress !== undefined && ms.manualProgress !== null) {
+                            return Math.max(0, Math.min(100, ms.manualProgress));
+                        }
+                        return Math.max(0, Math.min(100, auto));
+                    }
+                    return Math.min(100, Math.round(ms.progress || 0));
+                }
+                if (ms.type === 'binary') return ms.status === 'achieved' ? 100 : 0;
+                return ms.progress || 0;
+            }
+
+            function getTrackProgress(track) {
+                if (track.milestones && track.milestones.length > 0) {
+                    const sum = track.milestones.reduce((acc, m) => acc + getMilestoneProgress(m), 0);
+                    return Math.round(sum / track.milestones.length);
+                }
+                if (track.tasks && track.tasks.length > 0) {
+                    const sum = track.tasks.reduce((acc, t) => acc + getTaskProgress(t), 0);
+                    return Math.round(sum / track.tasks.length);
+                }
+                return 0;
+            }
+
+            function getAllTasksOfTrack(track) {
+                const all = [];
+                (track.tasks || []).forEach(t => all.push({ task: t, milestone: null }));
+                all.forEach(item => {
+                    const t = item.task;
+                    if (t.milestoneIds && t.milestoneIds.length > 0) {
+                        for (const msId of t.milestoneIds) {
+                            const ms = (track.milestones || []).find(m => m.id === msId);
+                            if (ms) {
+                                item.milestone = ms;
+                                break;
+                            }
+                        }
+                    }
+                });
+                return all;
+            }
+
+            function findTrackById(trackId) {
+                for (const area of areas) for (const track of area.tracks) if (track.id === trackId) return { track, area };
+                return null;
+            }
+
+            function findTaskById(taskId) {
+                for (const area of areas) {
+                    for (const track of area.tracks) {
+                        for (const task of (track.tasks || [])) if (task.id === taskId) return { task, track, milestone: null, area };
+                    }
+                    for (const task of (area.unassignedTasks || [])) if (task.id === taskId) return { task, track: null, milestone: null, area };
+                }
+                return null;
+            }
+
+            function findMilestoneById(msId) {
+                for (const area of areas) for (const track of area.tracks) for (const ms of (track.milestones || [])) if (ms.id === msId) return { milestone: ms, track, area };
+                return null;
+            }
+
+            function getAllMilestonesInArea(areaId) {
+                const result = [];
+                areas.forEach(area => {
+                    if (areaId !== 'all' && area.id !== areaId) return;
+                    area.tracks.forEach(track => (track.milestones || []).forEach(ms => result.push({ milestone: ms, track, area })));
+                });
+                return result;
+            }
+
+            function renderSidebar() {
+                const el = document.getElementById('areasSublist');
+                let html = `<div class="areas-sublabel">領域</div>`;
+                const allActive = activeAreaId === null ? 'active' : '';
+                html += `<div class="area-item all-areas ${allActive}" onclick="window.switchArea(null)"><span class="area-name">全部領域</span></div>`;
+                areas.forEach(area => {
+                    const activeClass = area.id === activeAreaId ? 'active' : '';
+                    html += `
+                        <div class="area-item ${activeClass}" draggable="true" data-area-id="${area.id}" onclick="window.switchArea('${area.id}')">
+                            <span class="area-name">${escapeHtml(area.name)}</span>
+                            <span class="area-edit-icon" onclick="event.stopPropagation();window.startEditAreaName('${area.id}')" title="重新命名">✎</span>
+                        </div>
+                    `;
+                });
+                html += `<div class="area-add-inline" onclick="window.showAreaAddInline()">＋ 新增領域</div>`;
+                el.innerHTML = html;
+                bindAreaDrag();
+            }
+
+            function renderOverview() {
+                const el = document.getElementById('overviewContent');
+                let areaName, isAll;
+                if (activeAreaId === null) { areaName = '全部領域'; isAll = true; }
+                else {
+                    const area = areas.find(a => a.id === activeAreaId);
+                    if (!area) { el.innerHTML = ''; return; }
+                    areaName = area.name; isAll = false;
+                }
+
+                if (areas.length === 0) {
+                    el.innerHTML = `
+                        <div class="welcome-panel">
+                            <div class="wp-moon">☽</div>
+                            <h2>歡迎使用月庭</h2>
+                            <p>從建立第一個領域開始。<br>例如：個人、學業、工作、健康。</p>
+                            <button class="empty-add-btn" onclick="window.showAreaAddInline()">＋ 新增領域</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const tracks = [];
+                areas.forEach(area => {
+                    if (activeAreaId !== null && area.id !== activeAreaId) return;
+                    area.tracks.forEach(track => tracks.push({ track, area }));
+                });
+
+                const allTasks = [];
+                areas.forEach(area => {
+                    if (activeAreaId !== null && area.id !== activeAreaId) return;
+                    (area.unassignedTasks || []).forEach(t => allTasks.push({ task: t, track: null, area }));
+                    area.tracks.forEach(track => {
+                        (track.tasks || []).forEach(t => allTasks.push({ task: t, track, area }));
+                    });
+                });
+
+                const activeTasks = allTasks.filter(t => !t.task.completed && t.task.status !== 'cancelled');
+                const milestones = getAllMilestonesInArea(activeAreaId);
+                const upcomingMilestones = milestones.filter(m => m.milestone.status !== 'achieved' && m.milestone.status !== 'cancelled');
+
+                let html = `
+                    <div class="area-header">
+                        <span class="deco-moon">☽</span>
+                        <div class="kicker">${isAll ? '全部領域' : '領域'}</div>
+                        <h1><span class="area-title-text">${escapeHtml(areaName)}</span></h1>
+                        <div class="area-stats">
+                            <div class="area-stat"><span class="stat-value">${tracks.length}</span><span class="stat-label">軌道</span></div>
+                            <div class="area-stat"><span class="stat-value">${activeTasks.length}</span><span class="stat-label">進行中任務</span></div>
+                            <div class="area-stat"><span class="stat-value">${upcomingMilestones.length}</span><span class="stat-label">即將到來里程碑</span></div>
+                        </div>
+                    </div>
+                `;
+
+                if (!isAll) {
+                    html += `<div style="margin-bottom:1.5rem;">
+                        <button class="section-action" style="border:1px solid var(--champagne-line);padding:0.5rem 1.2rem;border-radius:1.5rem;font-size:0.75rem;" onclick="window.addTrackInline()">＋ 新增軌道到「${escapeHtml(areaName)}」</button>
+                    </div>`;
+                }
+
+                const attention = getAttentionItems();
+                html += `<div class="section"><div class="section-header"><div class="section-title">需要注意</div></div>`;
+                if (attention.length === 0) {
+                    html += `<div class="empty-section"><span class="empty-text">目前沒有需要注意的事情。</span></div>`;
+                } else {
+                    attention.forEach(item => {
+                        if (item.type === 'task') {
+                            const { task, track, area } = item;
+                            const today = new Date(new Date().toDateString());
+                            let dueText = '', dueClass = '';
+                            if (task.dueDate) {
+                                const dueDate = new Date(task.dueDate);
+                                const diff = Math.round((dueDate - today) / 86400000);
+                                if (diff < 0) { dueText = `逾期 ${Math.abs(diff)} 天`; dueClass = 'overdue'; }
+                                else if (diff === 0) { dueText = '今天到期'; dueClass = 'today'; }
+                                else if (diff === 1) { dueText = '明天到期'; }
+                                else dueText = `${dueDate.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} 到期`;
+                            }
+                            let icon = '○', cls = 'progress';
+                            if (task.status === 'in-progress') icon = '◐';
+                            else if (dueClass === 'overdue' || dueClass === 'today' || task.status === 'blocked') { icon = '⚠'; cls = 'warning'; }
+                            html += `
+                                <div class="attention-item">
+                                    <div class="at-icon ${cls}">${icon}</div>
+                                    <div class="at-body">
+                                        <div class="at-title" onclick="window.openTaskDrawer('${task.id}')">${escapeHtml(task.title)}</div>
+                                        <div class="at-meta">
+                                            ${isAll ? `<span>${escapeHtml(area.name)}</span><span class="sep">·</span>` : ''}
+                                            ${track ? `<span>${escapeHtml(track.name)}</span>` : '<span>未分類</span>'}
+                                            ${item.reason ? `<span class="sep">·</span><span>${item.reason}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="at-due ${dueClass}">${dueText}</div>
+                                </div>
+                            `;
+                        } else {
+                            const { milestone, track, area } = item;
+                            let dateText = '';
+                            if (milestone.due) { const d = new Date(milestone.due); dateText = d.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' }); }
+                            html += `
+                                <div class="attention-item">
+                                    <div class="at-icon progress">●</div>
+                                    <div class="at-body">
+                                        <div class="at-title" onclick="window.openMilestoneDrawer('${milestone.id}')">${escapeHtml(milestone.title)}</div>
+                                        <div class="at-meta">
+                                            ${isAll ? `<span>${escapeHtml(area.name)}</span><span class="sep">·</span>` : ''}
+                                            <span>${escapeHtml(track.name)}</span>
+                                            ${item.reason ? `<span class="sep">·</span><span>${item.reason}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="at-due">${dateText}</div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+                html += `</div>`;
+
+                html += `<div class="section"><div class="section-header"><div class="section-title">軌道</div>${!isAll ? `<button class="section-action" onclick="window.addTrackInline()">＋ 新增軌道</button>` : ''}</div>`;
+                if (tracks.length === 0) {
+                    html += `<div class="empty-section"><span class="empty-text">目前沒有軌道。</span></div>`;
+                } else {
+                    html += `<div class="track-cards">`;
+                    tracks.forEach(({ track, area }) => {
+                        const progress = getTrackProgress(track);
+                        const msList = track.milestones || [];
+                        const allTasks = getAllTasksOfTrack(track);
+                        const doneTasks = allTasks.filter(t => t.task.completed).length;
+                        const nextMs = msList.find(m => m.status !== 'achieved' && m.status !== 'cancelled');
+                        const color = track.color || TRACK_COLORS[0];
+                        html += `
+                            <div class="track-card" onclick="window.openTrackDetail('${track.id}')">
+                                <div class="tc-name"><span class="dot" style="background:${color};"></span>${escapeHtml(track.name)}</div>
+                                <div class="tc-progress-label">成果進度</div>
+                                <div class="tc-bar-bg"><div class="tc-bar-fill" style="width:${progress}%;background:${color};"></div></div>
+                                <div class="tc-progress-num" style="color:${color};">${progress}%</div>
+                                ${nextMs ? `<div class="tc-next"><span class="label">下一個</span>${escapeHtml(nextMs.title)}</div>` : `<div class="tc-next"><span class="label">狀態</span>沒有未完成的里程碑</div>`}
+                                <div class="tc-stats">
+                                    ${isAll ? `<span>${escapeHtml(area.name)}</span>` : ''}
+                                    <span>${doneTasks} / ${allTasks.length} 任務</span>
+                                    <span>${msList.length} 個里程碑</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                html += `<div class="roadmap-container"><div class="roadmap-header"><div class="roadmap-title">領域路線圖</div><div class="roadmap-legend"><span><span class="lg-dot"></span> 未開始</span><span><span class="lg-dot in-progress"></span> 進行中</span><span><span class="lg-dot achieved"></span> 已達成</span></div></div>`;
+                if (tracks.length === 0) {
+                    html += `<div class="roadmap-empty-track">沒有軌道可以顯示。</div>`;
+                } else {
+                    tracks.forEach(({ track, area }) => {
+                        const msList = track.milestones || [];
+                        const color = track.color || TRACK_COLORS[0];
+                        html += `<div class="roadmap-track"><div class="roadmap-track-name"><span class="dot" style="background:${color};"></span>${escapeHtml(track.name)}${isAll ? `<span class="area-tag">${escapeHtml(area.name)}</span>` : ''}</div>`;
+                        if (msList.length === 0) {
+                            html += `<div class="roadmap-empty-track">沒有里程碑 — 這是一條持續進行的軌道。</div>`;
+                        } else {
+                            html += `<div class="roadmap-line">`;
+                            msList.forEach((ms, index) => {
+                                const achieved = ms.status === 'achieved';
+                                const inProgress = ms.status === 'in-progress';
+                                const nodeClass = achieved ? 'achieved' : (inProgress ? 'in-progress' : '');
+                                let metaStr = '';
+                                if (ms.type === 'numeric' && ms.start !== undefined && ms.current !== undefined && ms.target !== undefined) metaStr = `${ms.start} → ${ms.current} → ${ms.target}`;
+                                else if (ms.type === 'numeric' && ms.current !== undefined && ms.target !== undefined) metaStr = `${ms.current} → ${ms.target}`;
+                                else if (ms.type === 'progress') metaStr = `${ms.progress || 0}%`;
+                                else if (ms.due) { const d = new Date(ms.due); metaStr = d.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' }); }
+                                html += `
+                                    <div class="roadmap-node ${nodeClass}" data-ms-id="${ms.id}" data-track-id="${track.id}" draggable="true"
+                                        onclick="if(!this.classList.contains('dragging'))window.openMilestoneDrawer('${ms.id}')">
+                                        <div class="roadmap-circle" style="${achieved || inProgress ? `background:${color};border-color:${color};` : `border-color:${color};`}">${achieved ? '✓' : (inProgress ? '●' : '○')}</div>
+                                        <div class="roadmap-label">${escapeHtml(ms.title)}</div>
+                                        ${metaStr ? `<div class="roadmap-meta">${metaStr}</div>` : ''}
+                                    </div>
+                                `;
+                                if (index < msList.length - 1) {
+                                    const nextAchieved = msList[index + 1].status === 'achieved';
+                                    let cc = '';
+                                    if (achieved && nextAchieved) cc = 'done';
+                                    else if (achieved && !nextAchieved) cc = 'current';
+                                    else if (!achieved && inProgress) cc = 'current';
+                                    html += `<div class="roadmap-connector ${cc}" style="${cc === 'done' ? `background:${color};` : ''}"></div>`;
+                                }
+                            });
+                            html += `</div>`;
+                        }
+                        html += `</div>`;
+                    });
+                }
+                html += `</div>`;
+
+                el.innerHTML = html;
+                bindMilestoneDrag();
+            }
+
+            function getAttentionItems() {
+                const items = [];
+                const today = new Date(new Date().toDateString());
+                areas.forEach(area => {
+                    if (activeAreaId !== null && area.id !== activeAreaId) return;
+                    const allTasks = [];
+                    (area.unassignedTasks || []).forEach(t => allTasks.push({ task: t, track: null, area }));
+                    area.tracks.forEach(track => {
+                        (track.tasks || []).forEach(t => allTasks.push({ task: t, track, area }));
+                    });
+                    allTasks.forEach(({ task, track, milestone, area }) => {
+                        if (task.completed || task.status === 'cancelled') return;
+                        let priority = 999, reason = '';
+                        if (task.dueDate) {
+                            const dueDate = new Date(task.dueDate);
+                            if (dueDate < today) { priority = 0; reason = '逾期'; }
+                            else if (dueDate.getTime() === today.getTime()) { priority = 1; reason = '今天到期'; }
+                            else {
+                                const diff = Math.round((dueDate - today) / 86400000);
+                                if (diff <= 3) { priority = 2; reason = `${diff} 天後到期`; }
+                            }
+                        }
+                        if (task.status === 'blocked' && priority > 3) { priority = 3; reason = '阻塞'; }
+                        if (task.status === 'in-progress' && priority > 4) { priority = 4; reason = '進行中'; }
+                        if (priority < 999) items.push({ type: 'task', priority, reason, task, track, milestone, area });
+                    });
+                    (area.tracks || []).forEach(track => {
+                        (track.milestones || []).forEach(ms => {
+                            if (ms.status === 'achieved' || ms.status === 'cancelled') return;
+                            let priority = 999, reason = '';
+                            if (ms.due) {
+                                const dueDate = new Date(ms.due);
+                                if (dueDate < today) { priority = 0; reason = '逾期'; }
+                                else {
+                                    const diff = Math.round((dueDate - today) / 86400000);
+                                    if (diff <= 14) { priority = 5; reason = `${diff} 天後`; }
+                                }
+                            }
+                            if (ms.status === 'in-progress' && priority > 6) { priority = 6; reason = '進行中'; }
+                            if (priority < 999) items.push({ type: 'milestone', priority, reason, milestone: ms, track, area });
+                        });
+                    });
+                });
+                items.sort((a, b) => a.priority - b.priority);
+                return items.slice(0, 5);
+            }
+
+            function renderMyTasks() {
+                const el = document.getElementById('mytasksContent');
+                const filterArea = filterContext.areaId;
+                const filterStatus = filterContext.status;
+                const today = new Date(new Date().toDateString());
+
+                let allTasks = [];
+                areas.forEach(area => {
+                    if (filterArea !== 'all' && area.id !== filterArea) return;
+                    (area.unassignedTasks || []).forEach(t => allTasks.push({ task: t, track: null, area }));
+                    area.tracks.forEach(track => {
+                        (track.tasks || []).forEach(t => allTasks.push({ task: t, track, area }));
+                    });
+                });
+
+                if (filterStatus === 'active') allTasks = allTasks.filter(x => !x.task.completed && x.task.status !== 'cancelled');
+                else if (filterStatus === 'completed') allTasks = allTasks.filter(x => x.task.completed);
+                else if (filterStatus === 'overdue') allTasks = allTasks.filter(x => !x.task.completed && x.task.dueDate && new Date(x.task.dueDate) < today);
+                else if (filterStatus === 'today') allTasks = allTasks.filter(x => !x.task.completed && x.task.dueDate && new Date(x.task.dueDate).getTime() === today.getTime());
+                else if (filterStatus === 'unscheduled') allTasks = allTasks.filter(x => !x.task.startDate && !x.task.dueDate && (!x.task.schedule || x.task.schedule.length === 0));
+
+                allTasks.sort((a, b) => {
+                    const aOverdue = a.task.dueDate && new Date(a.task.dueDate) < today && !a.task.completed;
+                    const bOverdue = b.task.dueDate && new Date(b.task.dueDate) < today && !b.task.completed;
+                    if (aOverdue && !bOverdue) return -1;
+                    if (!aOverdue && bOverdue) return 1;
+                    const pa = { high: 0, medium: 1, low: 2 }[a.task.priority] ?? 3;
+                    const pb = { high: 0, medium: 1, low: 2 }[b.task.priority] ?? 3;
+                    if (pa !== pb) return pa - pb;
+                    if (a.task.dueDate && b.task.dueDate) return new Date(a.task.dueDate) - new Date(b.task.dueDate);
+                    return 0;
+                });
+
+                let html = `<div class="task-list-flat">`;
+                if (allTasks.length === 0) {
+                    html += `<div class="empty-section"><span class="empty-text">沒有符合條件的任務。</span></div>`;
+                } else {
+                    allTasks.forEach(({ task, track, area }) => {
+                        let dueText = '', dueClass = '';
+                        if (task.dueDate) {
+                            const dueDate = new Date(task.dueDate);
+                            const diff = Math.round((dueDate - today) / 86400000);
+                            if (diff < 0) { dueText = `逾期 ${Math.abs(diff)} 天`; dueClass = 'overdue'; }
+                            else if (diff === 0) { dueText = '今天到期'; dueClass = 'today'; }
+                            else if (diff === 1) { dueText = '明天到期'; }
+                            else dueText = `${dueDate.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} 到期`;
+                        }
+                        const priorityLabel = { high: '高', medium: '中', low: '低' }[task.priority] || '';
+                        const trackColor = track ? (track.color || TRACK_COLORS[0]) : '#ccc';
+                        let msNames = '';
+                        if (track && task.milestoneIds && task.milestoneIds.length > 0) {
+                            msNames = task.milestoneIds.map(id => {
+                                const ms = (track.milestones || []).find(m => m.id === id);
+                                return ms ? ms.title : '';
+                            }).filter(s => s).join(' · ');
+                        }
+                        html += `
+                            <div class="flat-task ${task.completed ? 'completed' : ''}" style="border-left:3px solid ${trackColor};">
+                                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="window.toggleTaskFromList('${task.id}')">
+                                <div style="flex:1;min-width:200px;">
+                                    <div class="breadcrumb">
+                                        ${filterArea === 'all' ? `<span>${escapeHtml(area.name)}</span><span class="sep">·</span>` : ''}
+                                        ${track ? `<span style="color:${trackColor};">${escapeHtml(track.name)}</span>` : `<span>未分類</span>`}
+                                        ${msNames ? `<span class="sep">·</span><span>${escapeHtml(msNames)}</span>` : ''}
+                                    </div>
+                                    <div class="task-name" onclick="window.openTaskDrawer('${task.id}')" style="cursor:pointer;">${escapeHtml(task.title)}</div>
+                                </div>
+                                <div class="task-right">
+                                    ${priorityLabel ? `<span>${priorityLabel}</span>` : ''}
+                                    ${dueText ? `<span style="${dueClass === 'overdue' || dueClass === 'today' ? 'color:var(--red);font-weight:500;' : ''}">${dueText}</span>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                html += `</div>`;
+                el.innerHTML = html;
+            }
+
+            function renderProjects() {
+                const el = document.getElementById('projectsContent');
+                const filterArea = filterContext.areaId;
+                let tracks = [];
+                areas.forEach(area => {
+                    if (filterArea !== 'all' && area.id !== filterArea) return;
+                    area.tracks.forEach(track => tracks.push({ track, area }));
+                });
+
+                let html = `<div class="projects-grid">`;
+                if (tracks.length === 0) {
+                    html += `<div class="empty-section"><span class="empty-text">目前沒有軌道。</span></div>`;
+                } else {
+                    tracks.forEach(({ track, area }) => {
+                        const progress = getTrackProgress(track);
+                        const msCount = (track.milestones || []).length;
+                        const allTasks = getAllTasksOfTrack(track);
+                        const doneTasks = allTasks.filter(t => t.task.completed).length;
+                        const color = track.color || TRACK_COLORS[0];
+                        html += `
+                            <div class="project-card" style="border-left:3px solid ${color};" onclick="window.openTrackDetail('${track.id}')">
+                                <div class="pc-area">${escapeHtml(area.name)}</div>
+                                <div class="pc-name"><span class="dot" style="background:${color};"></span>${escapeHtml(track.name)}</div>
+                                <div class="pc-bar-bg"><div class="pc-bar-fill" style="width:${progress}%;background:${color};"></div></div>
+                                <div class="pc-stats">
+                                    <span>${progress}%</span>
+                                    <span>${doneTasks} / ${allTasks.length} 任務</span>
+                                    <span>${msCount} 個里程碑</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                html += `</div>`;
+                el.innerHTML = html;
+            }
+
+            function renderTrackDetail() {
+                const el = document.getElementById('trackDetailContent');
+                if (!currentTrackId) {
+                    el.innerHTML = `<div class="empty-section"><span class="empty-text">請從專案選擇一條軌道。</span></div>`;
+                    return;
+                }
+                const found = findTrackById(currentTrackId);
+                if (!found) { el.innerHTML = `<div class="empty-section"><span class="empty-text">找不到這條軌道。</span></div>`; return; }
+                const { track, area } = found;
+                const progress = getTrackProgress(track);
+                const msList = track.milestones || [];
+                const allTasks = getAllTasksOfTrack(track);
+                const doneTasks = allTasks.filter(t => t.task.completed).length;
+                const color = track.color || TRACK_COLORS[0];
+
+                const colorSwatches = TRACK_COLORS.map(c => `
+                    <div class="color-swatch ${c === color ? 'selected' : ''}" style="background:${c};"
+                        onclick="window.setTrackColor('${track.id}', '${c}')"></div>
+                `).join('');
+
+                let html = `
+                    <div class="track-detail-header">
+                        <div class="track-detail-back" onclick="window.switchPage('projects')">← 返回專案</div>
+                        <h1>
+                            <span class="color-dot" style="background:${color};"></span>
+                            <span id="tdTrackName">${escapeHtml(track.name)}</span>
+                            <span style="cursor:pointer;opacity:0.4;font-size:0.9rem;" onclick="window.startEditTrackName('${track.id}')" title="重新命名">✎</span>
+                        </h1>
+                        <div class="track-detail-meta">${escapeHtml(area.name)} · ${msList.length} 個里程碑 · ${doneTasks} / ${allTasks.length} 任務完成</div>
+                        <div style="margin-top:0.8rem;">
+                            <div style="font-size:0.6rem;letter-spacing:0.2em;color:var(--brown-mute);margin-bottom:0.3rem;">軌道顏色</div>
+                            <div class="color-picker-row">${colorSwatches}</div>
+                        </div>
+                        <div class="track-detail-actions">
+                            <button class="track-detail-btn" onclick="window.toggleAddTaskPanelTrack('${track.id}')">＋ 新增任務</button>
+                            <button class="track-detail-btn" onclick="window.showAddMilestoneInline('${track.id}')">＋ 新增里程碑</button>
+                            <button class="track-detail-btn" onclick="window.sortMilestonesByDue('${track.id}')">一鍵排序（依截止日）</button>
+                            <button class="track-detail-btn danger" onclick="window.deleteTrackConfirm('${track.id}')">刪除軌道</button>
+                        </div>
+                    </div>
+                `;
+
+                if (addTaskPanelOpen && addTaskPanelOpen === 'track:' + currentTrackId) {
+                    html += renderAddTaskPanelTrack(currentTrackId);
+                }
+
+                html += `
+                    <div class="section">
+                        <div class="section-header"><div class="section-title">成果進度</div></div>
+                        <div class="tc-bar-bg" style="height:8px;"><div class="tc-bar-fill" style="width:${progress}%;background:${color};"></div></div>
+                        <div style="font-size:1.5rem;font-weight:600;color:${color};margin-top:0.5rem;">${progress}%</div>
+                    </div>
+                `;
+
+                html += `<div class="roadmap-container"><div class="roadmap-header"><div class="roadmap-title">軌道路線圖</div><div class="roadmap-legend"><span><span class="lg-dot"></span> 未開始</span><span><span class="lg-dot in-progress"></span> 進行中</span><span><span class="lg-dot achieved"></span> 已達成</span></div></div>`;
+                if (msList.length === 0) {
+                    html += `<div class="roadmap-empty-track">沒有里程碑 — 這是一條持續進行的軌道。</div>`;
+                } else {
+                    html += `<div class="roadmap-line">`;
+                    msList.forEach((ms, index) => {
+                        const achieved = ms.status === 'achieved';
+                        const inProgress = ms.status === 'in-progress';
+                        const nodeClass = achieved ? 'achieved' : (inProgress ? 'in-progress' : '');
+                        let metaStr = '';
+                        if (ms.type === 'numeric' && ms.start !== undefined && ms.current !== undefined && ms.target !== undefined) metaStr = `${ms.start} → ${ms.current} → ${ms.target}`;
+                        else if (ms.type === 'numeric' && ms.current !== undefined && ms.target !== undefined) metaStr = `${ms.current} → ${ms.target}`;
+                        else if (ms.type === 'progress') metaStr = `${ms.progress || 0}%`;
+                        else if (ms.due) { const d = new Date(ms.due); metaStr = d.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' }); }
+                        html += `
+                            <div class="roadmap-node ${nodeClass}" data-ms-id="${ms.id}" data-track-id="${track.id}" draggable="true"
+                                onclick="if(!this.classList.contains('dragging'))window.openMilestoneDrawer('${ms.id}')">
+                                <div class="roadmap-circle" style="${achieved || inProgress ? `background:${color};border-color:${color};` : `border-color:${color};`}">${achieved ? '✓' : (inProgress ? '●' : '○')}</div>
+                                <div class="roadmap-label">${escapeHtml(ms.title)}</div>
+                                ${metaStr ? `<div class="roadmap-meta">${metaStr}</div>` : ''}
+                            </div>
+                        `;
+                        if (index < msList.length - 1) {
+                            const nextAchieved = msList[index + 1].status === 'achieved';
+                            let cc = '';
+                            if (achieved && nextAchieved) cc = 'done';
+                            else if (achieved && !nextAchieved) cc = 'current';
+                            else if (!achieved && inProgress) cc = 'current';
+                            html += `<div class="roadmap-connector ${cc}" style="${cc === 'done' ? `background:${color};` : ''}"></div>`;
+                        }
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                html += `<div class="section"><div class="section-header"><div class="section-title">任務</div></div>`;
+                if (allTasks.length === 0) {
+                    html += `<div class="empty-section"><span class="empty-text">目前沒有任務。</span></div>`;
+                } else {
+                    html += `<div class="task-list-flat">`;
+                    allTasks.forEach(({ task, milestone }) => {
+                        html += `
+                            <div class="flat-task ${task.completed ? 'completed' : ''}" style="border-left:3px solid ${color};">
+                                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="window.toggleTaskFromList('${task.id}')">
+                                <div style="flex:1;min-width:200px;">
+                                    <div class="breadcrumb">
+                                        ${milestone ? `<span>${escapeHtml(milestone.title)}</span>` : `<span>未關聯里程碑</span>`}
+                                    </div>
+                                    <div class="task-name" onclick="window.openTaskDrawer('${task.id}')" style="cursor:pointer;">${escapeHtml(task.title)}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                el.innerHTML = html;
+                bindMilestoneDrag();
+            }
+
+            function renderAddTaskPanelTrack(trackId) {
+                const found = findTrackById(trackId);
+                if (!found) return '';
+                const { track } = found;
+                const msOptions = (track.milestones || []).map(ms => `<option value="${ms.id}">${escapeHtml(ms.title)}</option>`).join('');
+                return `
+                    <div class="add-task-panel">
+                        <div class="atp-title">新增任務到「${escapeHtml(track.name)}」</div>
+                        <div class="atp-row">
+                            <div class="atp-field" style="flex:2;"><label>任務名稱</label><input type="text" id="atpTTitle" placeholder="任務名稱..." autocomplete="off"></div>
+                        </div>
+                        <div class="atp-row">
+                            <div class="atp-field"><label>關聯里程碑（可選）</label><select id="atpTMs"><option value="">不關聯</option>${msOptions}</select></div>
+                            <div class="atp-field"><label>開始日（可選）</label><input type="date" id="atpTStart"></div>
+                            <div class="atp-field"><label>截止日（可選）</label><input type="date" id="atpTDue"></div>
+                        </div>
+                        <div class="atp-row">
+                            <div class="atp-field"><label>排程開始（可選）</label><input type="time" id="atpTSchStart"></div>
+                            <div class="atp-field"><label>排程結束（可選）</label><input type="time" id="atpTSchEnd"></div>
+                            <div class="atp-field"><label>預估時間（分鐘）</label><input type="number" id="atpTEstimate" value="0" min="0"></div>
+                            <div class="atp-field"><label>優先級</label>
+                                <select id="atpTPriority">
+                                    <option value="medium">中</option>
+                                    <option value="high">高</option>
+                                    <option value="low">低</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="atp-actions">
+                            <button class="primary" onclick="window.submitAddTaskPanelTrack()">新增</button>
+                            <button onclick="window.toggleAddTaskPanelTrack('${trackId}')">取消</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function getTrackMinutesOnDay(track, dayKey) {
+                let minutes = 0;
+                (track.tasks || []).forEach(t => {
+                    if (t.completed) return;
+                    if (t.schedule && t.schedule.length > 0) {
+                        t.schedule.forEach(sch => {
+                            const start = new Date(sch.start);
+                            const end = new Date(sch.end);
+                            if (dateKey(start) === dayKey) {
+                                minutes += (end - start) / 60000;
+                            }
+                        });
+                        return;
+                    }
+                    const start = parseDate(t.startDate) || parseDate(t.dueDate);
+                    const end = parseDate(t.dueDate) || parseDate(t.startDate);
+                    if (!start || !end) return;
+                    if (dayKey < dateKey(start) || dayKey > dateKey(end)) return;
+                    const totalDays = Math.round((end - start) / 86400000) + 1;
+                    if (totalDays <= 0) return;
+                    minutes += (t.estimatedTime || 0) / totalDays;
+                });
+                return minutes;
+            }
+
+            function renderTimeline() {
+                const el = document.getElementById('timelineContent');
+                let allDays = [];
+                let rangeLabel = '';
+
+                if (tlView === 'week') {
+                    const start = startOfWeek(tlAnchor);
+                    const totalDays = 7 * tlWeekCount;
+                    for (let i = 0; i < totalDays; i++) allDays.push(addDays(start, i));
+                    const end = allDays[allDays.length - 1];
+                    rangeLabel = `${start.getMonth() + 1}/${start.getDate()} – ${end.getMonth() + 1}/${end.getDate()}`;
+                } else {
+                    const start = new Date(tlAnchor.getFullYear(), tlAnchor.getMonth(), 1);
+                    const end = new Date(tlAnchor.getFullYear(), tlAnchor.getMonth() + tlMonthCount, 0);
+                    for (let d = new Date(start); d <= end; d = addDays(d, 1)) allDays.push(new Date(d));
+                    rangeLabel = `${start.getFullYear()}年${start.getMonth() + 1}月 – ${end.getFullYear()}年${end.getMonth() + 1}月`;
+                }
+                document.getElementById('tlDateRange').textContent = rangeLabel;
+
+                const todayKey = dateKey(new Date());
+                const tracks = [];
+                areas.forEach(area => {
+                    if (tlAreaId !== 'all' && area.id !== tlAreaId) return;
+                    area.tracks.forEach(track => tracks.push({ track, area }));
+                });
+
+                let groups = [];
+                if (tlView === 'week') {
+                    for (let w = 0; w < tlWeekCount; w++) {
+                        const weekDays = allDays.slice(w * 7, (w + 1) * 7);
+                        groups.push({ days: weekDays, label: null });
+                    }
+                } else {
+                    let currentMonth = null;
+                    let currentGroup = null;
+                    allDays.forEach(d => {
+                        const monthKey = d.getFullYear() + '-' + d.getMonth();
+                        if (monthKey !== currentMonth) {
+                            currentMonth = monthKey;
+                            currentGroup = { days: [], label: `${d.getFullYear()}年${d.getMonth() + 1}月` };
+                            groups.push(currentGroup);
+                        }
+                        currentGroup.days.push(d);
+                    });
+                }
+
+                let html = `<div class="timeline-wrapper"><div class="timeline-scroll">`;
+                if (tracks.length === 0) {
+                    html += `<div class="empty-state" style="text-align:center;padding:2rem;color:var(--brown-mute);font-style:italic;">沒有軌道可以顯示。</div>`;
+                } else {
+                    groups.forEach((group, groupIdx) => {
+                        const days = group.days;
+                        const groupStartKey = dateKey(days[0]);
+                        const groupEndKey = dateKey(days[days.length - 1]);
+                        const minCol = tlView === 'month' ? '10px' : '50px';
+                        if (group.label) {
+                            html += `<div class="timeline-month-label">${group.label}</div>`;
+                        }
+                        html += `<div class="timeline-grid" style="margin-bottom:${groupIdx < groups.length - 1 ? '2rem' : '0'};${tlView === 'month' ? 'grid-template-columns:80px 1fr;' : ''}">`;
+                        html += `<div class="timeline-header-row" style="${tlView === 'month' ? 'grid-template-columns:80px 1fr;' : ''}"><div></div><div class="timeline-header-days" style="grid-template-columns: repeat(${days.length}, minmax(${minCol}, 1fr));">`;
+                        days.forEach(d => {
+                            const isToday = dateKey(d) === todayKey;
+                            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+                            if (tlView === 'month' && days.length > 20 && d.getDate() % 2 !== 0 && d.getDate() !== 1) {
+                                html += `<div class="timeline-day-header ${isToday ? 'today' : ''}"><span class="day-name" style="opacity:0.3;">${dayNames[d.getDay()]}</span></div>`;
+                            } else {
+                                html += `<div class="timeline-day-header ${isToday ? 'today' : ''}"><span class="day-name">${dayNames[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></div>`;
+                            }
+                        });
+                        html += `</div></div>`;
+
+                        tracks.forEach(({ track, area }) => {
+                            const color = track.color || TRACK_COLORS[0];
+                            const tasks = track.tasks || [];
+
+                            html += `<div class="timeline-track-row">`;
+                            html += `<div class="timeline-track-name"><span class="dot" style="background:${color};"></span>${escapeHtml(track.name)}${tlAreaId === 'all' ? `<span class="area-tag">${escapeHtml(area.name)}</span>` : ''}</div>`;
+                            html += `<div class="timeline-track-bars" style="grid-template-columns: repeat(${days.length}, minmax(${minCol}, 1fr));">`;
+                            html += `<div class="timeline-day-grid" style="grid-template-columns: repeat(${days.length}, 1fr); grid-column: 1 / -1;">`;
+                            days.forEach(d => html += `<div class="${dateKey(d) === todayKey ? 'today' : ''}"></div>`);
+                            html += `</div>`;
+                            const todayIndex = days.findIndex(d => dateKey(d) === todayKey);
+                            if (todayIndex >= 0) html += `<div class="timeline-today-line" style="left: ${((todayIndex + 0.5) / days.length) * 100}%;"></div>`;
+
+                            tasks.forEach(task => {
+                                const taskStart = parseDate(task.startDate) || parseDate(task.dueDate);
+                                const taskEnd = parseDate(task.dueDate) || parseDate(task.startDate);
+                                if (!taskStart || !taskEnd) return;
+                                const taskStartKey = dateKey(taskStart);
+                                const taskEndKey = dateKey(taskEnd);
+
+                                // 判斷這個任務是否跟這一組有重疊
+                                if (taskEndKey < groupStartKey || taskStartKey > groupEndKey) return;
+
+                                // 把任務的起點和終點裁剪到這一組的範圍內
+                                const visibleStartKey = taskStartKey < groupStartKey ? groupStartKey : taskStartKey;
+                                const visibleEndKey = taskEndKey > groupEndKey ? groupEndKey : taskEndKey;
+
+                                // 找到對應的 index
+                                let startIdx = days.findIndex(d => dateKey(d) === visibleStartKey);
+                                let endIdx = days.findIndex(d => dateKey(d) === visibleEndKey);
+
+                                // 如果找不到（可能跨月或跨週的邊界），用 >= 找第一個符合的
+                                if (startIdx === -1) {
+                                    startIdx = days.findIndex(d => dateKey(d) >= visibleStartKey);
+                                }
+                                if (endIdx === -1) {
+                                    endIdx = days.findIndex(d => dateKey(d) >= visibleEndKey);
+                                }
+                                // 如果還是找不到，退回到該組的最後一天
+                                if (startIdx === -1) startIdx = 0;
+                                if (endIdx === -1) endIdx = days.length - 1;
+                                if (endIdx < startIdx) return;
+
+                                const span = endIdx - startIdx + 1;
+                                // 判斷是否被裁切
+                                const isContinuedLeft = taskStartKey < groupStartKey;
+                                const isContinuedRight = taskEndKey > groupEndKey;
+                                let extraClass = '';
+                                if (isContinuedLeft) extraClass += ' continued-left';
+                                if (isContinuedRight) extraClass += ' continued-right';
+
+                                html += `<div class="timeline-task-bar ${task.completed ? 'completed' : ''}${extraClass}" style="grid-column: ${startIdx + 1} / span ${span};background:${color};" onclick="window.openTaskDrawer('${task.id}')">${escapeHtml(task.title)}</div>`;
+                            });
+
+                            html += `</div></div>`;
+                        });
+                        html += `</div>`;
+                    });
+                }
+
+                const unscheduled = [];
+                areas.forEach(area => {
+                    if (tlAreaId !== 'all' && area.id !== tlAreaId) return;
+                    (area.unassignedTasks || []).forEach(t => { if (!t.completed && !t.startDate && !t.dueDate && (!t.schedule || t.schedule.length === 0)) unscheduled.push({ task: t }); });
+                    area.tracks.forEach(track => {
+                        (track.tasks || []).forEach(t => { if (!t.completed && !t.startDate && !t.dueDate && (!t.schedule || t.schedule.length === 0)) unscheduled.push({ task: t }); });
+                    });
+                });
+                html += `<div class="unscheduled-area"><div class="unscheduled-title">未排程</div>`;
+                if (unscheduled.length === 0) html += `<div style="font-size:0.75rem;color:var(--brown-mute);font-style:italic;">沒有未排程的任務。</div>`;
+                else {
+                    html += `<div class="unscheduled-list">`;
+                    unscheduled.forEach(({ task }) => html += `<div class="unscheduled-item" onclick="window.openTaskDrawer('${task.id}')">○ ${escapeHtml(task.title)}</div>`);
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                html += `<div class="capacity-section"><div class="capacity-title">時間容量</div><div class="capacity-note">若有排程優先用排程時長，否則預估總時數平均分攤到任務跨越的每一天</div><div class="capacity-rows">`;
+                allDays.forEach(d => {
+                    const key = dateKey(d);
+                    let totalMinutes = 0;
+                    tracks.forEach(({ track }) => {
+                        totalMinutes += getTrackMinutesOnDay(track, key);
+                    });
+                    const pct = Math.min(150, Math.round((totalMinutes / 480) * 100));
+                    const over = pct > 100;
+                    const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+                    const hoursText = (totalMinutes / 60).toFixed(1) + 'h';
+                    html += `<div class="capacity-row"><span>${d.getMonth() + 1}/${d.getDate()} (${dayNames[d.getDay()]})</span><div class="capacity-bar-bg"><div class="capacity-bar-fill ${over ? 'over' : ''}" style="width: ${Math.min(100, pct)}%;"></div></div><span class="capacity-label ${over ? 'over' : ''}">${hoursText} · ${pct}%</span></div>`;
+                });
+                html += `</div></div>`;
+
+                html += `</div></div>`;
+                el.innerHTML = html;
+            }
+
+            function renderCalendar() {
+                const el = document.getElementById('calendarContent');
+                const todayKey = dateKey(new Date());
+                const tracks = [];
+                areas.forEach(area => {
+                    if (calAreaId !== 'all' && area.id !== calAreaId) return;
+                    area.tracks.forEach(track => tracks.push({ track, area }));
+                });
+
+                let html = '';
+                let unscheduled = [];
+                areas.forEach(area => {
+                    if (calAreaId !== 'all' && area.id !== calAreaId) return;
+                    (area.unassignedTasks || []).forEach(t => { if (!t.completed && !t.startDate && !t.dueDate && (!t.schedule || t.schedule.length === 0)) unscheduled.push({ task: t }); });
+                    area.tracks.forEach(track => {
+                        (track.tasks || []).forEach(t => { if (!t.completed && !t.startDate && !t.dueDate && (!t.schedule || t.schedule.length === 0)) unscheduled.push({ task: t }); });
+                    });
+                });
+
+                if (calView === 'day') {
+                    const d = calAnchor;
+                    document.getElementById('calDateRange').textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+                    let blocks = [];
+                    tracks.forEach(({ track }) => {
+                        const color = track.color || TRACK_COLORS[0];
+                        (track.tasks || []).forEach(task => {
+                            (task.schedule || []).forEach(sch => {
+                                const start = new Date(sch.start);
+                                if (dateKey(start) === dateKey(d)) blocks.push({ task, start: new Date(sch.start), end: new Date(sch.end), color });
+                            });
+                        });
+                    });
+                    html += `<div class="calendar-wrapper"><div class="cal-day-grid">`;
+                    for (let h = 0; h < 24; h++) {
+                        html += `<div class="cal-hour-label">${String(h).padStart(2, '0')}:00</div>`;
+                        html += `<div class="cal-hour-cell" data-hour="${h}">`;
+                        blocks.forEach(b => {
+                            if (b.start.getHours() === h) {
+                                const topPct = (b.start.getMinutes() / 60) * 100;
+                                const durationMin = (b.end - b.start) / 60000;
+                                const heightPx = (durationMin / 60) * 48;
+                                html += `<div class="cal-time-block ${b.task.completed ? 'completed' : ''}" style="top: ${topPct}%; height: ${heightPx}px;background:${b.color};" onclick="event.stopPropagation();window.openTaskDrawer('${b.task.id}')">${escapeHtml(b.task.title)}</div>`;
+                            }
+                        });
+                        html += `</div>`;
+                    }
+                    const now = new Date();
+                    if (dateKey(now) === dateKey(d)) {
+                        const totalMin = now.getHours() * 60 + now.getMinutes();
+                        html += `<div class="cal-now-line" style="top: ${(totalMin / 60) * 48}px;"></div>`;
+                    }
+                    html += `</div>`;
+                    html += `<div class="unscheduled-area"><div class="unscheduled-title">未排程</div>`;
+                    if (unscheduled.length === 0) html += `<div style="font-size:0.75rem;color:var(--brown-mute);font-style:italic;">沒有未排程的任務。</div>`;
+                    else {
+                        html += `<div class="unscheduled-list">`;
+                        unscheduled.forEach(({ task }) => html += `<div class="unscheduled-item" onclick="window.openTaskDrawer('${task.id}')">○ ${escapeHtml(task.title)}</div>`);
+                        html += `</div>`;
+                    }
+                    html += `</div></div>`;
+                } else if (calView === 'week') {
+                    const start = startOfWeek(calAnchor);
+                    const days = [];
+                    for (let i = 0; i < 7; i++) days.push(addDays(start, i));
+                    document.getElementById('calDateRange').textContent = `${start.getMonth() + 1}/${start.getDate()} – ${days[6].getMonth() + 1}/${days[6].getDate()}`;
+                    let allBlocks = [];
+                    tracks.forEach(({ track }) => {
+                        const color = track.color || TRACK_COLORS[0];
+                        (track.tasks || []).forEach(task => {
+                            (task.schedule || []).forEach(sch => allBlocks.push({ task, start: new Date(sch.start), end: new Date(sch.end), color }));
+                        });
+                    });
+                    html += `<div class="calendar-wrapper"><div class="cal-week-grid">`;
+                    html += `<div></div>`;
+                    days.forEach(d => {
+                        const isToday = dateKey(d) === todayKey;
+                        const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+                        html += `<div class="cal-week-header ${isToday ? 'today' : ''}"><span class="day-name">${dayNames[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></div>`;
+                    });
+                    for (let h = 8; h < 22; h++) {
+                        html += `<div class="cal-hour-label">${String(h).padStart(2, '0')}:00</div>`;
+                        days.forEach(d => {
+                            html += `<div class="cal-week-cell">`;
+                            allBlocks.forEach(b => {
+                                if (dateKey(b.start) === dateKey(d) && b.start.getHours() === h) {
+                                    const durationMin = (b.end - b.start) / 60000;
+                                    const heightPx = Math.max(14, (durationMin / 60) * 40);
+                                    html += `<div class="cal-week-block" style="height:${heightPx}px;background:${b.color};" onclick="event.stopPropagation();window.openTaskDrawer('${b.task.id}')">${escapeHtml(b.task.title)}</div>`;
+                                }
+                            });
+                            html += `</div>`;
+                        });
+                    }
+                    html += `</div>`;
+                    html += `<div class="unscheduled-area"><div class="unscheduled-title">未排程</div>`;
+                    if (unscheduled.length === 0) html += `<div style="font-size:0.75rem;color:var(--brown-mute);font-style:italic;">沒有未排程的任務。</div>`;
+                    else {
+                        html += `<div class="unscheduled-list">`;
+                        unscheduled.forEach(({ task }) => html += `<div class="unscheduled-item" onclick="window.openTaskDrawer('${task.id}')">○ ${escapeHtml(task.title)}</div>`);
+                        html += `</div>`;
+                    }
+                    html += `</div></div>`;
+                } else {
+                    const year = calAnchor.getFullYear();
+                    const month = calAnchor.getMonth();
+                    document.getElementById('calDateRange').textContent = `${year}年${month + 1}月`;
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    const startDay = firstDay.getDay();
+                    let taskDates = {};
+                    let msDates = {};
+                    tracks.forEach(({ track }) => {
+                        const color = track.color || TRACK_COLORS[0];
+                        (track.tasks || []).forEach(t => {
+                            const start = parseDate(t.startDate) || parseDate(t.dueDate);
+                            const end = parseDate(t.dueDate) || parseDate(t.startDate);
+                            if (!start || !end) return;
+                            for (let d = new Date(start); d <= end; d = addDays(d, 1)) {
+                                const k = dateKey(d);
+                                if (!taskDates[k]) taskDates[k] = [];
+                                taskDates[k].push({ task: t, color });
+                            }
+                        });
+                        (track.milestones || []).forEach(ms => {
+                            if (!ms.due) return;
+                            const k = dateKey(parseDate(ms.due));
+                            if (!msDates[k]) msDates[k] = [];
+                            msDates[k].push({ milestone: ms, color });
+                        });
+                    });
+                    html += `<div class="calendar-wrapper"><div class="cal-month-grid">`;
+                    const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+                    dayNames.forEach(n => html += `<div class="cal-month-header">${n}</div>`);
+                    for (let i = 0; i < startDay; i++) html += `<div></div>`;
+                    for (let d = 1; d <= lastDay.getDate(); d++) {
+                        const dt = new Date(year, month, d);
+                        const k = dateKey(dt);
+                        const isToday = k === todayKey;
+                        const dayTasks = taskDates[k] || [];
+                        const dayMs = msDates[k] || [];
+                        html += `<div class="cal-month-day ${isToday ? 'today' : ''}"><div class="day-num">${d}</div>`;
+                        dayMs.slice(0, 2).forEach(item => {
+                            html += `<div class="cal-month-ms">◆ ${escapeHtml(item.milestone.title)}</div>`;
+                        });
+                        dayTasks.slice(0, 3).forEach(item => {
+                            html += `<div class="cal-month-task" style="border-left:3px solid ${item.color};padding-left:3px;">${escapeHtml(item.task.title)}</div>`;
+                        });
+                        if (dayTasks.length > 3) {
+                            html += `<div class="cal-month-task" style="color:var(--brown-mute);">+ ${dayTasks.length - 3} 更多</div>`;
+                        }
+                        html += `</div>`;
+                    }
+                    html += `</div></div>`;
+                }
+                el.innerHTML = html;
+            }
+
+            function renderInsights() {
+                const el = document.getElementById('insightsContent');
+                let totalTasks = 0, completedTasks = 0, overdueTasks = 0;
+                let totalMilestones = 0, achievedMilestones = 0;
+                let totalEstimated = 0, totalActual = 0;
+                let statusDist = { 'not-started': 0, 'in-progress': 0, 'paused': 0, 'blocked': 0, 'completed': 0, 'cancelled': 0 };
+
+                areas.forEach(area => {
+                    if (insightsAreaId !== 'all' && area.id !== insightsAreaId) return;
+                    const allTasks = [];
+                    (area.unassignedTasks || []).forEach(t => allTasks.push(t));
+                    area.tracks.forEach(track => {
+                        (track.tasks || []).forEach(t => allTasks.push(t));
+                        (track.milestones || []).forEach(ms => {
+                            totalMilestones++;
+                            if (ms.status === 'achieved') achievedMilestones++;
+                        });
+                    });
+                    const today = new Date(new Date().toDateString());
+                    allTasks.forEach(t => {
+                        totalTasks++;
+                        if (t.completed) completedTasks++;
+                        if (!t.completed && t.dueDate && new Date(t.dueDate) < today) overdueTasks++;
+                        totalEstimated += t.estimatedTime || 0;
+                        totalActual += t.actualTime || 0;
+                        statusDist[t.status] = (statusDist[t.status] || 0) + 1;
+                    });
+                });
+
+                const completionRate = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+                const milestoneRate = totalMilestones === 0 ? 0 : Math.round((achievedMilestones / totalMilestones) * 100);
+
+                let html = `
+                    <div class="insight-grid">
+                        <div class="insight-card"><div class="ic-value">${completionRate}%</div><div class="ic-label">任務完成率</div></div>
+                        <div class="insight-card"><div class="ic-value">${completedTasks} / ${totalTasks}</div><div class="ic-label">已完成任務</div></div>
+                        <div class="insight-card"><div class="ic-value">${overdueTasks}</div><div class="ic-label">逾期任務</div></div>
+                        <div class="insight-card"><div class="ic-value">${milestoneRate}%</div><div class="ic-label">里程碑達成率</div></div>
+                        <div class="insight-card"><div class="ic-value">${achievedMilestones} / ${totalMilestones}</div><div class="ic-label">已達成里程碑</div></div>
+                        <div class="insight-card"><div class="ic-value">${Math.round(totalEstimated / 60)}h</div><div class="ic-label">預估總時數</div></div>
+                        <div class="insight-card"><div class="ic-value">${Math.round(totalActual / 60)}h</div><div class="ic-label">實際總時數</div></div>
+                    </div>
+                `;
+
+                const statusLabels = { 'not-started': '未開始', 'in-progress': '進行中', 'paused': '暫停', 'blocked': '阻塞', 'completed': '已完成', 'cancelled': '取消' };
+                html += `<div class="chart-container"><div class="chart-title">任務狀態分佈</div><div class="bar-chart">`;
+                Object.keys(statusDist).forEach(key => {
+                    const count = statusDist[key];
+                    const pct = totalTasks === 0 ? 0 : (count / totalTasks) * 100;
+                    html += `<div class="bar-chart-item"><div class="bar-chart-value">${count}</div><div class="bar-chart-bar" style="height: ${Math.max(2, pct)}%;"></div><div class="bar-chart-label">${statusLabels[key]}</div></div>`;
+                });
+                html += `</div></div>`;
+
+                html += `<div class="chart-container"><div class="chart-title">各領域任務數</div><div class="bar-chart">`;
+                const filteredAreas = areas.filter(a => insightsAreaId === 'all' || a.id === insightsAreaId);
+                const maxAreaTasks = Math.max(1, ...filteredAreas.map(a => {
+                    let count = (a.unassignedTasks || []).length;
+                    a.tracks.forEach(t => { count += (t.tasks || []).length; });
+                    return count;
+                }));
+                filteredAreas.forEach(area => {
+                    let count = (area.unassignedTasks || []).length;
+                    area.tracks.forEach(t => { count += (t.tasks || []).length; });
+                    const pct = (count / maxAreaTasks) * 100;
+                    html += `<div class="bar-chart-item"><div class="bar-chart-value">${count}</div><div class="bar-chart-bar" style="height: ${Math.max(2, pct)}%;"></div><div class="bar-chart-label">${escapeHtml(area.name)}</div></div>`;
+                });
+                html += `</div></div>`;
+
+                el.innerHTML = html;
+            }
+
+            window.openTaskDrawer = function(taskId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const { task, track, area } = found;
+                document.getElementById('drawerTitle').textContent = '任務詳情';
+
+                const statusOptions = [
+                    { value: 'not-started', label: '未開始' },
+                    { value: 'in-progress', label: '進行中' },
+                    { value: 'paused', label: '暫停' },
+                    { value: 'blocked', label: '阻塞' },
+                    { value: 'completed', label: '已完成' },
+                    { value: 'cancelled', label: '取消' }
+                ];
+                const priorityOptions = [
+                    { value: 'high', label: '高' }, { value: 'medium', label: '中' }, { value: 'low', label: '低' }
+                ];
+
+                let subtasksHtml = '';
+                (task.subtasks || []).forEach(st => {
+                    subtasksHtml += `
+                        <div class="subtask-row ${st.completed ? 'completed' : ''}">
+                            <input type="checkbox" class="task-checkbox" ${st.completed ? 'checked' : ''} onchange="window.toggleSubtaskInDrawer('${task.id}', '${st.id}')" style="width:14px;height:14px;">
+                            <span class="st-title">${escapeHtml(st.title)}</span>
+                            <button class="st-del" onclick="window.deleteSubtaskInDrawer('${task.id}', '${st.id}')">✕</button>
+                        </div>
+                    `;
+                });
+
+                let msOptions = '';
+                if (track) {
+                    (track.milestones || []).forEach(ms => {
+                        const checked = (task.milestoneIds || []).includes(ms.id);
+                        msOptions += `
+                            <label class="milestone-checkbox-row">
+                                <input type="checkbox" ${checked ? 'checked' : ''} onchange="window.toggleMilestoneForTask('${task.id}', '${ms.id}')">
+                                <span>${escapeHtml(ms.title)}</span>
+                            </label>
+                        `;
+                    });
+                }
+
+                const schStart = (task.schedule && task.schedule[0]) ? task.schedule[0].start : '';
+                const schEnd = (task.schedule && task.schedule[0]) ? task.schedule[0].end : '';
+
+                document.getElementById('drawerBody').innerHTML = `
+                    <div class="autosave-note">修改會自動儲存</div>
+                    <div class="drawer-field"><div class="drawer-label">標題</div><input class="drawer-input" id="dTaskTitle" value="${escapeHtml(task.title)}" onchange="window.autoSaveTaskField('${task.id}', 'title', this.value)"></div>
+                    <div class="drawer-field"><div class="drawer-label">描述</div><textarea class="drawer-textarea" id="dTaskDesc" onchange="window.autoSaveTaskField('${task.id}', 'description', this.value)">${escapeHtml(task.description || '')}</textarea></div>
+                    <div class="drawer-field"><div class="drawer-label">狀態</div><select class="drawer-select" id="dTaskStatus" onchange="window.autoSaveTaskField('${task.id}', 'status', this.value)">${statusOptions.map(o => `<option value="${o.value}" ${task.status === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}</select></div>
+                    <div class="drawer-field"><div class="drawer-label">優先級</div><select class="drawer-select" id="dTaskPriority" onchange="window.autoSaveTaskField('${task.id}', 'priority', this.value)">${priorityOptions.map(o => `<option value="${o.value}" ${task.priority === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}</select></div>
+                    <div class="drawer-field"><div class="drawer-label">所屬</div><div style="font-size:0.82rem;color:var(--brown-soft);">${escapeHtml(area.name)}${track ? ` · ${escapeHtml(track.name)}` : ' · 未分類'}</div></div>
+                    <div class="drawer-field"><div class="drawer-label">開始日（清空即為未排程）</div><input class="drawer-input" type="date" id="dTaskStart" value="${task.startDate || ''}" onchange="window.autoSaveTaskField('${task.id}', 'startDate', this.value)"></div>
+                    <div class="drawer-field"><div class="drawer-label">截止日（清空即為未排程）</div><input class="drawer-input" type="date" id="dTaskDue" value="${task.dueDate || ''}" onchange="window.autoSaveTaskField('${task.id}', 'dueDate', this.value)"></div>
+                    <div class="drawer-field"><div class="drawer-label">排程（可選，會顯示在日曆）</div>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <input class="drawer-input" type="datetime-local" id="dTaskSchStart" style="flex:1;min-width:150px;" value="${schStart}" onchange="window.autoSaveTaskSchedule('${task.id}')">
+                            <input class="drawer-input" type="datetime-local" id="dTaskSchEnd" style="flex:1;min-width:150px;" value="${schEnd}" onchange="window.autoSaveTaskSchedule('${task.id}')">
+                        </div>
+                    </div>
+                    <div class="drawer-field"><div class="drawer-label">預估時間（分鐘）</div><input class="drawer-input" type="number" id="dTaskEstimate" value="${task.estimatedTime || 0}" onchange="window.autoSaveTaskField('${task.id}', 'estimatedTime', parseInt(this.value)||0)"></div>
+                    <div class="drawer-field"><div class="drawer-label">實際時間（分鐘）</div><input class="drawer-input" type="number" id="dTaskActual" value="${task.actualTime || 0}" onchange="window.autoSaveTaskField('${task.id}', 'actualTime', parseInt(this.value)||0)"></div>
+                    <div class="drawer-field"><div class="drawer-label">標籤（以逗號分隔）</div><input class="drawer-input" id="dTaskTags" value="${(task.tags || []).join(', ')}" onchange="window.autoSaveTaskField('${task.id}', 'tags', this.value.split(',').map(s=>s.trim()).filter(s=>s))"></div>
+                    ${track ? `<div class="drawer-field"><div class="drawer-label">關聯里程碑</div><div>${msOptions || '<div style="font-size:0.75rem;color:var(--brown-mute);font-style:italic;">這條軌道沒有里程碑</div>'}</div></div>` : ''}
+                    <div class="drawer-field"><div class="drawer-label">子任務</div><div id="dSubtasks">${subtasksHtml || '<div style="font-size:0.75rem;color:var(--brown-mute);font-style:italic;">沒有子任務</div>'}</div><button class="empty-add-btn" style="margin-top:0.5rem;" onclick="window.addSubtaskInDrawer('${task.id}')">＋ 新增子任務</button></div>
+                    <div class="drawer-actions">
+                        <button class="drawer-btn" onclick="window.duplicateTask('${task.id}')">複製</button>
+                        <button class="drawer-btn" onclick="window.toggleTaskComplete('${task.id}')">${task.completed ? '標記未完成' : '標記完成'}</button>
+                        <button class="drawer-btn danger" onclick="window.deleteTaskFromDrawer('${task.id}')">刪除</button>
+                    </div>
+                `;
+                showDrawer();
+            };
+
+            window.autoSaveTaskField = function(taskId, field, value) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const { task } = found;
+                if (field === 'title') task.title = value.trim() || task.title;
+                else if (field === 'description') task.description = value;
+                else if (field === 'status') { task.status = value; task.completed = value === 'completed'; }
+                else if (field === 'priority') task.priority = value;
+                else if (field === 'startDate') task.startDate = value;
+                else if (field === 'dueDate') task.dueDate = value;
+                else if (field === 'estimatedTime') task.estimatedTime = value;
+                else if (field === 'actualTime') task.actualTime = value;
+                else if (field === 'tags') task.tags = value;
+                save(); renderAll();
+            };
+
+            window.autoSaveTaskSchedule = function(taskId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const { task } = found;
+                const schStart = document.getElementById('dTaskSchStart').value;
+                const schEnd = document.getElementById('dTaskSchEnd').value;
+                if (schStart && schEnd) task.schedule = [{ id: generateId(), start: schStart, end: schEnd }];
+                else task.schedule = [];
+                save(); renderAll();
+            };
+
+            window.openMilestoneDrawer = function(msId) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                const { milestone, track, area } = found;
+                document.getElementById('drawerTitle').textContent = '里程碑詳情';
+
+                const statusOptions = [
+                    { value: 'upcoming', label: '即將到來' },
+                    { value: 'in-progress', label: '進行中' },
+                    { value: 'achieved', label: '已達成' },
+                    { value: 'overdue', label: '逾期' },
+                    { value: 'cancelled', label: '取消' }
+                ];
+                const typeOptions = [
+                    { value: 'binary', label: '二元（達成 / 未達成）' },
+                    { value: 'numeric', label: '數值（起始 → 當前 → 目標）' },
+                    { value: 'progress', label: '進度（0-100%）' }
+                ];
+
+                let typeSpecificHtml = '';
+                if (milestone.type === 'numeric') {
+                    let autoProgress = 0;
+                    if (milestone.start !== undefined && milestone.current !== undefined && milestone.target !== undefined) {
+                        const total = Math.abs(milestone.start - milestone.target);
+                        if (total > 0) {
+                            const done = Math.abs(milestone.start - milestone.current);
+                            autoProgress = Math.max(0, Math.min(100, Math.round((done / total) * 100)));
+                        }
+                    }
+                    const displayProgress = (milestone.manualProgress !== undefined && milestone.manualProgress !== null) ? milestone.manualProgress : autoProgress;
+
+                    typeSpecificHtml = `
+                        <div class="drawer-field">
+                            <div class="drawer-label">起始值 → 當前值 → 目標值</div>
+                            <div style="display:flex;gap:0.4rem;align-items:center;">
+                                <input class="drawer-input" type="number" id="dMsStart" value="${milestone.start ?? ''}" placeholder="起始" style="flex:1;" onchange="window.autoSaveMsNumeric('${msId}')">
+                                <span style="color:var(--brown-mute);">→</span>
+                                <input class="drawer-input" type="number" id="dMsCurrent" value="${milestone.current ?? ''}" placeholder="當前" style="flex:1;" onchange="window.autoSaveMsNumeric('${msId}')">
+                                <span style="color:var(--brown-mute);">→</span>
+                                <input class="drawer-input" type="number" id="dMsTarget" value="${milestone.target ?? ''}" placeholder="目標" style="flex:1;" onchange="window.autoSaveMsNumeric('${msId}')">
+                            </div>
+                            <div class="calc-note">自動進度：${autoProgress}%（公式：|起始 - 當前| / |起始 - 目標|）</div>
+                        </div>
+                        <div class="drawer-field">
+                            <div class="drawer-label">手動微調進度（留空則用自動計算）</div>
+                            <input type="range" min="0" max="100" value="${displayProgress}" class="progress-slider" id="dMsProgress" oninput="document.getElementById('dMsProgressVal').textContent=this.value+'%';window.autoSaveMsProgress('${msId}', this.value)">
+                            <div class="progress-value" id="dMsProgressVal">${displayProgress}%</div>
+                            <button class="empty-add-btn" style="margin-top:0.5rem;font-size:0.6rem;" onclick="window.clearMsManualProgress('${msId}')">清除手動微調（回歸自動計算）</button>
+                        </div>
+                    `;
+                } else if (milestone.type === 'progress') {
+                    typeSpecificHtml = `
+                        <div class="drawer-field">
+                            <div class="drawer-label">進度</div>
+                            <input type="range" min="0" max="100" value="${milestone.progress || 0}" class="progress-slider" id="dMsProgress" oninput="document.getElementById('dMsProgressVal').textContent=this.value+'%';window.autoSaveMsProgress('${msId}', this.value)">
+                            <div class="progress-value" id="dMsProgressVal">${milestone.progress || 0}%</div>
+                        </div>
+                    `;
+                } else {
+                    typeSpecificHtml = `
+                        <div class="drawer-field">
+                            <div class="drawer-label">達成狀態</div>
+                            <div style="font-size:0.82rem;color:var(--brown-soft);">${milestone.status === 'achieved' ? '已達成' : '未達成'}</div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('drawerBody').innerHTML = `
+                    <div class="autosave-note">修改會自動儲存</div>
+                    <div class="drawer-field"><div class="drawer-label">名稱</div><input class="drawer-input" id="dMsTitle" value="${escapeHtml(milestone.title)}" onchange="window.autoSaveMsField('${msId}', 'title', this.value)"></div>
+                    <div class="drawer-field"><div class="drawer-label">類型</div><select class="drawer-select" id="dMsType" onchange="window.autoSaveMsType('${msId}', this.value)">${typeOptions.map(o => `<option value="${o.value}" ${milestone.type === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}</select></div>
+                    ${typeSpecificHtml}
+                    <div class="drawer-field"><div class="drawer-label">狀態</div><select class="drawer-select" id="dMsStatus" onchange="window.autoSaveMsField('${msId}', 'status', this.value)">${statusOptions.map(o => `<option value="${o.value}" ${milestone.status === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}</select></div>
+                    <div class="drawer-field"><div class="drawer-label">所屬</div><div style="font-size:0.82rem;color:var(--brown-soft);">${escapeHtml(area.name)} · ${escapeHtml(track.name)}</div></div>
+                    <div class="drawer-field"><div class="drawer-label">截止日</div><input class="drawer-input" type="date" id="dMsDue" value="${milestone.due || ''}" onchange="window.autoSaveMsField('${msId}', 'due', this.value)"></div>
+                    <div class="drawer-actions">
+                        <button class="drawer-btn" onclick="window.toggleMilestoneAchieved('${msId}')">${milestone.status === 'achieved' ? '標記未達成' : '標記達成'}</button>
+                        <button class="drawer-btn danger" onclick="window.deleteMilestoneFromDrawer('${msId}')">刪除</button>
+                    </div>
+                `;
+                showDrawer();
+            };
+
+            window.autoSaveMsField = function(msId, field, value) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                const ms = found.milestone;
+                if (field === 'title') ms.title = value.trim() || ms.title;
+                else if (field === 'status') ms.status = value;
+                else if (field === 'due') ms.due = value;
+                save(); renderAll();
+            };
+
+            window.autoSaveMsType = function(msId, type) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                found.milestone.type = type;
+                save(); renderAll(); window.openMilestoneDrawer(msId);
+            };
+
+            window.autoSaveMsNumeric = function(msId) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                const ms = found.milestone;
+                const startVal = document.getElementById('dMsStart').value;
+                const curVal = document.getElementById('dMsCurrent').value;
+                const tgtVal = document.getElementById('dMsTarget').value;
+                ms.start = startVal === '' ? undefined : parseFloat(startVal);
+                ms.current = curVal === '' ? undefined : parseFloat(curVal);
+                ms.target = tgtVal === '' ? undefined : parseFloat(tgtVal);
+                if (ms.start !== undefined && ms.current !== undefined && ms.target !== undefined) {
+                    const total = Math.abs(ms.start - ms.target);
+                    if (total > 0) {
+                        const done = Math.abs(ms.start - ms.current);
+                        const auto = Math.round((done / total) * 100);
+                        if (auto >= 100) ms.status = 'achieved';
+                        else if (auto > 0) ms.status = 'in-progress';
+                    }
+                }
+                save(); renderAll(); window.openMilestoneDrawer(msId);
+            };
+
+            window.autoSaveMsProgress = function(msId, value) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                const ms = found.milestone;
+                ms.manualProgress = parseInt(value) || 0;
+                ms.progress = ms.manualProgress;
+                if (ms.manualProgress === 100) ms.status = 'achieved';
+                else if (ms.status === 'achieved') ms.status = 'in-progress';
+                save(); renderAll();
+            };
+
+            window.clearMsManualProgress = function(msId) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                found.milestone.manualProgress = null;
+                save(); renderAll(); window.openMilestoneDrawer(msId);
+            };
+
+            function showDrawer() {
+                document.getElementById('drawerOverlay').classList.add('show');
+                document.getElementById('drawer').classList.add('show');
+            }
+            function hideDrawer() {
+                document.getElementById('drawerOverlay').classList.remove('show');
+                document.getElementById('drawer').classList.remove('show');
+            }
+            document.getElementById('drawerClose').addEventListener('click', hideDrawer);
+            document.getElementById('drawerOverlay').addEventListener('click', hideDrawer);
+
+            window.duplicateTask = function(taskId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const { task, track, area } = found;
+                const newTask = JSON.parse(JSON.stringify(task));
+                newTask.id = generateId();
+                newTask.completed = false;
+                newTask.status = 'not-started';
+                (newTask.subtasks || []).forEach(st => { st.id = generateId(); st.completed = false; });
+                (newTask.schedule || []).forEach(s => s.id = generateId());
+                if (track) {
+                    if (!track.tasks) track.tasks = [];
+                    track.tasks.push(newTask);
+                } else {
+                    if (!area.unassignedTasks) area.unassignedTasks = [];
+                    area.unassignedTasks.push(newTask);
+                }
+                save(); renderAll(); hideDrawer();
+            };
+
+            window.toggleTaskComplete = function(taskId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                found.task.completed = !found.task.completed;
+                found.task.status = found.task.completed ? 'completed' : 'not-started';
+                save(); renderAll(); window.openTaskDrawer(taskId);
+            };
+
+            window.deleteTaskFromDrawer = function(taskId) {
+                if (!confirm('刪除這個任務？')) return;
+                for (const area of areas) {
+                    for (const track of area.tracks) {
+                        track.tasks = (track.tasks || []).filter(t => t.id !== taskId);
+                    }
+                    area.unassignedTasks = (area.unassignedTasks || []).filter(t => t.id !== taskId);
+                }
+                save(); renderAll(); hideDrawer();
+            };
+
+            window.toggleSubtaskInDrawer = function(taskId, stId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const st = (found.task.subtasks || []).find(s => s.id === stId);
+                if (!st) return;
+                st.completed = !st.completed;
+                save(); renderAll(); window.openTaskDrawer(taskId);
+            };
+
+            window.deleteSubtaskInDrawer = function(taskId, stId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                found.task.subtasks = (found.task.subtasks || []).filter(s => s.id !== stId);
+                save(); renderAll(); window.openTaskDrawer(taskId);
+            };
+
+            window.addSubtaskInDrawer = function(taskId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const container = document.getElementById('dSubtasks');
+                if (container.querySelector('.inline-add-row')) {
+                    container.querySelector('.inline-add-row input').focus();
+                    return;
+                }
+                const row = document.createElement('div');
+                row.className = 'inline-add-row';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = '子任務名稱...';
+                const btn = document.createElement('button');
+                btn.textContent = '新增';
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = '取消';
+                cancelBtn.className = 'row-cancel';
+                row.appendChild(input);
+                row.appendChild(btn);
+                row.appendChild(cancelBtn);
+                container.appendChild(row);
+                input.focus();
+                let finished = false;
+                function finish(saveIt) {
+                    if (finished) return;
+                    finished = true;
+                    const val = input.value.trim();
+                    if (saveIt && val) {
+                        if (!found.task.subtasks) found.task.subtasks = [];
+                        found.task.subtasks.push({ id: generateId(), title: val, completed: false });
+                        save(); renderAll(); window.openTaskDrawer(taskId);
+                    } else {
+                        if (row.parentNode) row.parentNode.removeChild(row);
+                    }
+                }
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+                    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+                });
+                btn.addEventListener('click', function() { finish(true); });
+                cancelBtn.addEventListener('click', function() { finish(false); });
+            };
+
+            window.toggleMilestoneForTask = function(taskId, msId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                const { task } = found;
+                if (!task.milestoneIds) task.milestoneIds = [];
+                const idx = task.milestoneIds.indexOf(msId);
+                if (idx >= 0) task.milestoneIds.splice(idx, 1);
+                else task.milestoneIds.push(msId);
+                save(); renderAll(); window.openTaskDrawer(taskId);
+            };
+
+            window.toggleMilestoneAchieved = function(msId) {
+                const found = findMilestoneById(msId);
+                if (!found) return;
+                found.milestone.status = found.milestone.status === 'achieved' ? 'in-progress' : 'achieved';
+                save(); renderAll(); window.openMilestoneDrawer(msId);
+            };
+
+            window.deleteMilestoneFromDrawer = function(msId) {
+                if (!confirm('刪除這個里程碑？底下任務的關聯也會清除。')) return;
+                for (const area of areas) {
+                    for (const track of area.tracks) {
+                        (track.tasks || []).forEach(t => {
+                            if (t.milestoneIds) {
+                                t.milestoneIds = t.milestoneIds.filter(id => id !== msId);
+                            }
+                        });
+                        track.milestones = (track.milestones || []).filter(m => m.id !== msId);
+                    }
+                }
+                save(); renderAll(); hideDrawer();
+            };
+
+            window.toggleTaskFromList = function(taskId) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                found.task.completed = !found.task.completed;
+                found.task.status = found.task.completed ? 'completed' : 'not-started';
+                save(); renderAll();
+            };
+
+            window.openTrackDetail = function(trackId) {
+                currentTrackId = trackId;
+                switchPage('trackdetail');
+            };
+
+            window.switchPage = function(page) {
+                currentPage = page;
+                addTaskPanelOpen = false;
+                document.querySelectorAll('.nav-item[data-page]').forEach(n => {
+                    n.classList.toggle('active', n.dataset.page === page);
+                });
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById('page-' + page);
+                if (target) target.classList.add('active');
+                renderAll();
+            };
+
+            window.startEditTrackName = function(trackId) {
+                const found = findTrackById(trackId);
+                if (!found) return;
+                const el = document.getElementById('tdTrackName');
+                if (!el) return;
+                startInlineEdit(el, found.track.name, function(newName) {
+                    found.track.name = newName; save(); renderAll();
+                });
+            };
+
+            window.startEditAreaName = function(areaId) {
+                const area = areas.find(a => a.id === areaId);
+                if (!area) return;
+                const el = document.querySelector(`.area-item[data-area-id="${areaId}"] .area-name`);
+                if (!el) return;
+                startInlineEdit(el, area.name, function(newName) {
+                    area.name = newName; save(); renderAll();
+                });
+            };
+
+            window.setTrackColor = function(trackId, color) {
+                const found = findTrackById(trackId);
+                if (!found) return;
+                found.track.color = color;
+                save(); renderAll();
+            };
+
+            window.sortMilestonesByDue = function(trackId) {
+                const found = findTrackById(trackId);
+                if (!found) return;
+                found.track.milestones.sort((a, b) => {
+                    if (!a.due && !b.due) return 0;
+                    if (!a.due) return 1;
+                    if (!b.due) return -1;
+                    return new Date(a.due) - new Date(b.due);
+                });
+                save(); renderAll();
+            };
+
+            window.showAddMilestoneInline = function(trackId) {
+                const found = findTrackById(trackId);
+                if (!found) return;
+                const container = document.getElementById('trackDetailContent');
+                if (container.querySelector('.add-ms-panel')) {
+                    container.querySelector('.add-ms-panel input').focus();
+                    return;
+                }
+                const panel = document.createElement('div');
+                panel.className = 'add-task-panel add-ms-panel';
+                panel.innerHTML = `
+                    <div class="atp-title">新增里程碑</div>
+                    <div class="atp-row">
+                        <div class="atp-field" style="flex:2;"><label>名稱</label><input type="text" id="amsTitle" placeholder="里程碑名稱..." autocomplete="off"></div>
+                        <div class="atp-field"><label>類型</label>
+                            <select id="amsType">
+                                <option value="binary">二元（達成 / 未達成）</option>
+                                <option value="numeric">數值（起始 → 當前 → 目標）</option>
+                                <option value="progress">進度（0-100%）</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="atp-row">
+                        <div class="atp-field"><label>截止日（可選）</label><input type="date" id="amsDue"></div>
+                    </div>
+                    <div class="atp-actions">
+                        <button class="primary" onclick="window.submitAddMilestone('${trackId}')">新增</button>
+                        <button onclick="window.cancelAddMilestone()">取消</button>
+                    </div>
+                `;
+                container.insertBefore(panel, container.firstChild);
+                document.getElementById('amsTitle').focus();
+            };
+
+            window.submitAddMilestone = function(trackId) {
+                const found = findTrackById(trackId);
+                if (!found) return;
+                const title = document.getElementById('amsTitle').value.trim();
+                const type = document.getElementById('amsType').value;
+                const due = document.getElementById('amsDue').value;
+                if (!title) return;
+                found.track.milestones.push({
+                    id: generateId(), title: title, type: type,
+                    status: 'upcoming', progress: 0, due: due,
+                    start: undefined, current: undefined, target: undefined,
+                    manualProgress: null
+                });
+                save(); renderAll();
+            };
+
+            window.cancelAddMilestone = function() {
+                const panel = document.querySelector('.add-ms-panel');
+                if (panel) panel.remove();
+            };
+
+            window.toggleAddTaskPanelTrack = function(trackId) {
+                const key = 'track:' + trackId;
+                addTaskPanelOpen = addTaskPanelOpen === key ? false : key;
+                renderAll();
+            };
+
+            window.submitAddTaskPanelTrack = function() {
+                if (!currentTrackId) return;
+                const found = findTrackById(currentTrackId);
+                if (!found) return;
+                const { track } = found;
+                const title = document.getElementById('atpTTitle').value.trim();
+                if (!title) return;
+                const msId = document.getElementById('atpTMs').value;
+                const startDate = document.getElementById('atpTStart').value;
+                const dueDate = document.getElementById('atpTDue').value;
+                const schStart = document.getElementById('atpTSchStart').value;
+                const schEnd = document.getElementById('atpTSchEnd').value;
+                const estimate = parseInt(document.getElementById('atpTEstimate').value) || 0;
+                const priority = document.getElementById('atpTPriority').value;
+
+                const newTask = {
+                    id: generateId(), title: title, description: '', completed: false,
+                    status: 'not-started', priority: priority, tags: [],
+                    startDate: startDate, dueDate: dueDate, estimatedTime: estimate, actualTime: 0,
+                    schedule: [], milestoneIds: msId ? [msId] : [], subtasks: []
+                };
+
+                if (schStart && schEnd) {
+                    const dateStr = startDate || dueDate || dateKey(new Date());
+                    newTask.schedule.push({ id: generateId(), start: dateStr + 'T' + schStart, end: dateStr + 'T' + schEnd });
+                }
+
+                if (!track.tasks) track.tasks = [];
+                track.tasks.push(newTask);
+
+                addTaskPanelOpen = false;
+                save(); renderAll();
+            };
+
+            window.deleteTrackConfirm = function(trackId) {
+                if (!confirm('刪除這條軌道？所有里程碑和任務都會消失。')) return;
+                for (const area of areas) {
+                    area.tracks = area.tracks.filter(t => t.id !== trackId);
+                }
+                save();
+                currentTrackId = null;
+                switchPage('projects');
+            };
+
+            window.switchArea = function(areaId) {
+                activeAreaId = areaId;
+                addTaskPanelOpen = false;
+                save(); renderAll();
+            };
+
+            function addArea(name) {
+                if (!name.trim()) return;
+                const newArea = { id: generateId(), name: name.trim(), tracks: [], unassignedTasks: [] };
+                areas.push(newArea);
+                activeAreaId = newArea.id;
+                save(); renderAll();
+            }
+
+            window.showAreaAddInline = function() {
+                const container = document.getElementById('areasSublist');
+                if (container.querySelector('.area-add-inline-input')) {
+                    container.querySelector('.area-add-inline-input input').focus();
+                    return;
+                }
+                const wrapper = document.createElement('div');
+                wrapper.className = 'area-add-inline-input';
+                wrapper.style.cssText = 'margin-top:0.3rem;';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = '領域名稱...';
+                input.style.cssText = 'width:100%;padding:0.4rem 0.6rem;border:1px solid var(--champagne);border-radius:0.4rem;background:rgba(255,255,255,0.9);font-family:inherit;font-size:0.65rem;color:var(--brown);outline:none;box-shadow:0 0 0 2px rgba(212,175,55,0.15);';
+                wrapper.appendChild(input);
+                container.appendChild(wrapper);
+                input.focus();
+                let finished = false;
+                function finish(saveIt) {
+                    if (finished) return;
+                    finished = true;
+                    const val = input.value.trim();
+                    if (saveIt && val) addArea(val);
+                    else if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+                }
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+                    else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+                });
+                input.addEventListener('blur', function() { finish(true); });
+            };
+
+            window.addTrackInline = function() {
+                if (activeAreaId === null) { alert('請先選擇一個特定領域。'); return; }
+                const area = areas.find(a => a.id === activeAreaId);
+                if (!area) return;
+                const container = document.getElementById('overviewContent');
+                if (container.querySelector('.add-track-panel')) {
+                    container.querySelector('.add-track-panel input').focus();
+                    return;
+                }
+                const panel = document.createElement('div');
+                panel.className = 'add-task-panel add-track-panel';
+                panel.innerHTML = `
+                    <div class="atp-title">新增軌道到「${escapeHtml(area.name)}」</div>
+                    <div class="atp-row">
+                        <div class="atp-field" style="flex:2;"><label>軌道名稱</label><input type="text" id="atkName" placeholder="軌道名稱..." autocomplete="off"></div>
+                        <div class="atp-field"><label>顏色</label>
+                            <select id="atkColor">${TRACK_COLORS.map((c, i) => `<option value="${c}" ${i===0?'selected':''}>顏色 ${i+1}</option>`).join('')}</select>
+                        </div>
+                    </div>
+                    <div class="atp-actions">
+                        <button class="primary" onclick="window.submitAddTrack('${area.id}')">新增</button>
+                        <button onclick="window.cancelAddTrack()">取消</button>
+                    </div>
+                `;
+                container.insertBefore(panel, container.firstChild);
+                document.getElementById('atkName').focus();
+            };
+
+            window.submitAddTrack = function(areaId) {
+                const area = areas.find(a => a.id === areaId);
+                if (!area) return;
+                const name = document.getElementById('atkName').value.trim();
+                const color = document.getElementById('atkColor').value;
+                if (!name) return;
+                area.tracks.push({ id: generateId(), name: name, color: color, milestones: [], tasks: [] });
+                save(); renderAll();
+            };
+
+            window.cancelAddTrack = function() {
+                const panel = document.querySelector('.add-track-panel');
+                if (panel) panel.remove();
+            };
+
+            function bindMilestoneDrag() {
+                const nodes = document.querySelectorAll('.roadmap-node[draggable="true"]');
+                let draggedId = null;
+                let draggedTrackId = null;
+                nodes.forEach(node => {
+                    node.addEventListener('dragstart', function(e) {
+                        draggedId = this.dataset.msId;
+                        draggedTrackId = this.dataset.trackId;
+                        this.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', draggedId);
+                        e.stopPropagation();
+                    });
+                    node.addEventListener('dragend', function(e) {
+                        this.classList.remove('dragging');
+                        document.querySelectorAll('.roadmap-node').forEach(n => n.classList.remove('drag-over'));
+                        e.stopPropagation();
+                    });
+                    node.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (this.dataset.msId !== draggedId && this.dataset.trackId === draggedTrackId) this.classList.add('drag-over');
+                    });
+                    node.addEventListener('dragleave', function(e) { this.classList.remove('drag-over'); });
+                    node.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.classList.remove('drag-over');
+                        const targetId = this.dataset.msId;
+                        if (!draggedId || draggedId === targetId || this.dataset.trackId !== draggedTrackId) return;
+                        const found = findTrackById(draggedTrackId);
+                        if (!found) return;
+                        const { track } = found;
+                        const fromIdx = track.milestones.findIndex(m => m.id === draggedId);
+                        const toIdx = track.milestones.findIndex(m => m.id === targetId);
+                        if (fromIdx === -1 || toIdx === -1) return;
+                        const [moved] = track.milestones.splice(fromIdx, 1);
+                        track.milestones.splice(toIdx, 0, moved);
+                        save(); renderAll();
+                    });
+                });
+            }
+
+            function bindAreaDrag() {
+                const items = document.querySelectorAll('.area-item[draggable="true"]');
+                let draggedId = null;
+                items.forEach(item => {
+                    item.addEventListener('dragstart', function(e) {
+                        draggedId = this.dataset.areaId;
+                        this.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', draggedId);
+                    });
+                    item.addEventListener('dragend', function() {
+                        this.classList.remove('dragging');
+                        document.querySelectorAll('.area-item').forEach(t => t.classList.remove('drag-over'));
+                    });
+                    item.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        if (this.dataset.areaId !== draggedId) this.classList.add('drag-over');
+                    });
+                    item.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+                    item.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                        const targetId = this.dataset.areaId;
+                        if (!draggedId || draggedId === targetId) return;
+                        const fromIndex = areas.findIndex(a => a.id === draggedId);
+                        const toIndex = areas.findIndex(a => a.id === targetId);
+                        if (fromIndex === -1 || toIndex === -1) return;
+                        const [moved] = areas.splice(fromIndex, 1);
+                        areas.splice(toIndex, 0, moved);
+                        save(); renderAll();
+                    });
+                });
+            }
+
+            document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+                item.addEventListener('click', function() { switchPage(this.dataset.page); });
+            });
+
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterContext.status = this.dataset.filter;
+                    renderAll();
+                });
+            });
+
+            document.getElementById('mytasksAreaFilter').addEventListener('change', function() { filterContext.areaId = this.value; renderAll(); });
+            document.getElementById('projectsAreaFilter').addEventListener('change', function() { filterContext.areaId = this.value; renderAll(); });
+            document.getElementById('insightsAreaFilter').addEventListener('change', function() { insightsAreaId = this.value; renderAll(); });
+
+            document.querySelectorAll('[data-tl-view]').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('[data-tl-view]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    tlView = this.dataset.tlView;
+                    updateTlCountSelect();
+                    renderTimeline();
+                });
+            });
+            document.getElementById('tlCountSelect').addEventListener('change', function() {
+                const val = parseInt(this.value) || 1;
+                if (tlView === 'week') tlWeekCount = val;
+                else tlMonthCount = val;
+                renderTimeline();
+            });
+            document.getElementById('tlPrev').addEventListener('click', function() {
+                if (tlView === 'week') tlAnchor = addDays(tlAnchor, -7);
+                else tlAnchor = new Date(tlAnchor.getFullYear(), tlAnchor.getMonth() - 1, 1);
+                renderTimeline();
+            });
+            document.getElementById('tlNext').addEventListener('click', function() {
+                if (tlView === 'week') tlAnchor = addDays(tlAnchor, 7);
+                else tlAnchor = new Date(tlAnchor.getFullYear(), tlAnchor.getMonth() + 1, 1);
+                renderTimeline();
+            });
+            document.getElementById('tlToday').addEventListener('click', function() { tlAnchor = new Date(); renderTimeline(); });
+            document.getElementById('timelineAreaFilter').addEventListener('change', function() { tlAreaId = this.value; renderTimeline(); });
+
+            function updateTlCountSelect() {
+                const label = document.getElementById('tlCountLabel');
+                const sel = document.getElementById('tlCountSelect');
+                if (tlView === 'week') {
+                    label.textContent = '週數';
+                    sel.innerHTML = `
+                        <option value="1">1 週</option>
+                        <option value="2">2 週</option>
+                        <option value="3">3 週</option>
+                        <option value="4">4 週</option>
+                        <option value="5">5 週</option>
+                        <option value="6">6 週</option>
+                    `;
+                    sel.value = tlWeekCount;
+                } else {
+                    label.textContent = '月數';
+                    sel.innerHTML = `
+                        <option value="1">1 個月</option>
+                        <option value="2">2 個月</option>
+                        <option value="3">3 個月</option>
+                        <option value="4">4 個月</option>
+                        <option value="5">5 個月</option>
+                        <option value="6">6 個月</option>
+                    `;
+                    sel.value = tlMonthCount;
+                }
+            }
+
+            document.querySelectorAll('[data-cal-view]').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('[data-cal-view]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    calView = this.dataset.calView;
+                    renderCalendar();
+                });
+            });
+            document.getElementById('calPrev').addEventListener('click', function() {
+                if (calView === 'day') calAnchor = addDays(calAnchor, -1);
+                else if (calView === 'week') calAnchor = addDays(calAnchor, -7);
+                else calAnchor = new Date(calAnchor.getFullYear(), calAnchor.getMonth() - 1, 1);
+                renderCalendar();
+            });
+            document.getElementById('calNext').addEventListener('click', function() {
+                if (calView === 'day') calAnchor = addDays(calAnchor, 1);
+                else if (calView === 'week') calAnchor = addDays(calAnchor, 7);
+                else calAnchor = new Date(calAnchor.getFullYear(), calAnchor.getMonth() + 1, 1);
+                renderCalendar();
+            });
+            document.getElementById('calToday').addEventListener('click', function() { calAnchor = new Date(); renderCalendar(); });
+            document.getElementById('calendarAreaFilter').addEventListener('change', function() { calAreaId = this.value; renderCalendar(); });
+
+            function renderAll() {
+                renderSidebar();
+                renderOverview();
+                renderMyTasks();
+                renderProjects();
+                renderTrackDetail();
+                renderTimeline();
+                renderCalendar();
+                renderInsights();
+                populateAreaFilters();
+            }
+
+            function populateAreaFilters() {
+                ['mytasksAreaFilter', 'projectsAreaFilter', 'timelineAreaFilter', 'calendarAreaFilter', 'insightsAreaFilter'].forEach(id => {
+                    const sel = document.getElementById(id);
+                    if (!sel) return;
+                    const current = sel.value;
+                    let html = `<option value="all">全部領域</option>`;
+                    areas.forEach(a => { html += `<option value="${a.id}">${escapeHtml(a.name)}</option>`; });
+                    sel.innerHTML = html;
+                    sel.value = current || 'all';
+                });
+            }
+
+            init();
+            updateTlCountSelect();
+        })();
+    </script>
+</body>
+</html>
