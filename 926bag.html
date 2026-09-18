@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>中秋PARTY · 打包提醒</title>
+<title>中秋轟趴 · 打包提醒测试</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -250,20 +250,20 @@
     margin-bottom: 20px;
   }
 
-  .list-section { margin-bottom: 22px; }
+  .category {
+    margin-bottom: 20px;
+  }
 
-  .list-label {
+  .category-label {
     font-size: 13px;
     font-weight: 800;
     margin-bottom: 10px;
     letter-spacing: 1.5px;
+    color: #1e90ff;
     display: flex;
     align-items: center;
     gap: 6px;
   }
-
-  .list-label.must { color: #1e90ff; }
-  .list-label.suggest { color: #00bfff; }
 
   .item {
     display: flex;
@@ -285,13 +285,10 @@
   }
 
   .item::before {
-    content: "🎒";
+    content: "□";
     margin-right: 10px;
-    font-size: 16px;
-  }
-
-  .item.suggest-item::before {
-    content: "✨";
+    color: #a8c8e8;
+    font-size: 15px;
   }
 
   .personality {
@@ -356,14 +353,7 @@
     <div class="result-title">🎒 你的打包清单</div>
     <div class="result-sub" id="resultSub"></div>
     <div id="personalityBox"></div>
-    <div class="list-section">
-      <div class="list-label must">■ 必带</div>
-      <div id="mustList"></div>
-    </div>
-    <div class="list-section">
-      <div class="list-label suggest">■ 建议带</div>
-      <div id="suggestList"></div>
-    </div>
+    <div id="categoryList"></div>
     <button class="btn btn-ghost" id="restartBtn2" style="width:100%;">🔄 重新测一次</button>
   </div>
 
@@ -424,7 +414,38 @@ const questions = [
   }
 ];
 
-const suggestItems = ["充电宝", "充电线", "薄外套", "防晒霜", "帽子", "个人药物", "毛巾（若要洗漱）"];
+// 物品归类规则：按关键词匹配到对应类别
+const categoryRules = [
+  {
+    name: "洗漱 & 护理",
+    keywords: ["洗漱包", "洗漱", "毛巾"]
+  },
+  {
+    name: "衣物 & 穿搭",
+    keywords: ["换洗衣物", "薄外套", "泳衣", "可下水的衣服", "轻便衣物", "打水仗", "礼裙", "礼服", "衬衫", "套装", "穿搭", "睡衣"]
+  },
+  {
+    name: "睡眠 & 休息",
+    keywords: ["睡袋", "薄被子", "保暖睡衣", "睡垫", "耳塞", "眼罩"]
+  },
+  {
+    name: "电子 & 随身",
+    keywords: ["充电宝"]
+  },
+  {
+    name: "鞋 & 配件",
+    keywords: ["拖鞋"]
+  }
+];
+
+function getCategory(item) {
+  for (const rule of categoryRules) {
+    for (const kw of rule.keywords) {
+      if (item.includes(kw)) return rule.name;
+    }
+  }
+  return "其他";
+}
 
 let current = 0;
 let answers = [];
@@ -491,7 +512,15 @@ function showResult() {
     if (opt) allItems.push(...opt.items);
   });
 
-  const mustItems = [...new Set(allItems)];
+  const uniqueItems = [...new Set(allItems)];
+
+  // 按类别分组
+  const grouped = {};
+  uniqueItems.forEach(item => {
+    const cat = getCategory(item);
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(item);
+  });
 
   const q1Ans = answers[0];
   const q4Ans = answers[2];
@@ -523,13 +552,17 @@ function showResult() {
       <div class="personality-desc">${personality.desc}</div>
     </div>`;
 
-  const mustList = document.getElementById("mustList");
-  mustList.innerHTML = mustItems.length
-    ? mustItems.map(i => `<div class="item">${i}</div>`).join("")
-    : `<div class="item">暂无必带物品</div>`;
-
-  const suggestList = document.getElementById("suggestList");
-  suggestList.innerHTML = suggestItems.map(i => `<div class="item suggest-item">${i}</div>`).join("");
+  const categoryList = document.getElementById("categoryList");
+  if (uniqueItems.length === 0) {
+    categoryList.innerHTML = `<div class="item">你什么都没选，什么都不用带，人来就好 😎</div>`;
+  } else {
+    categoryList.innerHTML = Object.keys(grouped).map(cat => `
+      <div class="category">
+        <div class="category-label">■ ${cat}</div>
+        ${grouped[cat].map(item => `<div class="item">${item}</div>`).join("")}
+      </div>
+    `).join("");
+  }
 
   quizCard.style.display = "none";
   resultCard.style.display = "block";
