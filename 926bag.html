@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中秋PARTY · 打包提醒</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, #f0f9ff 0%, transparent 50%),
+      radial-gradient(circle at 80% 30%, #d4ecff 0%, transparent 55%),
+      radial-gradient(circle at 50% 80%, #b8e0ff 0%, transparent 60%),
+      linear-gradient(180deg, #eaf6ff 0%, #c2e4ff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 40px;
+    color: #1e3a5f;
+  }
+
+  .app { width: 100%; max-width: 560px; }
+
+  .card {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    border: 2px solid rgba(255,255,255,1);
+    border-radius: 28px;
+    padding: 30px 26px;
+    margin-bottom: 16px;
+    box-shadow: 0 12px 40px rgba(100,160,220,0.18);
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.94) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #1e90ff, #00bfff, #4a7cff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+  }
+
+  .intro {
+    font-size: 14px;
+    color: #5a7a9a;
+    line-height: 1.7;
+  }
+
+  .progress {
+    height: 8px;
+    background: rgba(120,160,200,0.18);
+    border-radius: 8px;
+    margin: 22px 0 8px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #1e90ff, #00bfff, #4a7cff);
+    border-radius: 8px;
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .progress-text {
+    font-size: 12px;
+    color: #7a9ab8;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .question { display: none; }
+  .question.active { display: block; animation: slideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .q-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: #1e3a5f;
+  }
+
+  .q-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e90ff, #00bfff);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    margin-right: 10px;
+    box-shadow: 0 4px 12px rgba(30,144,255,0.35);
+  }
+
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 2px solid #e8f4ff;
+    color: #1e3a5f;
+    padding: 16px 18px;
+    border-radius: 16px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-family: inherit;
+    line-height: 1.5;
+    font-weight: 500;
+    position: relative;
+    box-shadow: 0 3px 0 #e8f4ff;
+  }
+
+  .option:hover {
+    border-color: #00bfff;
+    background: #f5fbff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #c2e4ff;
+  }
+
+  .option:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 #c2e4ff;
+  }
+
+  .option.selected {
+    background: linear-gradient(135deg, #e8f4ff, #f0f9ff);
+    border-color: #1e90ff;
+    box-shadow: 0 5px 0 #a8d4ff;
+  }
+
+  .option.selected::after {
+    content: "✓";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #1e90ff;
+    font-weight: 700;
+    font-size: 18px;
+    animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes checkPop {
+    0% { transform: translateY(-50%) scale(0); }
+    100% { transform: translateY(-50%) scale(1); }
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .btn {
+    padding: 14px;
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(135deg, #1e90ff, #00bfff);
+    color: #fff;
+    box-shadow: 0 5px 0 #1668b3;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 #1668b3;
+  }
+
+  .btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 0 #1668b3;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 5px 0 #1668b3;
+  }
+
+  .btn-ghost {
+    background: #fff;
+    color: #7a9ab8;
+    border: 2px solid #e8f4ff;
+    box-shadow: 0 4px 0 #e8f4ff;
+    padding: 14px 20px;
+  }
+
+  .btn-ghost:hover {
+    color: #1e90ff;
+    border-color: #b8d8f5;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #d0e8ff;
+  }
+
+  .btn-ghost:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 #d0e8ff;
+  }
+
+  .btn-ghost:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 0 #e8f4ff;
+  }
+
+  .result-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #1e90ff, #00bfff, #4a7cff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .result-sub {
+    font-size: 13px;
+    color: #7a9ab8;
+    margin-bottom: 20px;
+  }
+
+  .list-section { margin-bottom: 22px; }
+
+  .list-label {
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .list-label.must { color: #1e90ff; }
+  .list-label.suggest { color: #00bfff; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    padding: 11px 14px;
+    background: #fff;
+    border: 2px solid #e8f2fc;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .item:hover {
+    transform: translateX(4px);
+    border-color: #b8d8f5;
+  }
+
+  .item::before {
+    content: "🎒";
+    margin-right: 10px;
+    font-size: 16px;
+  }
+
+  .item.suggest-item::before {
+    content: "✨";
+  }
+
+  .personality {
+    background: linear-gradient(135deg, #e8f4ff, #f0f9ff, #e0f2ff);
+    border: 2px solid #b8d8f5;
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 22px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(30,144,255,0.12);
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .personality-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1e90ff;
+    margin-bottom: 8px;
+  }
+
+  .personality-desc {
+    font-size: 13.5px;
+    color: #5a7a9a;
+    line-height: 1.7;
+    font-weight: 500;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(90,122,154,0.6);
+    margin-top: 20px;
+    line-height: 1.7;
+    font-weight: 600;
+  }
+
+  @media (max-width: 400px) {
+    .card { padding: 24px 20px; border-radius: 24px; }
+    h1 { font-size: 21px; }
+    .q-title { font-size: 16px; }
+    .option { font-size: 14px; padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card" id="quizCard">
+    <h1>🌊 中秋轟趴 · 打包提醒</h1>
+    <p class="intro">9/26-9/27 两天一夜，答 5 道题，帮你列好要带的东西。</p>
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">1 / 5</div>
+    <div id="questionsContainer"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="prevBtn" disabled>← 上一题</button>
+      <button class="btn btn-primary" id="nextBtn" disabled>下一题 →</button>
+    </div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none;">
+    <div class="result-title">🎒 你的打包清单</div>
+    <div class="result-sub" id="resultSub"></div>
+    <div id="personalityBox"></div>
+    <div class="list-section">
+      <div class="list-label must">■ 必带</div>
+      <div id="mustList"></div>
+    </div>
+    <div class="list-section">
+      <div class="list-label suggest">■ 建议带</div>
+      <div id="suggestList"></div>
+    </div>
+    <button class="btn btn-ghost" id="restartBtn2" style="width:100%;">🔄 重新测一次</button>
+  </div>
+
+  <div class="footer">
+    中秋轟趴 · 9/26-9/27<br>
+    早点收拾，别到最后一天才慌 💙
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    id: "q1",
+    text: "你打算怎么参与这次活动？",
+    options: [
+      { label: "全程参与，两天一夜都待着", items: ["洗漱包", "换洗衣物"] },
+      { label: "只参加白天，晚上离开", items: [] },
+      { label: "白天来，晚上通宵不睡", items: ["充电宝", "薄外套"] }
+    ]
+  },
+  {
+    id: "q2",
+    text: "你准备住哪种床位？",
+    options: [
+      { label: "大床房（三人一间）", items: [] },
+      { label: "双床房（四人一间）", items: [] },
+      { label: "榻榻米大通铺 + 睡垫", items: ["睡袋或薄被子或保暖睡衣", "耳塞或眼罩"] },
+      { label: "榻榻米大通铺，自带睡垫", items: ["自带睡垫", "睡袋或薄被子或保暖睡衣", "耳塞或眼罩"] },
+      { label: "不住宿，通宵", items: [] },
+      { label: "不住宿，自行离开", items: [] }
+    ]
+  },
+  {
+    id: "q4",
+    text: "活动当天你会玩水吗？",
+    options: [
+      { label: "会，我要下水", items: ["泳衣或可下水的衣服", "拖鞋"] },
+      { label: "不下水，但在岸边玩水枪水球（可能被泼水）", items: ["拖鞋", "可参与打水仗的轻便衣物"] },
+      { label: "完全不参与泳池环节", items: [] }
+    ]
+  },
+  {
+    id: "q5",
+    text: "晚会 Dresscode 是“美高毕业晚会风”，你打算穿什么？",
+    options: [
+      { label: "半正式礼裙/礼服", items: ["半正式礼裙或礼服"] },
+      { label: "类似制服的衬衫/半正式套装", items: ["半正式衬衫或套装"] },
+      { label: "我觉得好看的穿搭（自行定义半正式）", items: ["符合主题的自定义好看穿搭"] }
+    ]
+  },
+  {
+    id: "q11",
+    text: "你参加睡衣派对吗？",
+    options: [
+      { label: "参加", items: ["可打架或防御的睡衣"] },
+      { label: "不参加", items: [] }
+    ]
+  }
+];
+
+const suggestItems = ["充电宝", "充电线", "薄外套", "防晒霜", "帽子", "个人药物", "毛巾（若要洗漱）"];
+
+let current = 0;
+let answers = [];
+
+const container = document.getElementById("questionsContainer");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+const quizCard = document.getElementById("quizCard");
+const resultCard = document.getElementById("resultCard");
+
+function renderQuestion() {
+  const q = questions[current];
+  let html = `<div class="question active">`;
+  html += `<div class="q-title"><span class="q-num">${current + 1}</span>${q.text}</div>`;
+  q.options.forEach((opt, i) => {
+    const selected = answers[current] === i ? "selected" : "";
+    html += `<button class="option ${selected}" onclick="selectOption(${i})">${opt.label}</button>`;
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+
+  progressBar.style.width = (current / questions.length * 100) + "%";
+  progressText.textContent = `${current + 1} / ${questions.length}`;
+
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = answers[current] === undefined;
+  nextBtn.textContent = current === questions.length - 1 ? "查看打包清单 🎁" : "下一题 →";
+}
+
+function selectOption(i) {
+  answers[current] = i;
+  renderQuestion();
+
+  if (current < questions.length - 1) {
+    setTimeout(() => {
+      current++;
+      renderQuestion();
+    }, 280);
+  }
+}
+
+nextBtn.addEventListener("click", () => {
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+});
+
+prevBtn.addEventListener("click", () => {
+  if (current > 0) {
+    current--;
+    renderQuestion();
+  }
+});
+
+function showResult() {
+  const allItems = [];
+  answers.forEach((ansIdx, qIdx) => {
+    const opt = questions[qIdx].options[ansIdx];
+    if (opt) allItems.push(...opt.items);
+  });
+
+  const mustItems = [...new Set(allItems)];
+
+  const q1Ans = answers[0];
+  const q4Ans = answers[2];
+  const q11Ans = answers[4];
+
+  let personality = { name: "轻装体验派", desc: "你带的东西不多，轻装上阵，享受活动本身就好。" };
+
+  if (q1Ans === 0 && q4Ans === 0 && q11Ans === 0) {
+    personality = { name: "全程永动机", desc: "从白天玩到深夜，泳池、舞会、睡衣派对一个不落。记得带足换洗衣物和充电宝。" };
+  } else if (q1Ans === 0) {
+    personality = { name: "过夜稳妥派", desc: "你全程参与，但选择比较务实。带好洗漱包和换洗衣物，晚上才能睡得舒服。" };
+  } else if (q1Ans === 2) {
+    personality = { name: "通宵战神", desc: "你不打算睡，准备玩到天亮。充电宝和薄外套是你的命根子。" };
+  } else if (q1Ans === 1) {
+    personality = { name: "日间玩家", desc: "你只参加白天，晚上就撤。轻便出行，不用带过夜用品。" };
+  }
+
+  if (q4Ans === 0 && personality.name !== "全程永动机") {
+    personality.desc += " 你会下水，记得带泳衣或可下水的衣服和拖鞋。";
+  }
+  if (q11Ans === 0 && personality.name !== "全程永动机") {
+    personality.desc += " 另外你参加睡衣派对，记得带上可打架或防御的睡衣。";
+  }
+
+  document.getElementById("resultSub").textContent = "根据你的选择，以下是你需要准备的东西：";
+  document.getElementById("personalityBox").innerHTML =
+    `<div class="personality">
+      <div class="personality-name">🏷️ ${personality.name}</div>
+      <div class="personality-desc">${personality.desc}</div>
+    </div>`;
+
+  const mustList = document.getElementById("mustList");
+  mustList.innerHTML = mustItems.length
+    ? mustItems.map(i => `<div class="item">${i}</div>`).join("")
+    : `<div class="item">暂无必带物品</div>`;
+
+  const suggestList = document.getElementById("suggestList");
+  suggestList.innerHTML = suggestItems.map(i => `<div class="item suggest-item">${i}</div>`).join("");
+
+  quizCard.style.display = "none";
+  resultCard.style.display = "block";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("restartBtn2").addEventListener("click", () => {
+  current = 0;
+  answers = [];
+  resultCard.style.display = "none";
+  quizCard.style.display = "block";
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+renderQuestion();
+</script>
+</body>
+</html>
