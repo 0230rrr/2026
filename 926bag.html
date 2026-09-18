@@ -291,6 +291,26 @@
     font-size: 15px;
   }
 
+  .towel-note {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    background: #f0f9ff;
+    border: 2px solid #b8d8f5;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #1e90ff;
+  }
+
+  .towel-note::before {
+    content: "🏠";
+    margin-right: 10px;
+    font-size: 16px;
+  }
+
   .personality {
     background: linear-gradient(135deg, #e8f4ff, #f0f9ff, #e0f2ff);
     border: 2px solid #b8d8f5;
@@ -353,6 +373,7 @@
     <div class="result-title">🎒 你的打包清单</div>
     <div class="result-sub" id="resultSub"></div>
     <div id="personalityBox"></div>
+    <div id="towelNote"></div>
     <div id="categoryList"></div>
     <button class="btn btn-ghost" id="restartBtn2" style="width:100%;">🔄 重新测一次</button>
   </div>
@@ -523,8 +544,17 @@ function showResult() {
   });
 
   const q1Ans = answers[0];
+  const q2Ans = answers[1];
   const q4Ans = answers[2];
   const q11Ans = answers[4];
+
+  // 毛巾提示：选大床房/双床房时显示
+  const towelNoteEl = document.getElementById("towelNote");
+  if (q2Ans === 0 || q2Ans === 1) {
+    towelNoteEl.innerHTML = `<div class="towel-note">民宿提供毛巾</div>`;
+  } else {
+    towelNoteEl.innerHTML = "";
+  }
 
   let personality = { name: "轻装体验派", desc: "你带的东西不多，轻装上阵，享受活动本身就好。" };
 
