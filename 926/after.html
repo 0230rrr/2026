@@ -29,6 +29,8 @@
   .hero-orb-b { background:radial-gradient(circle,rgba(245,162,93,.18) 0%,rgba(10,26,34,0) 70%); width:450px; height:450px; top:100px; right:-100px; }
   .btn { background:linear-gradient(112deg,#0b9eb6,#2dd4e0 55%,#f5a25d); color:#04222a; border:1px solid rgba(255,255,255,.15); box-shadow:0 12px 25px rgba(45,212,224,.2); transition:.2s; }
   .btn:hover { transform:translateY(-2px); }
+  .btn-outline { background:transparent; color:var(--teal); border:1px solid rgba(45,212,224,.5); box-shadow:none; transition:.2s; }
+  .btn-outline:hover { background:rgba(45,212,224,.1); transform:translateY(-2px); }
 
   .toc-card { border-radius:28px; padding:28px; }
   .toc-title { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
@@ -39,7 +41,6 @@
   .toc-num { font-family:'Noto Serif TC',serif; color:var(--teal); font-weight:900; font-size:15px; min-width:22px; }
   .toc-arrow { margin-left:auto; color:var(--teal); opacity:.7; }
 
-  /* 方形縮圖 */
   .thumb-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; margin-top:16px; }
   .thumb { position:relative; aspect-ratio:1/1; overflow:hidden; border-radius:14px; cursor:pointer; border:1px solid rgba(45,212,224,.2); transition:.2s; }
   .thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:.3s; }
@@ -48,12 +49,36 @@
   .thumb::after { content:'＋'; position:absolute; right:8px; bottom:8px; width:22px; height:22px; display:grid; place-items:center; border-radius:50%; background:rgba(10,26,34,.7); color:#2dd4e0; font-size:14px; font-weight:900; opacity:0; transition:.2s; }
   .thumb:hover::after { opacity:1; }
 
-  /* Lightbox */
   .lightbox { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; background:rgba(4,12,16,.92); backdrop-filter:blur(8px); padding:24px; }
   .lightbox.open { display:flex; }
   .lightbox img { max-width:90vw; max-height:85vh; border-radius:16px; box-shadow:0 30px 80px rgba(0,0,0,.6); }
   .lightbox-close { position:absolute; top:24px; right:24px; width:44px; height:44px; border-radius:50%; background:rgba(45,212,224,.15); border:1px solid rgba(45,212,224,.4); color:#2dd4e0; font-size:20px; cursor:pointer; display:grid; place-items:center; }
   .lightbox-close:hover { background:rgba(45,212,224,.3); }
+
+  /* 支出類目 */
+  .expense-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .expense-table th { text-align:left; padding:12px 10px; color:#2dd4e0; font-weight:900; font-size:12px; letter-spacing:.1em; border-bottom:1px solid rgba(45,212,224,.3); }
+  .expense-table td { padding:14px 10px; border-bottom:1px solid rgba(45,212,224,.12); color:#cfe9ec; vertical-align:top; line-height:1.8; }
+  .expense-table td:first-child { font-weight:900; color:#f5a25d; white-space:nowrap; }
+  .expense-table tr:hover td { background:rgba(45,212,224,.04); }
+
+  /* 投票卡片 */
+  .vote-card { border-radius:20px; padding:20px; background:rgba(16,38,47,.8); border:1px solid rgba(45,212,224,.12); box-shadow:0 8px 20px rgba(0,0,0,.2); }
+  .vote-card h4 { font-size:14px; font-weight:900; color:#2dd4e0; margin-bottom:12px; letter-spacing:.03em; }
+  .vote-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .vote-table td { padding:6px 4px; border-bottom:1px solid rgba(45,212,224,.1); color:#cfe9ec; vertical-align:middle; }
+  .vote-table td:last-child { text-align:right; font-weight:700; color:#f5a25d; min-width:48px; }
+  .vote-bar { height:6px; border-radius:3px; background:linear-gradient(90deg,#2dd4e0,#f5a25d); margin-top:2px; }
+  .vote-note { font-size:11px; color:#7a9ba0; margin-top:8px; font-style:italic; }
+
+  /* 籌備歷程 */
+  .timeline { position:relative; padding-left:28px; }
+  .timeline::before { content:''; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg,#2dd4e0,#f5a25d); border-radius:2px; }
+  .timeline-item { position:relative; padding-bottom:22px; }
+  .timeline-item::before { content:''; position:absolute; left:-24px; top:5px; width:10px; height:10px; border-radius:50%; background:#2dd4e0; border:2px solid #0a1a22; box-shadow:0 0 0 2px rgba(45,212,224,.4); }
+  .timeline-date { font-family:'Noto Serif TC',serif; font-weight:900; color:#f5a25d; font-size:14px; }
+  .timeline-content { color:#cfe9ec; font-size:13px; line-height:1.8; margin-top:4px; }
+  .timeline-content .highlight { color:#2dd4e0; font-weight:700; }
 </style>
 </head>
 <body>
@@ -83,11 +108,11 @@
       <a href="#moments" class="toc-item"><span class="toc-num">03</span>活動片段<span class="toc-arrow">→</span></a>
       <a href="#gallery" class="toc-item"><span class="toc-num">04</span>照片牆<span class="toc-arrow">→</span></a>
       <a href="#ig" class="toc-item"><span class="toc-num">05</span>IG 展板<span class="toc-arrow">→</span></a>
-      <a href="#epilogue" class="toc-item"><span class="toc-num">06</span>結語<span class="toc-arrow">→</span></a>
+      <a href="#epilogue" class="toc-item"><span class="toc-num">06</span>結語與工作人員<span class="toc-arrow">→</span></a>
       <a href="#expense" class="toc-item"><span class="toc-num">07</span>活動支出<span class="toc-arrow">→</span></a>
-      <a href="#thanks" class="toc-item"><span class="toc-num">08</span>工作人員<span class="toc-arrow">→</span></a>
+      <a href="#vote" class="toc-item"><span class="toc-num">08</span>投票結果<span class="toc-arrow">→</span></a>
       <a href="#survey" class="toc-item"><span class="toc-num">09</span>意見調查<span class="toc-arrow">→</span></a>
-      <a href="#prep" class="toc-item"><span class="toc-num">10</span>籌備回顧<span class="toc-arrow">→</span></a>
+      <a href="#prep" class="toc-item"><span class="toc-num">10</span>籌備歷程<span class="toc-arrow">→</span></a>
     </div>
   </div>
 </nav>
@@ -99,7 +124,6 @@
   <p class="muted mt-4">左邊是工作人員的籌備，右邊是大家一起參與的活動。<br />把它們放在一起，是因為這場活動，是兩邊一起完成的。</p>
 
   <div class="grid md:grid-cols-2 gap-6 mt-8">
-
     <div class="card" style="border-color:rgba(245,162,93,.35);">
       <h3 class="font-black text-lg mb-1 text-[#f5a25d]">工作人員</h3>
       <p class="muted mb-4 text-xs">佈置、料理、場控</p>
@@ -127,7 +151,6 @@
         <tr><td>24:00 — 25:00</td><td>調酒比賽（3 位評委，單人賽 6 輪，雙人賽 2 輪）</td></tr>
       </table>
     </div>
-
   </div>
 </section>
 
@@ -155,7 +178,6 @@
   <p class="muted mt-4">點擊縮圖即可看大圖。</p>
 
   <div class="grid md:grid-cols-2 gap-6 mt-8">
-
     <div class="card">
       <h3 class="font-black mb-2">泳池遊戲</h3>
       <p class="muted">這一段回憶，有照片，也有聲音。</p>
@@ -195,7 +217,6 @@
         <div class="thumb" onclick="openLightbox('alc02.jpg')"><img src="alc02.jpg" alt="調酒 2" /></div>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -225,19 +246,18 @@
   <p class="muted mt-4">那兩天認識的人，回去之後還可以繼續聯絡。<br />有提供帳號的人，我們另外整理了一份名單；如果你有給我們回饋，應該已經收到連結了。</p>
 </section>
 
-<!-- 結語 -->
+<!-- 結語與工作人員（合併區塊） -->
 <section id="epilogue" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-  <div class="glass rounded-[32px] p-8 md:p-12 text-center">
+  <!-- 結語卡片 -->
+  <div class="glass rounded-[32px] p-8 md:p-12 text-center mb-10">
     <span class="eyebrow">EPILOGUE · 結語</span>
     <h2 class="section-title mt-4">活動結束了，<br /><span class="text-gradient">還有一些話想留下。</span></h2>
     <p class="muted mt-6 max-w-xl mx-auto">謝謝你加入這場中秋相聚。從破冰到煙火，從泳池到調酒，每一個片段，都是因為有你在，才成立。</p>
     <p class="muted mt-4 max-w-xl mx-auto">希望那兩天，有讓你認識新的人，也有讓你留下一些，回去之後還會想起的畫面。</p>
     <p class="font-black text-[#2dd4e0] mt-6">我們下次見。</p>
   </div>
-</section>
 
-<!-- 工作人員 -->
-<section id="thanks" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
+  <!-- 工作人員 -->
   <span class="eyebrow">TEAM · 工作人員</span>
   <h2 class="section-title mt-3">謝謝<span class="text-gradient">每一位夥伴。</span></h2>
   <div class="grid md:grid-cols-2 gap-4 mt-8">
@@ -253,26 +273,136 @@
 <!-- 活動支出 -->
 <section id="expense" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
   <span class="eyebrow">EXPENSE · 活動支出</span>
-  <h2 class="section-title mt-3">收支<span class="text-gradient">明細。</span></h2>
-  <div class="grid md:grid-cols-2 gap-6 mt-8">
-    <div class="card">
-      <h3 class="font-black mb-3">收入</h3>
-      <table class="money-table">
-        <tr><td>補助</td><td>［金額］</td></tr>
-        <tr><td>贊助</td><td>［金額］</td></tr>
-        <tr><td>報名費</td><td>［金額］</td></tr>
+  <h2 class="section-title mt-3">錢花在<span class="text-gradient">這些地方。</span></h2>
+  <p class="muted mt-4">以下是這次活動的支出類目與粗略信息，讓大家知道錢去了哪裡。</p>
+
+  <div class="card mt-8 overflow-x-auto">
+    <table class="expense-table">
+      <thead>
+        <tr><th>類目</th><th>粗略信息</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>場地</td>
+          <td>環嶼（訂金－趣玩社轉交、尾款－趣玩社轉交）、趣玩社轉介（佣金－提供趣玩社跟定金同天付、泳池費－開泳池的費用、清潔費－否則自行清潔還原場地）、淘寶（榻榻米墊 196.92）、運費（29.6＋26）</td>
+        </tr>
+        <tr>
+          <td>餐食</td>
+          <td>竹炭、燒烤夾、一次性筷子盤子、竹籤子、噴槍＋氣罐、滷肉飯材料 15 人份、滷肉飯調料與香料、燒烤食材 35 人份（整隻雞、香腸、蛋、五花肉、韭菜、西葫蘆、茄子、香菇、娃娃菜、土豆、紫薯、紅薯、上海青、年糕、雞肉腸、玉米腸、小娃娃菜、棉花糖、蒜頭、甜玉米、糯玉米、花甲、薄荷葉、紫蘇葉、羅勒、九層塔、大蔥、洋蔥、羊肉串、蘑菇、牛肉串、海鮮等）、燒烤調料粉、燒烤調料醬、披薩 25 人份、炸雞 8 人份、小食些許</td>
+        </tr>
+        <tr>
+          <td>物料</td>
+          <td>音響、沙灘排球、水槍 30 個、水球 500 個、紙質物料印刷費、仙女棒 100 支、天燈 20 個、橫幅 1 個、團康道具 all、眼罩、拔河布和繩子、場地佈置道具 all、橘色氛圍燈、舞會氛圍燈（0）、桌遊 1 個、氣球 200 個、氮氣</td>
+        </tr>
+        <tr>
+          <td>酒</td>
+          <td>調酒用品、檸檬、冰塊、糖漿、6 大基酒、利口酒、各種酒、軟飲、提香葉、杯子、酒桶等，懶得列完了</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 下載詳細明細 -->
+  <div class="mt-6 text-center">
+    <a href="mingxi.xlsx" download class="btn-outline inline-block px-6 py-3 rounded-full font-bold text-sm">
+      ⬇ 下載活動支出詳細明細（mingxi.xlsx）
+    </a>
+  </div>
+</section>
+
+<!-- 投票結果 -->
+<section id="vote" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
+  <span class="eyebrow">VOTE · 投票結果</span>
+  <h2 class="section-title mt-3">你們的選擇，<span class="text-gradient">我們都聽到了。</span></h2>
+  <p class="muted mt-4">感謝大家投票決定酒類預算、餐食加價與種類。以下是投票結果的完整整理。</p>
+
+  <div class="grid md:grid-cols-2 gap-5 mt-8">
+    <!-- 問題1-1：是否增加餐食預算 -->
+    <div class="vote-card">
+      <h4>🍽️ 是否增加餐食預算</h4>
+      <table class="vote-table">
+        <tr><td>是，增加</td><td>62%</td></tr>
+        <tr><td>否，不增加</td><td>38%</td></tr>
       </table>
+      <p class="vote-note">多數人支持增加餐食預算，因此最終加價方案以最高票「增加 40 元」為主。</p>
+      <div class="vote-bar" style="width:62%;"></div>
     </div>
-    <div class="card">
-      <h3 class="font-black mb-3">支出</h3>
-      <table class="money-table">
-        <tr><td>場地</td><td>［金額］</td></tr>
-        <tr><td>餐飲</td><td>［金額］</td></tr>
-        <tr><td>器材・雜支</td><td>［金額］</td></tr>
+
+    <!-- 問題1-2：增加的餐食預算額度 -->
+    <div class="vote-card">
+      <h4>💰 增加的餐食預算額度</h4>
+      <table class="vote-table">
+        <tr><td>是，增加 40 元</td><td>44%</td></tr>
+        <tr><td>是，增加 20 元</td><td>25%</td></tr>
+        <tr><td>是，增加 30 元</td><td>25%</td></tr>
+        <tr><td>是，增加 50 元</td><td>6%</td></tr>
       </table>
+      <p class="vote-note">最終加價方案以最高票「增加 40 元」為主。</p>
+      <div class="vote-bar" style="width:44%;"></div>
+    </div>
+
+    <!-- 問題2：選擇餐食種類 -->
+    <div class="vote-card">
+      <h4>🍕 選擇餐食種類（可多選）</h4>
+      <table class="vote-table">
+        <tr><td>想吃多一點燒烤（燒烤架）</td><td>39%</td></tr>
+        <tr><td>想吃多一點披薩（外賣）</td><td>23%</td></tr>
+        <tr><td>想吃多一點任意外賣（外賣）</td><td>16%</td></tr>
+        <tr><td>想吃多一點滷肉飯（廚房）</td><td>13%</td></tr>
+        <tr><td>想吃多一點炸雞薯條（外賣）</td><td>10%</td></tr>
+      </table>
+      <p class="vote-note">燒烤為最高票，披薩與任意外賣次之。由於當天晚餐時間為雨天，且遊玩庭院和泳池遊戲的人們稍微錯過了燒烤時間，所以我們適當增加了外賣披薩、炸雞的餐食比例。</p>
+      <div class="vote-bar" style="width:39%;"></div>
+    </div>
+
+    <!-- 問題3：是否要大罐飲料 -->
+    <div class="vote-card">
+      <h4>🥤 是否要大罐飲料</h4>
+      <table class="vote-table">
+        <tr><td>不想要大罐飲料，飲料自行解決</td><td>65%</td></tr>
+        <tr><td>想要有一點雪碧可樂等飲料</td><td>35%</td></tr>
+        <tr><td>想要很多雪碧可樂等飲料</td><td>0%</td></tr>
+      </table>
+      <p class="vote-note">多數人傾向自行解決飲料，因此活動僅提供少量軟飲作為調酒用途。</p>
+      <div class="vote-bar" style="width:65%;"></div>
+    </div>
+
+    <!-- 問題4：喝酒參與方式（飲酒風格） -->
+    <div class="vote-card">
+      <h4>🍸 喝酒參與方式（飲酒風格）</h4>
+      <table class="vote-table">
+        <tr><td>我要參與喝酒，我想喝調過的酒桶（威士忌可樂桶等）</td><td>41%</td></tr>
+        <tr><td>我要參與喝酒，我各只喝一點</td><td>41%</td></tr>
+        <tr><td>我要參與喝酒，我想喝很多啤酒</td><td>14%</td></tr>
+        <tr><td>我要參與喝酒，我想喝很多烈酒</td><td>5%</td></tr>
+      </table>
+      <p class="vote-note">酒桶與小酌為主流，各佔四成以上。</p>
+      <div class="vote-bar" style="width:41%;"></div>
+    </div>
+
+    <!-- 問題5：喝酒預算（參與喝酒） -->
+    <div class="vote-card">
+      <h4>💰 喝酒預算（參與喝酒）</h4>
+      <table class="vote-table">
+        <tr><td>我要參與喝酒，預算 55 元</td><td>37%</td></tr>
+        <tr><td>我要參與喝酒，預算 35 元</td><td>32%</td></tr>
+        <tr><td>我要參與喝酒，預算 75 元</td><td>32%</td></tr>
+      </table>
+      <p class="vote-note">預算以 55 元、35 元、75 元三檔分布較平均。最終酒類採購已綜合此結果。</p>
+      <div class="vote-bar" style="width:37%;"></div>
+    </div>
+
+    <!-- 問題6：調酒比賽預算 -->
+    <div class="vote-card">
+      <h4>🍹 調酒比賽預算</h4>
+      <table class="vote-table">
+        <tr><td>我要參與調酒比賽，預算 15 元</td><td>60%</td></tr>
+        <tr><td>我要參與調酒比賽，預算 25 元</td><td>40%</td></tr>
+      </table>
+      <p class="vote-note">調酒比賽預算以 15 元方案較受支持。</p>
+      <div class="vote-bar" style="width:60%;"></div>
     </div>
   </div>
-  <p class="muted mt-4">結餘：［金額］｜用途：［說明］｜單位：［幣別］</p>
 </section>
 
 <!-- 意見調查 -->
@@ -283,17 +413,132 @@
   <a href="https://v.wjx.cn/vm/OKmqy8S.aspx" target="_blank" rel="noreferrer" class="btn inline-block mt-5 px-6 py-3 rounded-full font-bold text-sm">前往填寫問卷 ➔</a>
 </section>
 
-<!-- 籌備回顧 -->
+<!-- 籌備歷程（按日期順序） -->
 <section id="prep" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-  <span class="eyebrow">BEHIND THE SCENES · 籌備回顧</span>
+  <span class="eyebrow">BEHIND THE SCENES · 籌備歷程</span>
   <h2 class="section-title mt-3">那些沒被拍進<span class="text-gradient">照片裡的畫面。</span></h2>
-  <p class="muted mt-4">大家看到的，是兩天一夜的活動。但其實，在這之前，還有很多個晚上。<br />場地是怎麼找到的、流程是怎麼排的、遊戲規則是怎麼想的、酒的材料是誰去買的，這些都沒有出現在照片裡。</p>
-  <p class="muted mt-2">把它們放在這裡，是因為它們也是這場活動的一部分。</p>
-  <div class="thumb-grid mt-8">
-    <div class="thumb" onclick="openLightbox('images/11.jpg')"><img src="images/11.jpg" alt="籌備" /></div>
-    <div class="thumb" onclick="openLightbox('images/12.jpg')"><img src="images/12.jpg" alt="籌備" /></div>
-    <div class="thumb" onclick="openLightbox('images/13.jpg')"><img src="images/13.jpg" alt="籌備" /></div>
-    <div class="thumb" onclick="openLightbox('images/14.jpg')"><img src="images/14.jpg" alt="籌備" /></div>
+  <p class="muted mt-4">大家看到的，是兩天一夜的活動。但其實，在這之前，還有很多個晚上。<br />以下是從 8 月底到 9 月中，我們一步步走過的籌備行事曆。</p>
+
+  <div class="card mt-8">
+    <div class="timeline">
+      <!-- 8/24 - 8/30 區塊 -->
+      <div class="timeline-item">
+        <div class="timeline-date">8/24 — 8/30｜確認方向，建立框架</div>
+        <div class="timeline-content">
+          確認整體方向、活動大綱、各組分工、副召分工、工作人員。<br />
+          這周會從一開始的茫然，變成對活動有框架、有認知、有方向。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/24</div>
+        <div class="timeline-content">
+          對接場地方，談合作。<br />
+          拉副召核心群。<br />
+          製作<活動概念>企劃書。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/25 晚上</div>
+        <div class="timeline-content">
+          開企劃書確認會——初步確認活動執行企劃。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/26</div>
+        <div class="timeline-content">
+          付場地方定金。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/28</div>
+        <div class="timeline-content">
+          製作<轟趴目錄>。<br />
+          初步確定各組分工。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/29</div>
+        <div class="timeline-content">
+          初步確認月程表。<br />
+          確認各組詳細任務。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/30</div>
+        <div class="timeline-content">
+          製作官網稿件（<a href="https://share.gemini.google/TVSGHkxc7B1S" target="_blank" class="text-[#2dd4e0] underline">連結</a>）。<br />
+          製作報名問卷稿件。
+        </div>
+      </div>
+
+      <!-- 8/31 - 9/6 區塊 -->
+      <div class="timeline-item" style="margin-top:18px;">
+        <div class="timeline-date">8/31 — 9/6｜確認定價，完善方案</div>
+        <div class="timeline-content">
+          確認定價、確認所有組別的方案的大綱。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">8/31</div>
+        <div class="timeline-content">
+          投票本周開會時間。<br />
+          邀請友校見面談合作。<br />
+          持續完善<轟趴目錄>。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/3 晚上</div>
+        <div class="timeline-content">
+          開定價會。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/4</div>
+        <div class="timeline-content">
+          報名問卷定稿、確認。<br />
+          持續製作官網稿件。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/6</div>
+        <div class="timeline-content">
+          官網定稿、確認。<br />
+          發出正式活動通知——在校台生群。<br />
+          同步發放官網 link、報名問卷。
+        </div>
+      </div>
+
+      <!-- 9/7 - 9/13 區塊 -->
+      <div class="timeline-item" style="margin-top:18px;">
+        <div class="timeline-date">9/7 — 9/13｜招募夥伴，正式啟動</div>
+        <div class="timeline-content">
+          確認所有組別的詳細執行方案，開始招募更廣的各組夥伴。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/7</div>
+        <div class="timeline-content">
+          召集新伙伴——美食總監（物料組）。<br />
+          召集新伙伴——活動總監（活動組）。<br />
+          製作活動邀請函。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/8</div>
+        <div class="timeline-content">
+          活動新伙伴聚餐討論。<br />
+          正式向各群發出活動邀請。<br />
+          總召回上海。<br />
+          友校聚餐，談未來和本次的合作。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/13</div>
+        <div class="timeline-content">
+          副召聚，晚上開活動會。
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
