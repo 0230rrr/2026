@@ -212,15 +212,30 @@
     box-shadow: 0 0 0 3px rgba(13, 154, 168, 0.1);
   }
   .search-input::placeholder { color: #9db8bc; }
+
+  /* 乱序标注 */
+  .shuffle-note {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #6b8f94;
+    background: #e9f3f5;
+    padding: 4px 10px;
+    border-radius: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body class="relative overflow-x-hidden">
 
-  <!-- 背景光暈 -->
+  <!-- 背景光晕 -->
   <div class="hero-orb hero-orb-a"></div>
   <div class="hero-orb hero-orb-b"></div>
 
-  <!-- ============ 密碼鎖屏 ============ -->
+  <!-- ============ 密码锁屏 ============ -->
   <div id="lockScreen" class="lock-screen">
     <div class="lock-card">
       <div class="lock-icon">🔒</div>
@@ -242,16 +257,25 @@
     </div>
   </div>
 
-  <!-- ============ 主內容 ============ -->
+  <!-- ============ 主内容 ============ -->
   <main id="mainContent" class="max-w-5xl mx-auto px-5 sm:px-8 py-12 relative z-10 hidden">
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
       <div>
         <span class="eyebrow">CONTACT · 聯絡展板</span>
         <h2 class="section-title mt-2">把大家<span class="text-gradient">加起來。</span></h2>
         <p class="muted mt-2">那兩天認識的人，回去之後還可以繼續聯絡！點擊一鍵複製帳號或直達 IG。</p>
+        <!-- 标注：AI乱序说明 -->
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+          <span class="shuffle-note">
+            <span>🤖</span> 成員 1–4 保留原序，其餘由 AI 一鍵亂序排序
+          </span>
+          <button id="shuffleBtn" class="btn-outline text-xs px-4 py-1.5 rounded-full font-bold flex items-center gap-1.5">
+            <span>🔀</span> 一鍵亂序（非1–4）
+          </button>
+        </div>
       </div>
 
-      <!-- 即時搜尋列 -->
+      <!-- 即时搜索列 -->
       <div class="relative min-w-[260px]">
         <input
           type="text"
@@ -266,7 +290,7 @@
     <!-- IG 卡片容器 -->
     <div id="igGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 
-    <!-- 空狀態提示 -->
+    <!-- 空状态提示 -->
     <div id="emptyState" class="hidden text-center py-16">
       <div class="text-5xl mb-4">🔍</div>
       <p class="muted">沒有找到符合的成員，換個關鍵字試試看。</p>
@@ -275,7 +299,7 @@
 
   <script>
     // ==========================================
-    // 0. 密碼驗證
+    // 0. 密码验证
     // ==========================================
     const CORRECT_PASSWORD = "0230rrr";
 
@@ -288,6 +312,7 @@
       if (input.value.trim() === CORRECT_PASSWORD) {
         lockScreen.classList.add('hidden');
         mainContent.classList.remove('hidden');
+        // 初始渲染（已经包含乱序后的数据）
         renderIGCards();
         error.textContent = '';
       } else {
@@ -298,43 +323,71 @@
     }
 
     // ==========================================
-    // 1. 成員資料庫（成員 1-4 保持原序，其餘已亂序）
+    // 1. 成员资料库（已加上昵称）
+    //    ★ 成员1-4保持原序（索引0~3）
+    //    ★ 成员5之后（含新增 _jhou.15）已由 AI 一键乱序
     // ==========================================
-    const partyMembers = [
+    // 成员1-4（固定）
+    const FIXED_MEMBERS = [
       { name: "_0230rrr（加薪）", handle: "_0230rrr", link: "https://instagram.com/_0230rrr?cplk=MWg3a2ljY2RnYWMxYw%3D%3D" },
-      { name: "sabrinalu0119", handle: "sabrinalu0119", link: "https://www.instagram.com/sabrinalu0119?srtk=MWlqZGdiMG41eW0wbw==" },
-      { name: "ginnnny_0321", handle: "ginnnny_0321", link: "https://www.instagram.com/ginnnny_0321?obrf=MWMxcm9ibjEybTZkag==" },
-      { name: "linshuyen16", handle: "linshuyen16", link: "https://www.instagram.com/linshuyen16?cplk=MWgwbzFteWxzcHB1Zw==" },
-      { name: "YITING.YUAN.39", handle: "yiting.yuan.39", link: "https://www.instagram.com/yiting.yuan.39?dlrf=eGJ1aDA4ZGEwbDFk" },
-      { name: "CINNAMOROLL_0127", handle: "cinnamoroll_0127", link: "https://www.instagram.com/cinnamoroll_0127?dlrf=dnVweG4wbGN6emli" },
-      { name: "SHANNON_4260", handle: "shannon_4260", link: "https://www.instagram.com/shannon_4260?mdxt=cTlzdHJ5OGhjc2N3" },
-      { name: "adrian_chancw", handle: "adrian_chancw", link: "https://www.instagram.com/adrian_chancw?xtok=MTc5MmR1ZDAxczAyZA==" },
-      { name: "evelynme1221", handle: "evelynme1221", link: "https://www.instagram.com/evelynme1221?mdxt=bHZ6bmQxN2c4ZWJ6" },
-      { name: "yankunnnn", handle: "yankunnnn", link: "https://www.instagram.com/yankunnnn?xtok=MXJoNWY5cGZ5eTBiZw==" },
-      { name: "arielll963", handle: "arielll963", link: "https://www.instagram.com/arielll963?xtok=cmFrYmo0Njcwenhr" },
-      { name: "peggy.ji_", handle: "peggy.ji_", link: "https://www.instagram.com/peggy.ji_?psln=cDJjNm5tOTA3NWRx" },
-      { name: "MENGFUQIA07", handle: "mengfuqiao7", link: "https://www.instagram.com/mengfuqiao7?psln=MWxlZnFuc3c2azRrcg==" },
-      { name: "KAIII0306", handle: "kaiii0306", link: "https://www.instagram.com/kaiii0306?srtk=MTRqM2NsbG1kYTd5Ng==" },
-      { name: "JOOYCEEE_7", handle: "jooyceee_7", link: "https://www.instagram.com/jooyceee_7?rpxt=eHg1cXNmdnJ6dWdw" },
-      { name: "milk810119", handle: "milk810119", link: "https://www.instagram.com/milk810119?rpxt=MWw3Mng2N3c3YmhuNA==" },
-      { name: "frey.un03", handle: "frey.un03", link: "https://www.instagram.com/frey.un03?exln=MXU0NmppcTljNHcyaQ==" },
-      { name: "rosalinddd_11", handle: "rosalinddd_11", link: "https://www.instagram.com/rosalinddd_11?srtk=MTh4amgwdmozcWxwaQ==" },
-      { name: "ALLEN_HAO_LUN", handle: "allen_hao_lun", link: "https://www.instagram.com/allen_hao_lun?psln=cTgwYW5pdDVnbGc0" },
-      { name: "Sanctuary_L", handle: "sanctuary_l8", link: "https://www.instagram.com/sanctuary_l8?cplk=a3NhanNpZmU0YTN4" },
-      { name: "X404NOTFOUNDV", handle: "x404notfoundv", link: "https://www.instagram.com/x404notfoundv?srtk=MTlmZTJzZnE3dWYxdg==" },
-      { name: "kylin.ll", handle: "kylin.ll", link: "https://www.instagram.com/kylin.ll?obrf=MXUxdDNyc2l2ZzZmbg==" },
-      { name: "YU.TIEN", handle: "yu.tien__", link: "https://www.instagram.com/yu.tien__?cplk=MXhtcDc5MWkxbzI0NA==" },
-      { name: "_.1SNMUDX", handle: "_.1snmudx", link: "https://www.instagram.com/_.1snmudx?mdxt=anE5dmMzamNqZndl" },
-      { name: "caraa628", handle: "caraa628", link: "https://www.instagram.com/caraa628?vrfl=MXF5Z3hoZTNqZ3VzMA==" },
-      { name: "aladdin_yu", handle: "aladdin_yu", link: "https://www.instagram.com/aladdin_yu?srtk=MWc3NWt4MTE2a2xlNw==" },
-      { name: "CROWISHY", handle: "crowishy", link: "https://www.instagram.com/crowishy?cplk=Ym9scG5nMzNwNjlj" },
-      { name: "ying_tsen_", handle: "ying_tsen_", link: "https://www.instagram.com/ying_tsen_?mdxt=MjR3d2hkdjJ6bWt1" },
-      { name: "CHIAHSUAN310", handle: "chiahsuan310", link: "https://www.instagram.com/chiahsuan310?exln=cDEwOWIyYXF3c2x0" },
-      { name: "_h.c.y_0602_", handle: "_h.c.y_0602_", link: "https://www.instagram.com/_h.c.y_0602_?srtk=N2h5anNsejk5MmNv" }
+      { name: "sabrinalu0119（陸）", handle: "sabrinalu0119", link: "https://www.instagram.com/sabrinalu0119?srtk=MWlqZGdiMG41eW0wbw==" },
+      { name: "ginnnny_0321（點點凡塵）", handle: "ginnnny_0321", link: "https://www.instagram.com/ginnnny_0321?obrf=MWMxcm9ibjEybTZkag==" },
+      { name: "linshuyen16（樹岩）", handle: "linshuyen16", link: "https://www.instagram.com/linshuyen16?cplk=MWgwbzFteWxzcHB1Zw==" }
+    ];
+
+    // 其余成员池（已加上昵称，并包含新增成员 _jhou.15）
+    const OTHER_MEMBERS_POOL = [
+      { name: "YITING.YUAN.39（yiting）", handle: "yiting.yuan.39", link: "https://www.instagram.com/yiting.yuan.39?dlrf=eGJ1aDA4ZGEwbDFk" },
+      { name: "CINNAMOROLL_0127（Cinnamoroll）", handle: "cinnamoroll_0127", link: "https://www.instagram.com/cinnamoroll_0127?dlrf=dnVweG4wbGN6emli" },
+      { name: "SHANNON_4260（Shannon）", handle: "shannon_4260", link: "https://www.instagram.com/shannon_4260?mdxt=cTlzdHJ5OGhjc2N3" },
+      { name: "adrian_chancw（仙貝）", handle: "adrian_chancw", link: "https://www.instagram.com/adrian_chancw?xtok=MTc5MmR1ZDAxczAyZA==" },
+      { name: "evelynme1221（小藍）", handle: "evelynme1221", link: "https://www.instagram.com/evelynme1221?mdxt=bHZ6bmQxN2c4ZWJ6" },
+      { name: "yankunnnn（坤坤）", handle: "yankunnnn", link: "https://www.instagram.com/yankunnnn?xtok=MXJoNWY5cGZ5eTBiZw==" },
+      { name: "arielll963（ariel）", handle: "arielll963", link: "https://www.instagram.com/arielll963?xtok=cmFrYmo0Njcwenhr" },
+      { name: "peggy.ji_（Kiki.）", handle: "peggy.ji_", link: "https://www.instagram.com/peggy.ji_?psln=cDJjNm5tOTA3NWRx" },
+      { name: "MENGFUQIA07（祉涵）", handle: "mengfuqiao7", link: "https://www.instagram.com/mengfuqiao7?psln=MWxlZnFuc3c2azRrcg==" },
+      { name: "KAIII0306（Kaiiii）", handle: "kaiii0306", link: "https://www.instagram.com/kaiii0306?srtk=MTRqM2NsbG1kYTd5Ng==" },
+      { name: "JOOYCEEE_7（JoYCEee_）", handle: "jooyceee_7", link: "https://www.instagram.com/jooyceee_7?rpxt=eHg1cXNmdnJ6dWdw" },
+      { name: "milk810119（媛媛宝Amy）", handle: "milk810119", link: "https://www.instagram.com/milk810119?rpxt=MWw3Mng2N3c3YmhuNA==" },
+      { name: "frey.un03（嘎呜.）", handle: "frey.un03", link: "https://www.instagram.com/frey.un03?exln=MXU0NmppcTljNHcyaQ==" },
+      { name: "rosalinddd_11（Rosalind）", handle: "rosalinddd_11", link: "https://www.instagram.com/rosalinddd_11?srtk=MTh4amgwdmozcWxwaQ==" },
+      // ↓↓↓ 已更新昵称 ↓↓↓
+      { name: "ALLEN_HAO_LUN（Allen高浩伦）", handle: "allen_hao_lun", link: "https://www.instagram.com/allen_hao_lun?psln=cTgwYW5pdDVnbGc0" },
+      { name: "Sanctuary_L（Pastel de nata）", handle: "sanctuary_l8", link: "https://www.instagram.com/sanctuary_l8?cplk=a3NhanNpZmU0YTN4" },
+      { name: "X404NOTFOUNDV（error.connection_lost）", handle: "x404notfoundv", link: "https://www.instagram.com/x404notfoundv?srtk=MTlmZTJzZnE3dWYxdg==" },
+      { name: "kylin.ll（一竹）", handle: "kylin.ll", link: "https://www.instagram.com/kylin.ll?obrf=MXUxdDNyc2l2ZzZmbg==" },
+      { name: "YU.TIEN（雨田）", handle: "yu.tien__", link: "https://www.instagram.com/yu.tien__?cplk=MXhtcDc5MWkxbzI0NA==" },
+      { name: "_.1SNMUDX（GorBoat）", handle: "_.1snmudx", link: "https://www.instagram.com/_.1snmudx?mdxt=anE5dmMzamNqZndl" },
+      { name: "caraa628（Cara）", handle: "caraa628", link: "https://www.instagram.com/caraa628?vrfl=MXF5Z3hoZTNqZ3VzMA==" },
+      { name: "aladdin_yu（yu）", handle: "aladdin_yu", link: "https://www.instagram.com/aladdin_yu?srtk=MWc3NWt4MTE2a2xlNw==" },
+      { name: "CROWISHY（Ice Wing）", handle: "crowishy", link: "https://www.instagram.com/crowishy?cplk=Ym9scG5nMzNwNjlj" },
+      { name: "ying_tsen_（映岑）", handle: "ying_tsen_", link: "https://www.instagram.com/ying_tsen_?mdxt=MjR3d2hkdjJ6bWt1" },
+      { name: "CHIAHSUAN310（mojave）", handle: "chiahsuan310", link: "https://www.instagram.com/chiahsuan310?exln=cDEwOWIyYXF3c2x0" },
+      { name: "_h.c.y_0602_（Robbie.H）", handle: "_h.c.y_0602_", link: "https://www.instagram.com/_h.c.y_0602_?srtk=N2h5anNsejk5MmNv" },
+      // 新增成员 _jhou.15
+      { name: "_jhou.15（洲）", handle: "_jhou.15", link: "https://www.instagram.com/_jhou.15?exln=MWZia2RuZHBmOHgzNg==" }
     ];
 
     // ==========================================
-    // 2. 自動渲染卡片
+    // 2. 初始乱序
+    // ==========================================
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // 初始乱序后的其他成员（打乱一次）
+    let shuffledOthers = shuffleArray(OTHER_MEMBERS_POOL);
+
+    // 全局 partyMembers = 固定成员 + 乱序后的其他成员
+    let partyMembers = [...FIXED_MEMBERS, ...shuffledOthers];
+
+    // ==========================================
+    // 3. 渲染卡片
     // ==========================================
     function renderIGCards() {
       const container = document.getElementById('igGrid');
@@ -344,7 +397,7 @@
         <div class="ig-card card flex flex-col justify-between" style="border-radius:20px;">
           <div>
             <div class="flex items-center gap-3.5 mb-4">
-              <!-- IG 漸層徽章（無照片，只顯示首字母） -->
+              <!-- IG 渐变徽章（无照片，只显示首字母） -->
               <div class="ig-avatar-ring">
                 <div>${m.handle.charAt(0).toUpperCase()}</div>
               </div>
@@ -356,11 +409,11 @@
           </div>
 
           <div class="flex gap-2 pt-3 border-t border-[rgba(13,154,168,0.12)]">
-            <!-- 一鍵複製 -->
+            <!-- 一键复制 -->
             <button onclick="copyToClipboard('${m.handle}', this)" class="btn-outline flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
               <span>📋</span> 複製帳號
             </button>
-            <!-- 直達 IG -->
+            <!-- 直达 IG -->
             <a href="${m.link}" target="_blank" rel="noreferrer" class="btn flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-center">
               <span>🔗</span> 追蹤 IG
             </a>
@@ -370,7 +423,7 @@
     }
 
     // ==========================================
-    // 3. 一鍵複製與提示反饋
+    // 4. 一键复制与提示反馈
     // ==========================================
     function copyToClipboard(text, btnElement) {
       navigator.clipboard.writeText(text).then(() => {
@@ -389,7 +442,7 @@
     }
 
     // ==========================================
-    // 4. 即時搜尋過濾
+    // 5. 即时搜索过滤
     // ==========================================
     function filterIGCards() {
       const query = document.getElementById('igSearchInput').value.toLowerCase();
@@ -406,6 +459,38 @@
 
       emptyState.classList.toggle('hidden', visibleCount > 0);
     }
+
+    // ==========================================
+    // 6. 一键乱序按钮（仅打乱非成员1-4）
+    // ==========================================
+    function shuffleOthers() {
+      if (partyMembers.length <= 4) return;
+
+      const fixed = partyMembers.slice(0, 4);          // 成员1-4
+      const others = partyMembers.slice(4);           // 其余成员
+      const shuffled = shuffleArray(others);
+      partyMembers = [...fixed, ...shuffled];
+
+      // 重新渲染，并清空搜索（可选）
+      renderIGCards();
+      // 清空搜索框，避免过滤状态导致显示不全
+      const searchInput = document.getElementById('igSearchInput');
+      if (searchInput) {
+        searchInput.value = '';
+        filterIGCards();
+      }
+    }
+
+    // ==========================================
+    // 7. 页面初始化与事件绑定
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // 给乱序按钮绑定事件
+      const shuffleBtn = document.getElementById('shuffleBtn');
+      if (shuffleBtn) {
+        shuffleBtn.addEventListener('click', shuffleOthers);
+      }
+    });
   </script>
 </body>
 </html>
