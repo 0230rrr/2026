@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中秋VillaParty · IG 展板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --ink: #1a3a42;
+    --muted: #4a6b72;
+    --teal: #0d9aa8;
+    --teal-light: #6bcbd4;
+    --orange: #d97d3a;
+    --bg: #f0f7f9;
+    --card: #ffffff;
+    --border-light: rgba(13, 154, 168, 0.15);
+    --ig-gradient: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    min-height: 100vh;
+  }
+  .font-serif-custom { font-family: 'Noto Serif TC', serif; }
+  .text-gradient {
+    background: linear-gradient(102deg, #0d9aa8, #3bc0c7 52%, #e08e4a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  }
+  .eyebrow {
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 900;
+    line-height: 1.15;
+  }
+  .muted { color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+  .card {
+    border-radius: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+  }
+  .card:hover {
+    box-shadow: 0 12px 28px rgba(13, 154, 168, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    filter: blur(60px);
+    z-index: 0;
+  }
+  .hero-orb-a {
+    background: radial-gradient(circle, rgba(13, 154, 168, 0.15) 0%, rgba(240, 247, 249, 0) 70%);
+    width: 500px;
+    height: 500px;
+    top: -150px;
+    left: -100px;
+  }
+  .hero-orb-b {
+    background: radial-gradient(circle, rgba(217, 125, 58, 0.1) 0%, rgba(240, 247, 249, 0) 70%);
+    width: 450px;
+    height: 450px;
+    top: 100px;
+    right: -100px;
+  }
+
+  .btn {
+    background: linear-gradient(112deg, #0b8c9c, #34bcc8 55%, #e8a05e);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 8px 20px rgba(13, 154, 168, 0.2);
+    transition: 0.2s;
+    font-weight: 700;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(13, 154, 168, 0.3);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--teal);
+    border: 1.5px solid rgba(13, 154, 168, 0.5);
+    transition: 0.2s;
+    font-weight: 700;
+  }
+  .btn-outline:hover {
+    background: rgba(13, 154, 168, 0.08);
+    transform: translateY(-2px);
+  }
+
+  /* IG 渐变头像框（无照片，仅用于账号徽章） */
+  .ig-avatar-ring {
+    background: var(--ig-gradient);
+    padding: 3px;
+    border-radius: 16px;
+    flex-shrink: 0;
+  }
+  .ig-avatar-ring > div {
+    background: #ffffff;
+    border-radius: 13px;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    font-weight: 900;
+    color: #0d9aa8;
+  }
+
+  /* 密码锁屏 */
+  .lock-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 24px;
+  }
+  .lock-screen.hidden { display: none; }
+  .lock-card {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 40px 32px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 60px rgba(13, 154, 168, 0.12);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+  }
+  .lock-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 20px;
+    background: var(--ig-gradient);
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(238, 42, 123, 0.25);
+  }
+  .lock-input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-light);
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--ink);
+    background: #f7fbfc;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    transition: 0.2s;
+  }
+  .lock-input:focus {
+    border-color: var(--teal);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(13, 154, 168, 0.1);
+  }
+  .lock-error {
+    color: #d9534f;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-light);
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--ink);
+    background: #ffffff;
+    outline: none;
+    transition: 0.2s;
+  }
+  .search-input:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(13, 154, 168, 0.1);
+  }
+  .search-input::placeholder { color: #9db8bc; }
+</style>
+</head>
+<body class="relative overflow-x-hidden">
+
+  <!-- 背景光暈 -->
+  <div class="hero-orb hero-orb-a"></div>
+  <div class="hero-orb hero-orb-b"></div>
+
+  <!-- ============ 密碼鎖屏 ============ -->
+  <div id="lockScreen" class="lock-screen">
+    <div class="lock-card">
+      <div class="lock-icon">🔒</div>
+      <h1 class="font-serif-custom text-2xl font-black text-[#1a3a42] mb-2">IG 展板</h1>
+      <p class="muted text-xs mb-6">請輸入通關密語，解鎖大家的 IG 名單</p>
+      <input
+        id="lockInput"
+        type="password"
+        class="lock-input"
+        placeholder="請輸入密碼"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter') unlockPage()"
+      />
+      <div id="lockError" class="lock-error"></div>
+      <button onclick="unlockPage()" class="btn w-full mt-4 py-3 rounded-2xl text-sm">
+        解鎖展板 ➔
+      </button>
+      <p class="muted text-[11px] mt-5 opacity-70">僅限參與本次活動的夥伴進入</p>
+    </div>
+  </div>
+
+  <!-- ============ 主內容 ============ -->
+  <main id="mainContent" class="max-w-5xl mx-auto px-5 sm:px-8 py-12 relative z-10 hidden">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div>
+        <span class="eyebrow">CONTACT · 聯絡展板</span>
+        <h2 class="section-title mt-2">把大家<span class="text-gradient">加起來。</span></h2>
+        <p class="muted mt-2">那兩天認識的人，回去之後還可以繼續聯絡！點擊一鍵複製帳號或直達 IG。</p>
+      </div>
+
+      <!-- 即時搜尋列 -->
+      <div class="relative min-w-[260px]">
+        <input
+          type="text"
+          id="igSearchInput"
+          onkeyup="filterIGCards()"
+          placeholder="🔍 搜尋暱稱或 IG 帳號..."
+          class="search-input"
+        />
+      </div>
+    </div>
+
+    <!-- IG 卡片容器 -->
+    <div id="igGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+
+    <!-- 空狀態提示 -->
+    <div id="emptyState" class="hidden text-center py-16">
+      <div class="text-5xl mb-4">🔍</div>
+      <p class="muted">沒有找到符合的成員，換個關鍵字試試看。</p>
+    </div>
+  </main>
+
+  <script>
+    // ==========================================
+    // 0. 密碼驗證
+    // ==========================================
+    const CORRECT_PASSWORD = "0230rrr";
+
+    function unlockPage() {
+      const input = document.getElementById('lockInput');
+      const error = document.getElementById('lockError');
+      const lockScreen = document.getElementById('lockScreen');
+      const mainContent = document.getElementById('mainContent');
+
+      if (input.value.trim() === CORRECT_PASSWORD) {
+        lockScreen.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        renderIGCards();
+        error.textContent = '';
+      } else {
+        error.textContent = '密碼不對喔，再試一次～';
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    // ==========================================
+    // 1. 成員資料庫（成員 1-4 保持原序，其餘已亂序）
+    // ==========================================
+    const partyMembers = [
+      { name: "_0230rrr（加薪）", handle: "_0230rrr", link: "https://instagram.com/_0230rrr?cplk=MWg3a2ljY2RnYWMxYw%3D%3D" },
+      { name: "sabrinalu0119", handle: "sabrinalu0119", link: "https://www.instagram.com/sabrinalu0119?srtk=MWlqZGdiMG41eW0wbw==" },
+      { name: "ginnnny_0321", handle: "ginnnny_0321", link: "https://www.instagram.com/ginnnny_0321?obrf=MWMxcm9ibjEybTZkag==" },
+      { name: "linshuyen16", handle: "linshuyen16", link: "https://www.instagram.com/linshuyen16?cplk=MWgwbzFteWxzcHB1Zw==" },
+      { name: "YITING.YUAN.39", handle: "yiting.yuan.39", link: "https://www.instagram.com/yiting.yuan.39?dlrf=eGJ1aDA4ZGEwbDFk" },
+      { name: "CINNAMOROLL_0127", handle: "cinnamoroll_0127", link: "https://www.instagram.com/cinnamoroll_0127?dlrf=dnVweG4wbGN6emli" },
+      { name: "SHANNON_4260", handle: "shannon_4260", link: "https://www.instagram.com/shannon_4260?mdxt=cTlzdHJ5OGhjc2N3" },
+      { name: "adrian_chancw", handle: "adrian_chancw", link: "https://www.instagram.com/adrian_chancw?xtok=MTc5MmR1ZDAxczAyZA==" },
+      { name: "evelynme1221", handle: "evelynme1221", link: "https://www.instagram.com/evelynme1221?mdxt=bHZ6bmQxN2c4ZWJ6" },
+      { name: "yankunnnn", handle: "yankunnnn", link: "https://www.instagram.com/yankunnnn?xtok=MXJoNWY5cGZ5eTBiZw==" },
+      { name: "arielll963", handle: "arielll963", link: "https://www.instagram.com/arielll963?xtok=cmFrYmo0Njcwenhr" },
+      { name: "peggy.ji_", handle: "peggy.ji_", link: "https://www.instagram.com/peggy.ji_?psln=cDJjNm5tOTA3NWRx" },
+      { name: "MENGFUQIA07", handle: "mengfuqiao7", link: "https://www.instagram.com/mengfuqiao7?psln=MWxlZnFuc3c2azRrcg==" },
+      { name: "KAIII0306", handle: "kaiii0306", link: "https://www.instagram.com/kaiii0306?srtk=MTRqM2NsbG1kYTd5Ng==" },
+      { name: "JOOYCEEE_7", handle: "jooyceee_7", link: "https://www.instagram.com/jooyceee_7?rpxt=eHg1cXNmdnJ6dWdw" },
+      { name: "milk810119", handle: "milk810119", link: "https://www.instagram.com/milk810119?rpxt=MWw3Mng2N3c3YmhuNA==" },
+      { name: "frey.un03", handle: "frey.un03", link: "https://www.instagram.com/frey.un03?exln=MXU0NmppcTljNHcyaQ==" },
+      { name: "rosalinddd_11", handle: "rosalinddd_11", link: "https://www.instagram.com/rosalinddd_11?srtk=MTh4amgwdmozcWxwaQ==" },
+      { name: "ALLEN_HAO_LUN", handle: "allen_hao_lun", link: "https://www.instagram.com/allen_hao_lun?psln=cTgwYW5pdDVnbGc0" },
+      { name: "Sanctuary_L", handle: "sanctuary_l8", link: "https://www.instagram.com/sanctuary_l8?cplk=a3NhanNpZmU0YTN4" },
+      { name: "X404NOTFOUNDV", handle: "x404notfoundv", link: "https://www.instagram.com/x404notfoundv?srtk=MTlmZTJzZnE3dWYxdg==" },
+      { name: "kylin.ll", handle: "kylin.ll", link: "https://www.instagram.com/kylin.ll?obrf=MXUxdDNyc2l2ZzZmbg==" },
+      { name: "YU.TIEN", handle: "yu.tien__", link: "https://www.instagram.com/yu.tien__?cplk=MXhtcDc5MWkxbzI0NA==" },
+      { name: "_.1SNMUDX", handle: "_.1snmudx", link: "https://www.instagram.com/_.1snmudx?mdxt=anE5dmMzamNqZndl" },
+      { name: "caraa628", handle: "caraa628", link: "https://www.instagram.com/caraa628?vrfl=MXF5Z3hoZTNqZ3VzMA==" },
+      { name: "aladdin_yu", handle: "aladdin_yu", link: "https://www.instagram.com/aladdin_yu?srtk=MWc3NWt4MTE2a2xlNw==" },
+      { name: "CROWISHY", handle: "crowishy", link: "https://www.instagram.com/crowishy?cplk=Ym9scG5nMzNwNjlj" },
+      { name: "ying_tsen_", handle: "ying_tsen_", link: "https://www.instagram.com/ying_tsen_?mdxt=MjR3d2hkdjJ6bWt1" },
+      { name: "CHIAHSUAN310", handle: "chiahsuan310", link: "https://www.instagram.com/chiahsuan310?exln=cDEwOWIyYXF3c2x0" },
+      { name: "_h.c.y_0602_", handle: "_h.c.y_0602_", link: "https://www.instagram.com/_h.c.y_0602_?srtk=N2h5anNsejk5MmNv" }
+    ];
+
+    // ==========================================
+    // 2. 自動渲染卡片
+    // ==========================================
+    function renderIGCards() {
+      const container = document.getElementById('igGrid');
+      if (!container) return;
+
+      container.innerHTML = partyMembers.map(m => `
+        <div class="ig-card card flex flex-col justify-between" style="border-radius:20px;">
+          <div>
+            <div class="flex items-center gap-3.5 mb-4">
+              <!-- IG 漸層徽章（無照片，只顯示首字母） -->
+              <div class="ig-avatar-ring">
+                <div>${m.handle.charAt(0).toUpperCase()}</div>
+              </div>
+              <div class="overflow-hidden">
+                <h3 class="font-bold text-[#1a3a42] text-base truncate">${m.name}</h3>
+                <p class="text-xs text-[#0d9aa8] font-mono mt-0.5 truncate">@${m.handle}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2 pt-3 border-t border-[rgba(13,154,168,0.12)]">
+            <!-- 一鍵複製 -->
+            <button onclick="copyToClipboard('${m.handle}', this)" class="btn-outline flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
+              <span>📋</span> 複製帳號
+            </button>
+            <!-- 直達 IG -->
+            <a href="${m.link}" target="_blank" rel="noreferrer" class="btn flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-center">
+              <span>🔗</span> 追蹤 IG
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==========================================
+    // 3. 一鍵複製與提示反饋
+    // ==========================================
+    function copyToClipboard(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        const originalHTML = btnElement.innerHTML;
+        btnElement.innerHTML = '<span>✅</span> 已複製';
+        btnElement.style.borderColor = '#0d9aa8';
+        btnElement.style.color = '#0d9aa8';
+        btnElement.style.background = 'rgba(13,154,168,0.08)';
+        setTimeout(() => {
+          btnElement.innerHTML = originalHTML;
+          btnElement.style.borderColor = '';
+          btnElement.style.color = '';
+          btnElement.style.background = '';
+        }, 1800);
+      });
+    }
+
+    // ==========================================
+    // 4. 即時搜尋過濾
+    // ==========================================
+    function filterIGCards() {
+      const query = document.getElementById('igSearchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.ig-card');
+      const emptyState = document.getElementById('emptyState');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const match = text.includes(query);
+        card.style.display = match ? 'flex' : 'none';
+        if (match) visibleCount++;
+      });
+
+      emptyState.classList.toggle('hidden', visibleCount > 0);
+    }
+  </script>
+</body>
+</html>
