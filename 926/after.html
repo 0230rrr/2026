@@ -171,16 +171,46 @@
   }
   .thumb:hover::after { opacity: 1; }
 
-  /* 間諜照片：不可放大，不顯示＋ */
-  .thumb-static {
+  /* 間諜照片：預設霧化，點擊後才清晰（不可放大） */
+  .spy-photo {
     position: relative;
     aspect-ratio: 1/1;
     overflow: hidden;
     border-radius: 14px;
     border: 1px solid rgba(13, 154, 168, 0.2);
+    cursor: pointer;
+    transition: 0.2s;
   }
-  .thumb-static img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb-static::after { content: none; }
+  .spy-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: blur(12px) saturate(0.8);
+    transform: scale(1.08);
+    transition: filter 0.35s ease, transform 0.35s ease;
+  }
+  .spy-photo.revealed img {
+    filter: blur(0) saturate(1);
+    transform: scale(1);
+  }
+  .spy-photo::after {
+    content: '點擊查看';
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    background: rgba(13, 154, 168, 0.35);
+    backdrop-filter: blur(1px);
+    transition: opacity 0.3s;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+  .spy-photo.revealed::after { opacity: 0; pointer-events: none; }
+  .spy-photo:hover { border-color: rgba(13, 154, 168, 0.5); box-shadow: 0 8px 18px rgba(13, 154, 168, 0.12); }
 
   /* 橫式影片卡片（game） */
   .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
@@ -457,8 +487,8 @@
       <a href="#epilogue" class="toc-item"><span class="toc-num">06</span>結語與工作人員<span class="toc-arrow">→</span></a>
       <a href="#expense" class="toc-item"><span class="toc-num">07</span>活動支出<span class="toc-arrow">→</span></a>
       <a href="#vote" class="toc-item"><span class="toc-num">08</span>投票結果<span class="toc-arrow">→</span></a>
-      <a href="#survey" class="toc-item"><span class="toc-num">09</span>意見調查<span class="toc-arrow">→</span></a>
-      <a href="#prep" class="toc-item"><span class="toc-num">10</span>籌備歷程<span class="toc-arrow">→</span></a>
+      <a href="#prep" class="toc-item"><span class="toc-num">09</span>籌備歷程<span class="toc-arrow">→</span></a>
+      <a href="#survey" class="toc-item"><span class="toc-num">10</span>意見調查<span class="toc-arrow">→</span></a>
     </div>
   </div>
 </nav>
@@ -505,37 +535,45 @@
   </div>
 </section>
 
-<!-- 臥底是誰（原破冰遊戲） -->
+<!-- 臥底是誰（預設顯示身份，照片霧化，點擊查看） -->
 <section id="ice" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
   <span class="eyebrow">BREAK THE ICE · 臥底是誰</span>
   <h2 class="section-title mt-3">現在，<span class="text-gradient">可以公開身份了。</span></h2>
   <p class="muted mt-4">當時和你一起玩遊戲的人，可能藏著另一個身份。<br />破冰遊戲結束了，現在正式公開潛伏名單。你猜中了幾位？</p>
-  <button onclick="toggleReveal()" class="btn mt-5 px-6 py-3 rounded-full text-sm">點我揭曉臥底名單</button>
-  <div id="revealBox" class="glass rounded-3xl p-6 mt-5 hidden">
+
+  <div class="glass rounded-3xl p-6 mt-5">
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="text-center">
-        <div class="thumb-static"><img src="spy1.jpg" alt="間諜 1" /></div>
+        <div class="spy-photo" onclick="revealSpy(this)">
+          <img src="spy1.jpg" alt="間諜 1" />
+        </div>
         <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 1／諜中諜</p>
         <p class="muted text-xs">Hana</p>
       </div>
       <div class="text-center">
-        <div class="thumb-static"><img src="spy2.jpg" alt="間諜 2" /></div>
+        <div class="spy-photo" onclick="revealSpy(this)">
+          <img src="spy2.jpg" alt="間諜 2" />
+        </div>
         <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 2</p>
         <p class="muted text-xs">小藍</p>
       </div>
       <div class="text-center">
-        <div class="thumb-static"><img src="spy3.jpg" alt="間諜 3" /></div>
+        <div class="spy-photo" onclick="revealSpy(this)">
+          <img src="spy3.jpg" alt="間諜 3" />
+        </div>
         <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 3</p>
         <p class="muted text-xs">雨田</p>
       </div>
       <div class="text-center">
-        <div class="thumb-static"><img src="spy4.jpg" alt="間諜 4" /></div>
+        <div class="spy-photo" onclick="revealSpy(this)">
+          <img src="spy4.jpg" alt="間諜 4" />
+        </div>
         <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 4</p>
         <p class="muted text-xs">Cinnamoroll</p>
       </div>
     </div>
     <div class="spy-note">
-      📌 如果照片看不清楚，不知道是誰，可以找我詢問～
+      📌 點擊照片即可查看清晰模樣；如果照片看不清楚，不知道是誰，也可以找我詢問～
     </div>
     <p class="muted mt-4">知道答案後，再看一次照片。是不是每個表情都變得可疑了？</p>
   </div>
@@ -744,12 +782,6 @@
       </tbody>
     </table>
   </div>
-
-  <div class="mt-6 text-center">
-    <a href="mingxi.xlsx" download class="btn-outline inline-block px-6 py-3 rounded-full text-sm">
-      ⬇ 下載投票明細（mingxi.xlsx）
-    </a>
-  </div>
 </section>
 
 <!-- 投票結果 -->
@@ -839,59 +871,12 @@
     </div>
   </div>
 
-  <!-- 投票明细（放在票数总结后面） -->
-  <div class="mt-10">
-    <div class="card bright-accent" style="border-color:rgba(13,154,168,0.3);">
-      <h3 class="font-black text-lg text-[#0d9aa8] mb-2">📋 投票明細</h3>
-      <p class="muted mb-4">以下是投票的完整明細，包含每一輪的原始數據。</p>
-      <div class="overflow-x-auto">
-        <table class="expense-table">
-          <thead>
-            <tr><th>項目</th><th>明細</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>是否增加餐食預算</td>
-              <td>是，增加 62%；否，不增加 38%</td>
-            </tr>
-            <tr>
-              <td>增加的餐食預算額度</td>
-              <td>增加 40 元 44%；增加 20 元 25%；增加 30 元 25%；增加 50 元 6%</td>
-            </tr>
-            <tr>
-              <td>選擇餐食種類（可多選）</td>
-              <td>燒烤 39%；披薩 23%；任意外賣 16%；滷肉飯 13%；炸雞薯條 10%</td>
-            </tr>
-            <tr>
-              <td>是否要大罐飲料</td>
-              <td>自行解決 65%；想要一點 35%；想要很多 0%</td>
-            </tr>
-            <tr>
-              <td>喝酒參與方式</td>
-              <td>酒桶 41%；各只喝一點 41%；很多啤酒 14%；很多烈酒 5%</td>
-            </tr>
-            <tr>
-              <td>喝酒預算</td>
-              <td>55 元 37%；35 元 32%；75 元 32%</td>
-            </tr>
-            <tr>
-              <td>調酒比賽預算</td>
-              <td>15 元 60%；25 元 40%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="muted mt-4 text-xs">＊詳細投票檔案請點擊上方按鈕下載。</p>
-    </div>
+  <!-- 下載投票明細（原投票明細位置） -->
+  <div class="mt-8 text-center">
+    <a href="mingxi.xlsx" download class="btn-outline inline-block px-6 py-3 rounded-full text-sm">
+      ⬇ 下載投票明細（mingxi.xlsx）
+    </a>
   </div>
-</section>
-
-<!-- 意見調查 -->
-<section id="survey" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-  <span class="eyebrow">SURVEY · 意見調查</span>
-  <h2 class="section-title mt-3">想聽聽<span class="text-gradient">你的想法。</span></h2>
-  <p class="muted mt-4">謝謝你參與這次活動。想聽聽你的想法，讓我們下次辦得更好。</p>
-  <a href="https://v.wjx.cn/vm/OKmqy8S.aspx" target="_blank" rel="noreferrer" class="btn inline-block mt-5 px-6 py-3 rounded-full text-sm">前往填寫問卷 ➔</a>
 </section>
 
 <!-- 籌備歷程 -->
@@ -1043,6 +1028,14 @@
   </div>
 </section>
 
+<!-- 意見調查（移至頁尾） -->
+<section id="survey" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
+  <span class="eyebrow">SURVEY · 意見調查</span>
+  <h2 class="section-title mt-3">想聽聽<span class="text-gradient">你的想法。</span></h2>
+  <p class="muted mt-4">謝謝你參與這次活動。想聽聽你的想法，讓我們下次辦得更好。</p>
+  <a href="https://v.wjx.cn/vm/OKmqy8S.aspx" target="_blank" rel="noreferrer" class="btn inline-block mt-5 px-6 py-3 rounded-full text-sm">前往填寫問卷 ➔</a>
+</section>
+
 <footer class="py-10 text-center text-xs text-[#7a9ba0] border-t border-[rgba(13,154,168,0.1)] mt-10">
   © 2026 中秋宿營 Villa Party · 交大台生會
 </footer>
@@ -1054,8 +1047,8 @@
 </div>
 
 <script>
-  function toggleReveal() {
-    document.getElementById('revealBox').classList.toggle('hidden');
+  function revealSpy(el) {
+    el.classList.add('revealed');
   }
 
   function openLightbox(src) {
