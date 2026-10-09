@@ -9,76 +9,422 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  :root { --ink:#e8f4f5; --muted:#9db8bc; --teal:#2dd4e0; --orange:#f5a25d; --bg:#0a1a22; --card:#10262f; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:'Noto Sans TC',sans-serif; color:var(--ink); background:var(--bg); }
-  .font-serif-custom { font-family:'Noto Serif TC',serif; }
-  .text-gradient { background:linear-gradient(102deg,#2dd4e0,#5eead4 52%,#f5a25d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .glass { background:rgba(16,38,47,.72); backdrop-filter:blur(12px); border:1px solid rgba(45,212,224,.18); box-shadow:0 18px 45px rgba(0,0,0,.35); }
-  .eyebrow { color:var(--teal); font-size:11px; font-weight:900; letter-spacing:.18em; text-transform:uppercase; }
-  .section-title { font-family:'Noto Serif TC',serif; font-size:clamp(28px,4vw,42px); font-weight:900; line-height:1.15; }
-  .muted { color:var(--muted); font-size:13px; line-height:1.8; }
-  .card { border-radius:24px; padding:22px; background:rgba(16,38,47,.8); border:1px solid rgba(45,212,224,.15); box-shadow:0 12px 25px rgba(0,0,0,.25); }
-  .money-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .money-table td { padding:8px 4px; border-bottom:1px solid rgba(45,212,224,.15); color:var(--muted); vertical-align:top; }
-  .money-table td:last-child { text-align:right; font-weight:800; color:var(--teal); }
-  .timeline-table td:first-child { color:#cfe9ec; font-weight:800; white-space:nowrap; padding-right:12px; }
-  .timeline-table td:last-child { text-align:left; }
-  .hero-orb { position:absolute; border-radius:9999px; pointer-events:none; filter:blur(50px); }
-  .hero-orb-a { background:radial-gradient(circle,rgba(45,212,224,.25) 0%,rgba(10,26,34,0) 70%); width:500px; height:500px; top:-150px; left:-100px; }
-  .hero-orb-b { background:radial-gradient(circle,rgba(245,162,93,.18) 0%,rgba(10,26,34,0) 70%); width:450px; height:450px; top:100px; right:-100px; }
-  .btn { background:linear-gradient(112deg,#0b9eb6,#2dd4e0 55%,#f5a25d); color:#04222a; border:1px solid rgba(255,255,255,.15); box-shadow:0 12px 25px rgba(45,212,224,.2); transition:.2s; }
-  .btn:hover { transform:translateY(-2px); }
-  .btn-outline { background:transparent; color:var(--teal); border:1px solid rgba(45,212,224,.5); box-shadow:none; transition:.2s; }
-  .btn-outline:hover { background:rgba(45,212,224,.1); transform:translateY(-2px); }
+  :root {
+    --ink: #1a3a42;
+    --muted: #4a6b72;
+    --teal: #0d9aa8;
+    --teal-light: #6bcbd4;
+    --orange: #d97d3a;
+    --orange-light: #f5b88c;
+    --bg: #f0f7f9;
+    --card: #ffffff;
+    --card-glass: rgba(255, 255, 255, 0.8);
+    --border-light: rgba(13, 154, 168, 0.15);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  .font-serif-custom { font-family: 'Noto Serif TC', serif; }
+  .text-gradient {
+    background: linear-gradient(102deg, #0d9aa8, #3bc0c7 52%, #e08e4a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .glass {
+    background: var(--card-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  }
+  .eyebrow {
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 900;
+    line-height: 1.15;
+  }
+  .muted {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .card {
+    border-radius: 24px;
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: 0 10px 28px rgba(13, 154, 168, 0.08); }
 
-  .toc-card { border-radius:28px; padding:28px; }
-  .toc-title { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
-  .toc-title span { font-family:'Noto Serif TC',serif; font-size:20px; font-weight:900; }
-  .toc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
-  .toc-item { display:flex; align-items:center; gap:12px; padding:14px 16px; border-radius:16px; background:rgba(45,212,224,.06); border:1px solid rgba(45,212,224,.15); color:#cfe9ec; font-size:13px; font-weight:800; text-decoration:none; transition:.2s; }
-  .toc-item:hover { background:rgba(45,212,224,.14); border-color:rgba(45,212,224,.4); transform:translateX(3px); color:#fff; }
-  .toc-num { font-family:'Noto Serif TC',serif; color:var(--teal); font-weight:900; font-size:15px; min-width:22px; }
-  .toc-arrow { margin-left:auto; color:var(--teal); opacity:.7; }
+  .money-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .money-table td {
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(13, 154, 168, 0.12);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  .money-table td:last-child {
+    text-align: right;
+    font-weight: 800;
+    color: var(--teal);
+  }
+  .timeline-table td:first-child {
+    color: #2a5a62;
+    font-weight: 800;
+    white-space: nowrap;
+    padding-right: 12px;
+  }
+  .timeline-table td:last-child { text-align: left; }
 
-  .thumb-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; margin-top:16px; }
-  .thumb { position:relative; aspect-ratio:1/1; overflow:hidden; border-radius:14px; cursor:pointer; border:1px solid rgba(45,212,224,.2); transition:.2s; }
-  .thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:.3s; }
-  .thumb:hover { border-color:rgba(45,212,224,.6); transform:translateY(-3px); }
-  .thumb:hover img { transform:scale(1.06); }
-  .thumb::after { content:'＋'; position:absolute; right:8px; bottom:8px; width:22px; height:22px; display:grid; place-items:center; border-radius:50%; background:rgba(10,26,34,.7); color:#2dd4e0; font-size:14px; font-weight:900; opacity:0; transition:.2s; }
-  .thumb:hover::after { opacity:1; }
+  .hero-orb { position: absolute; border-radius: 9999px; pointer-events: none; filter: blur(50px); }
+  .hero-orb-a { background: radial-gradient(circle, rgba(13, 154, 168, 0.12) 0%, rgba(240, 247, 249, 0) 70%); width: 500px; height: 500px; top: -150px; left: -100px; }
+  .hero-orb-b { background: radial-gradient(circle, rgba(217, 125, 58, 0.08) 0%, rgba(240, 247, 249, 0) 70%); width: 450px; height: 450px; top: 100px; right: -100px; }
 
-  .lightbox { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; background:rgba(4,12,16,.92); backdrop-filter:blur(8px); padding:24px; }
-  .lightbox.open { display:flex; }
-  .lightbox img { max-width:90vw; max-height:85vh; border-radius:16px; box-shadow:0 30px 80px rgba(0,0,0,.6); }
-  .lightbox-close { position:absolute; top:24px; right:24px; width:44px; height:44px; border-radius:50%; background:rgba(45,212,224,.15); border:1px solid rgba(45,212,224,.4); color:#2dd4e0; font-size:20px; cursor:pointer; display:grid; place-items:center; }
-  .lightbox-close:hover { background:rgba(45,212,224,.3); }
+  .btn {
+    background: linear-gradient(112deg, #0b8c9c, #34bcc8 55%, #e8a05e);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 8px 20px rgba(13, 154, 168, 0.2);
+    transition: 0.2s;
+    font-weight: 700;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(13, 154, 168, 0.3); }
+  .btn-outline {
+    background: transparent;
+    color: var(--teal);
+    border: 1.5px solid rgba(13, 154, 168, 0.5);
+    box-shadow: none;
+    transition: 0.2s;
+    font-weight: 700;
+  }
+  .btn-outline:hover { background: rgba(13, 154, 168, 0.08); transform: translateY(-2px); }
 
-  /* 支出類目 */
-  .expense-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .expense-table th { text-align:left; padding:12px 10px; color:#2dd4e0; font-weight:900; font-size:12px; letter-spacing:.1em; border-bottom:1px solid rgba(45,212,224,.3); }
-  .expense-table td { padding:14px 10px; border-bottom:1px solid rgba(45,212,224,.12); color:#cfe9ec; vertical-align:top; line-height:1.8; }
-  .expense-table td:first-child { font-weight:900; color:#f5a25d; white-space:nowrap; }
-  .expense-table tr:hover td { background:rgba(45,212,224,.04); }
+  .toc-card { border-radius: 28px; padding: 28px; }
+  .toc-title { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .toc-title span { font-family: 'Noto Serif TC', serif; font-size: 20px; font-weight: 900; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: rgba(13, 154, 168, 0.04);
+    border: 1px solid rgba(13, 154, 168, 0.12);
+    color: #2a5a62;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.2s;
+  }
+  .toc-item:hover {
+    background: rgba(13, 154, 168, 0.1);
+    border-color: rgba(13, 154, 168, 0.35);
+    transform: translateX(3px);
+    color: #0d9aa8;
+  }
+  .toc-num { font-family: 'Noto Serif TC', serif; color: var(--teal); font-weight: 900; font-size: 15px; min-width: 22px; }
+  .toc-arrow { margin-left: auto; color: var(--teal); opacity: 0.7; }
 
-  /* 投票卡片 */
-  .vote-card { border-radius:20px; padding:20px; background:rgba(16,38,47,.8); border:1px solid rgba(45,212,224,.12); box-shadow:0 8px 20px rgba(0,0,0,.2); }
-  .vote-card h4 { font-size:14px; font-weight:900; color:#2dd4e0; margin-bottom:12px; letter-spacing:.03em; }
-  .vote-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-  .vote-table td { padding:6px 4px; border-bottom:1px solid rgba(45,212,224,.1); color:#cfe9ec; vertical-align:middle; }
-  .vote-table td:last-child { text-align:right; font-weight:700; color:#f5a25d; min-width:48px; }
-  .vote-bar { height:6px; border-radius:3px; background:linear-gradient(90deg,#2dd4e0,#f5a25d); margin-top:2px; }
-  .vote-note { font-size:11px; color:#7a9ba0; margin-top:8px; font-style:italic; }
+  .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 16px; }
+  .thumb {
+    position: relative;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    border-radius: 14px;
+    cursor: pointer;
+    border: 1px solid rgba(13, 154, 168, 0.2);
+    transition: 0.2s;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: 0.3s; }
+  .thumb:hover { border-color: rgba(13, 154, 168, 0.5); transform: translateY(-3px); box-shadow: 0 8px 18px rgba(13, 154, 168, 0.12); }
+  .thumb:hover img { transform: scale(1.06); }
+  .thumb::after {
+    content: '＋';
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: #0d9aa8;
+    font-size: 14px;
+    font-weight: 900;
+    opacity: 0;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .thumb:hover::after { opacity: 1; }
 
-  /* 籌備歷程 */
-  .timeline { position:relative; padding-left:28px; }
-  .timeline::before { content:''; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg,#2dd4e0,#f5a25d); border-radius:2px; }
-  .timeline-item { position:relative; padding-bottom:22px; }
-  .timeline-item::before { content:''; position:absolute; left:-24px; top:5px; width:10px; height:10px; border-radius:50%; background:#2dd4e0; border:2px solid #0a1a22; box-shadow:0 0 0 2px rgba(45,212,224,.4); }
-  .timeline-date { font-family:'Noto Serif TC',serif; font-weight:900; color:#f5a25d; font-size:14px; }
-  .timeline-content { color:#cfe9ec; font-size:13px; line-height:1.8; margin-top:4px; }
-  .timeline-content .highlight { color:#2dd4e0; font-weight:700; }
+  /* 間諜照片：不可放大，不顯示＋ */
+  .thumb-static {
+    position: relative;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid rgba(13, 154, 168, 0.2);
+  }
+  .thumb-static img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-static::after { content: none; }
+
+  /* 橫式影片卡片（game） */
+  .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+  .video-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(13, 154, 168, 0.2);
+    background: #ffffff;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .video-card:hover {
+    border-color: rgba(13, 154, 168, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(13, 154, 168, 0.12);
+  }
+  .video-card video { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #eef4f6; }
+  .video-label {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #2a5a62;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+  }
+  .video-label span:last-child { color: var(--teal); font-size: 11px; }
+
+  /* 直式影片容器（all, fire）——限宽居中，不占满版面 */
+  .portrait-video-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .portrait-video-card {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(13, 154, 168, 0.25);
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(13, 154, 168, 0.08);
+    transition: 0.2s;
+  }
+  .portrait-video-card:hover {
+    border-color: rgba(13, 154, 168, 0.55);
+    box-shadow: 0 12px 30px rgba(13, 154, 168, 0.16);
+    transform: translateY(-2px);
+  }
+  .portrait-video-card video {
+    width: 100%;
+    aspect-ratio: 9/16;
+    object-fit: cover;
+    display: block;
+    background: #eef4f6;
+  }
+  .portrait-video-label {
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #1a3a42;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(13, 154, 168, 0.06), rgba(255, 255, 255, 0.9));
+  }
+  .portrait-video-label span:last-child { color: var(--teal); font-size: 11px; font-weight: 700; }
+
+  /* 總集篇：直式，但稍微大一點、仍是限寬居中 */
+  .feature-portrait-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .feature-portrait-card {
+    width: 100%;
+    max-width: 360px;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1.5px solid rgba(13, 154, 168, 0.35);
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(13, 154, 168, 0.1);
+    transition: 0.2s;
+  }
+  .feature-portrait-card:hover {
+    border-color: rgba(13, 154, 168, 0.6);
+    box-shadow: 0 16px 40px rgba(13, 154, 168, 0.18);
+    transform: translateY(-2px);
+  }
+  .feature-portrait-card video {
+    width: 100%;
+    aspect-ratio: 9/16;
+    object-fit: cover;
+    display: block;
+    background: #eef4f6;
+  }
+  .feature-portrait-label {
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 900;
+    color: #1a3a42;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(13, 154, 168, 0.06), rgba(255, 255, 255, 0.9));
+  }
+  .feature-portrait-label span:last-child { color: var(--teal); font-size: 11px; font-weight: 700; }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(240, 247, 249, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 24px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(13, 154, 168, 0.15);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(13, 154, 168, 0.3);
+    color: #0d9aa8;
+    font-size: 20px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+  .lightbox-close:hover { background: #ffffff; }
+
+  .expense-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .expense-table th {
+    text-align: left;
+    padding: 12px 10px;
+    color: #0d9aa8;
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(13, 154, 168, 0.2);
+  }
+  .expense-table td {
+    padding: 14px 10px;
+    border-bottom: 1px solid rgba(13, 154, 168, 0.08);
+    color: #3a5a62;
+    vertical-align: top;
+    line-height: 1.8;
+  }
+  .expense-table td:first-child { font-weight: 900; color: #d97d3a; white-space: nowrap; }
+  .expense-table tr:hover td { background: rgba(13, 154, 168, 0.03); }
+
+  .vote-card {
+    border-radius: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  }
+  .vote-card h4 { font-size: 14px; font-weight: 900; color: #0d9aa8; margin-bottom: 12px; letter-spacing: 0.03em; }
+  .vote-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .vote-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(13, 154, 168, 0.08);
+    color: #3a5a62;
+    vertical-align: middle;
+  }
+  .vote-table td:last-child { text-align: right; font-weight: 700; color: #d97d3a; min-width: 48px; }
+  .vote-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #34bcc8, #e8a05e);
+    margin-top: 2px;
+  }
+  .vote-note { font-size: 11px; color: #7a9ba0; margin-top: 8px; font-style: italic; }
+
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: linear-gradient(180deg, #34bcc8, #e8a05e);
+    border-radius: 2px;
+    opacity: 0.6;
+  }
+  .timeline-item { position: relative; padding-bottom: 22px; }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #34bcc8;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 2px rgba(13, 154, 168, 0.2);
+  }
+  .timeline-date { font-family: 'Noto Serif TC', serif; font-weight: 900; color: #d97d3a; font-size: 14px; }
+  .timeline-content { color: #3a5a62; font-size: 13px; line-height: 1.8; margin-top: 4px; }
+  .timeline-content .highlight { color: #0d9aa8; font-weight: 700; }
+
+  .cocktail-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+  .tag-ingredient { background: rgba(13, 154, 168, 0.08); color: #0d9aa8; border: 1px solid rgba(13, 154, 168, 0.25); }
+  .tag-garnish { background: rgba(217, 125, 58, 0.08); color: #d97d3a; border: 1px solid rgba(217, 125, 58, 0.25); }
+
+  .bright-accent { background: linear-gradient(135deg, rgba(13, 154, 168, 0.04), rgba(255, 255, 255, 0.8)); }
+
+  .spy-note {
+    background: rgba(217, 125, 58, 0.06);
+    border-left: 3px solid #d97d3a;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    color: #5a4a3a;
+    margin-top: 14px;
+  }
 </style>
 </head>
 <body>
@@ -91,7 +437,7 @@
     <span class="eyebrow">2026.09.26—27 · MID-AUTUMN VILLA PARTY</span>
     <h1 class="section-title text-gradient mt-4">50 個人，7 所學校，<br />把這個中秋，過成共同的回憶。</h1>
     <p class="muted mt-5">上海・浦東環嶼別墅<br />從第一次打招呼，到一起留下合照。來看看，那兩天一夜的我們。</p>
-    <img src="dance01.jpg" alt="舞會大合照" class="mt-8 rounded-[28px] shadow-[0_20px_50px_rgba(0,0,0,.4)] w-full" />
+    <img src="dance01.jpg" alt="舞會大合照" class="mt-8 rounded-[28px] shadow-[0_16px_40px_rgba(13,154,168,0.12)] w-full border border-[rgba(13,154,168,0.1)]" />
   </div>
 </header>
 
@@ -99,14 +445,14 @@
 <nav class="max-w-5xl mx-auto px-5 sm:px-8 pb-10">
   <div class="glass toc-card">
     <div class="toc-title">
-      <span class="text-[#2dd4e0] text-2xl">☰</span>
-      <span>目錄 <span class="text-[#9db8bc] text-sm font-normal">· 點擊即可跳轉</span></span>
+      <span class="text-[#0d9aa8] text-2xl">☰</span>
+      <span>目錄 <span class="text-[#4a6b72] text-sm font-normal">· 點擊即可跳轉</span></span>
     </div>
     <div class="toc-grid">
       <a href="#review" class="toc-item"><span class="toc-num">01</span>活動回顧<span class="toc-arrow">→</span></a>
-      <a href="#ice" class="toc-item"><span class="toc-num">02</span>破冰遊戲<span class="toc-arrow">→</span></a>
+      <a href="#ice" class="toc-item"><span class="toc-num">02</span>臥底是誰<span class="toc-arrow">→</span></a>
       <a href="#moments" class="toc-item"><span class="toc-num">03</span>活動片段<span class="toc-arrow">→</span></a>
-      <a href="#gallery" class="toc-item"><span class="toc-num">04</span>照片牆<span class="toc-arrow">→</span></a>
+      <a href="#videos" class="toc-item"><span class="toc-num">04</span>影片牆<span class="toc-arrow">→</span></a>
       <a href="#ig" class="toc-item"><span class="toc-num">05</span>IG 展板<span class="toc-arrow">→</span></a>
       <a href="#epilogue" class="toc-item"><span class="toc-num">06</span>結語與工作人員<span class="toc-arrow">→</span></a>
       <a href="#expense" class="toc-item"><span class="toc-num">07</span>活動支出<span class="toc-arrow">→</span></a>
@@ -117,28 +463,16 @@
   </div>
 </nav>
 
-<!-- 活動回顧 -->
+<!-- 活動回顧（左：大眾，右：工作人員） -->
 <section id="review" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
   <span class="eyebrow">REVIEW · 活動回顧</span>
   <h2 class="section-title mt-3">同一段時間，<span class="text-gradient">兩條並行的節奏。</span></h2>
-  <p class="muted mt-4">左邊是工作人員的籌備，右邊是大家一起參與的活動。<br />把它們放在一起，是因為這場活動，是兩邊一起完成的。</p>
+  <p class="muted mt-4">左邊是大家一起參與的活動，右邊是工作人員的籌備。<br />把它們放在一起，是因為這場活動，是兩邊一起完成的。</p>
 
   <div class="grid md:grid-cols-2 gap-6 mt-8">
-    <div class="card" style="border-color:rgba(245,162,93,.35);">
-      <h3 class="font-black text-lg mb-1 text-[#f5a25d]">工作人員</h3>
-      <p class="muted mb-4 text-xs">佈置、料理、場控</p>
-      <table class="money-table timeline-table">
-        <tr><td>13:00 — 14:00</td><td>工作人員佈置場地：搬沙發、整理物料、整理食材。工作人員簽到及選房間</td></tr>
-        <tr><td>15:30 — 16:30</td><td>廚房大廚（工作人員）製作滷肉飯（廚房）</td></tr>
-        <tr><td>16:30 — 17:30</td><td>廚房大廚（工作人員）製作燒烤（後院）</td></tr>
-        <tr><td>17:30 — 18:00</td><td>工作人員統計食物需求、食物種類比例，工作人員點單多批次外賣</td></tr>
-        <tr><td>19:30 — 20:00</td><td>工作人員籌備舞會</td></tr>
-        <tr><td>23:00 — 24:00</td><td>工作人員調酒比賽物料清點、籌備</td></tr>
-      </table>
-    </div>
-
-    <div class="card" style="border-color:rgba(45,212,224,.35);">
-      <h3 class="font-black text-lg mb-1 text-[#2dd4e0]">大眾</h3>
+    <!-- 大眾（左） -->
+    <div class="card" style="border-color:rgba(13,154,168,0.3);">
+      <h3 class="font-black text-lg mb-1 text-[#0d9aa8]">大眾</h3>
       <p class="muted mb-4 text-xs">報到、遊戲、晚餐、舞會、調酒</p>
       <table class="money-table timeline-table">
         <tr><td>14:00 — 15:30</td><td>簽到、破冰遊戲</td></tr>
@@ -151,22 +485,58 @@
         <tr><td>24:00 — 25:00</td><td>調酒比賽（3 位評委，單人賽 6 輪，雙人賽 2 輪）</td></tr>
       </table>
     </div>
+
+    <!-- 工作人員（右） -->
+    <div class="card" style="border-color:rgba(217,125,58,0.3);">
+      <h3 class="font-black text-lg mb-1 text-[#d97d3a]">工作人員</h3>
+      <p class="muted mb-4 text-xs">佈置、料理、場控</p>
+      <table class="money-table timeline-table">
+        <tr><td>13:00 — 14:00</td><td>工作人員佈置場地：搬沙發、整理物料、整理食材。工作人員簽到及選房間</td></tr>
+        <tr><td>14:00 — 15:30</td><td>工作人員籌備庭院遊戲和泳池遊戲</td></tr>
+        <tr><td>15:30 — 16:30</td><td>廚房大廚（工作人員）製作滷肉飯（廚房）</td></tr>
+        <tr><td>15:30 — 17:30</td><td>工作人員帶玩庭院遊戲和泳池遊戲</td></tr>
+        <tr><td>16:30 — 17:30</td><td>廚房大廚（工作人員）製作燒烤（後院）</td></tr>
+        <tr><td>17:30 — 18:00</td><td>工作人員統計食物需求、食物種類比例，工作人員點單多批次外賣</td></tr>
+        <tr><td>19:30 — 20:00</td><td>工作人員籌備舞會</td></tr>
+        <tr><td>20:00 — 23:00</td><td>工作人員帶玩 dresscode 舞會、合照、仙女棒光軌攝影等</td></tr>
+        <tr><td>23:00 — 24:00</td><td>工作人員調酒比賽物料清點、籌備</td></tr>
+      </table>
+    </div>
   </div>
 </section>
 
-<!-- 破冰遊戲 -->
+<!-- 臥底是誰（原破冰遊戲） -->
 <section id="ice" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-  <span class="eyebrow">BREAK THE ICE · 破冰遊戲</span>
+  <span class="eyebrow">BREAK THE ICE · 臥底是誰</span>
   <h2 class="section-title mt-3">現在，<span class="text-gradient">可以公開身份了。</span></h2>
   <p class="muted mt-4">當時和你一起玩遊戲的人，可能藏著另一個身份。<br />破冰遊戲結束了，現在正式公開潛伏名單。你猜中了幾位？</p>
-  <button onclick="toggleReveal()" class="btn mt-5 px-6 py-3 rounded-full font-bold text-sm">點我揭曉臥底名單</button>
+  <button onclick="toggleReveal()" class="btn mt-5 px-6 py-3 rounded-full text-sm">點我揭曉臥底名單</button>
   <div id="revealBox" class="glass rounded-3xl p-6 mt-5 hidden">
-    <table class="money-table">
-      <tr><td>間諜 1／諜中諜</td><td>Hana</td></tr>
-      <tr><td>間諜 2</td><td>小藍</td></tr>
-      <tr><td>間諜 3</td><td>雨田</td></tr>
-      <tr><td>間諜 4</td><td>Cinnamoroll</td></tr>
-    </table>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="text-center">
+        <div class="thumb-static"><img src="spy1.jpg" alt="間諜 1" /></div>
+        <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 1／諜中諜</p>
+        <p class="muted text-xs">Hana</p>
+      </div>
+      <div class="text-center">
+        <div class="thumb-static"><img src="spy2.jpg" alt="間諜 2" /></div>
+        <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 2</p>
+        <p class="muted text-xs">小藍</p>
+      </div>
+      <div class="text-center">
+        <div class="thumb-static"><img src="spy3.jpg" alt="間諜 3" /></div>
+        <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 3</p>
+        <p class="muted text-xs">雨田</p>
+      </div>
+      <div class="text-center">
+        <div class="thumb-static"><img src="spy4.jpg" alt="間諜 4" /></div>
+        <p class="font-black text-sm mt-2 text-[#0d9aa8]">間諜 4</p>
+        <p class="muted text-xs">Cinnamoroll</p>
+      </div>
+    </div>
+    <div class="spy-note">
+      📌 如果照片看不清楚，不知道是誰，可以找我詢問～
+    </div>
     <p class="muted mt-4">知道答案後，再看一次照片。是不是每個表情都變得可疑了？</p>
   </div>
 </section>
@@ -197,46 +567,114 @@
     </div>
 
     <div class="card">
-      <h3 class="font-black mb-2">煙火與仙女棒</h3>
+      <h3 class="font-black mb-2">煙火</h3>
       <p class="muted">煙火留在影片裡，我們留在光軌裡。</p>
       <div class="thumb-grid">
         <div class="thumb" onclick="openLightbox('fire01.jpg')"><img src="fire01.jpg" alt="煙火 1" /></div>
         <div class="thumb" onclick="openLightbox('fire02.jpg')"><img src="fire02.jpg" alt="煙火 2" /></div>
+      </div>
+    </div>
+
+    <!-- 仙女棒 -->
+    <div class="card">
+      <h3 class="font-black mb-2">仙女棒</h3>
+      <p class="muted">那一晚的光軌，是我們一起畫的。</p>
+      <div class="thumb-grid">
         <div class="thumb" onclick="openLightbox('light03.jpg')"><img src="light03.jpg" alt="仙女棒 1" /></div>
         <div class="thumb" onclick="openLightbox('light04.jpg')"><img src="light04.jpg" alt="仙女棒 2" /></div>
       </div>
     </div>
+  </div>
 
-    <div class="card" style="background:linear-gradient(135deg,rgba(245,162,93,.12),rgba(16,38,47,.8));border-color:rgba(245,162,93,.3);">
-      <h3 class="font-black mb-2">🏆 調酒冠軍</h3>
-      <p class="muted mb-1">那晚的冠軍，是這一杯。</p>
-      <p class="font-black text-xl text-[#f5a25d] my-3">［酒名］</p>
-      <p class="muted mb-3">獲勝者／隊伍：［名稱］<br />［一句風味描述。］</p>
-      <div class="thumb-grid">
-        <div class="thumb" onclick="openLightbox('alc01.jpg')"><img src="alc01.jpg" alt="調酒 1" /></div>
-        <div class="thumb" onclick="openLightbox('alc02.jpg')"><img src="alc02.jpg" alt="調酒 2" /></div>
+  <!-- 調酒單獨拉出來，放大卡片（图片在右侧） -->
+  <div class="card mt-8 bright-accent" style="border-color:rgba(217,125,58,0.25);">
+    <div class="md:flex md:gap-8">
+      <div class="md:flex-1">
+        <h3 class="font-black mb-2">🍸 調酒比賽 — 失戀主題</h3>
+        <p class="muted mb-1">那晚的參賽作品，主題是「失戀」。</p>
+        <p class="font-black text-xl text-[#d97d3a] my-3">《地平線》</p>
+        <p class="muted mb-3">獲勝者：<span class="font-bold text-[#0d9aa8]">Ice Wing</span></p>
+
+        <div class="mb-3">
+          <p class="text-xs font-bold text-[#0d9aa8] mb-1">酒體材料</p>
+          <span class="cocktail-tag tag-ingredient">龍舌蘭</span>
+          <span class="cocktail-tag tag-ingredient">石榴糖漿</span>
+          <span class="cocktail-tag tag-ingredient">檸檬汁</span>
+          <span class="cocktail-tag tag-ingredient">蘋果汁</span>
+          <span class="cocktail-tag tag-ingredient">橙汁</span>
+          <span class="cocktail-tag tag-ingredient">梨汁</span>
+        </div>
+        <div class="mb-3">
+          <p class="text-xs font-bold text-[#d97d3a] mb-1">輔料</p>
+          <span class="cocktail-tag tag-garnish">肉桂</span>
+          <span class="cocktail-tag tag-garnish">迷迭香</span>
+          <span class="cocktail-tag tag-garnish">鹽邊</span>
+        </div>
+
+        <p class="muted mb-2">
+          <span class="font-bold text-[#0d9aa8]">色彩：</span>整體霧色，體現失戀心情的迷茫。石榴糖漿淌下，體現心暗暗滴血。
+        </p>
+        <p class="muted mb-3">
+          <span class="font-bold text-[#d97d3a]">理念：</span>前調以比較鹹、苦和香料的衝來鋪墊，然後是複合果汁的淡複合甜味，體現回憶的複雜美好，回味是龍舌蘭的清苦。整體比較偏淡口，希望可以放下失戀，繼續向前～
+        </p>
+      </div>
+      <div class="md:w-56 mt-4 md:mt-0">
+        <div class="thumb-grid grid-cols-1">
+          <div class="thumb" onclick="openLightbox('alc01.jpg')"><img src="alc01.jpg" alt="調酒 1" /></div>
+          <div class="thumb" onclick="openLightbox('alc02.jpg')"><img src="alc02.jpg" alt="調酒 2" /></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 照片牆 -->
-<section id="gallery" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-  <span class="eyebrow">GALLERY · 照片牆</span>
-  <h2 class="section-title mt-3">找找看，<span class="text-gradient">你在哪一張裡面。</span></h2>
-  <div class="thumb-grid mt-8">
-    <div class="thumb" onclick="openLightbox('game01.jpg')"><img src="game01.jpg" alt="泳池 1" /></div>
-    <div class="thumb" onclick="openLightbox('game02.jpg')"><img src="game02.jpg" alt="泳池 2" /></div>
-    <div class="thumb" onclick="openLightbox('dance01.jpg')"><img src="dance01.jpg" alt="舞會 1" /></div>
-    <div class="thumb" onclick="openLightbox('dance02.jpg')"><img src="dance02.jpg" alt="舞會 2" /></div>
-    <div class="thumb" onclick="openLightbox('fire01.jpg')"><img src="fire01.jpg" alt="煙火 1" /></div>
-    <div class="thumb" onclick="openLightbox('fire02.jpg')"><img src="fire02.jpg" alt="煙火 2" /></div>
-    <div class="thumb" onclick="openLightbox('light03.jpg')"><img src="light03.jpg" alt="仙女棒 1" /></div>
-    <div class="thumb" onclick="openLightbox('light04.jpg')"><img src="light04.jpg" alt="仙女棒 2" /></div>
-    <div class="thumb" onclick="openLightbox('alc01.jpg')"><img src="alc01.jpg" alt="調酒 1" /></div>
-    <div class="thumb" onclick="openLightbox('alc02.jpg')"><img src="alc02.jpg" alt="調酒 2" /></div>
+<!-- 影片牆 -->
+<section id="videos" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
+  <span class="eyebrow">VIDEO WALL · 影片牆</span>
+  <h2 class="section-title mt-3">動起來的回憶，<span class="text-gradient">在這裡。</span></h2>
+  <p class="muted mt-4">先看總集篇，再回顧泳池遊戲與煙火的片段。</p>
+
+  <!-- 總集篇 all.mp4（直式，限寬居中） -->
+  <div class="mt-8">
+    <h3 class="font-black text-base text-[#0d9aa8] mb-3 flex items-center gap-2">
+      <span>🎬</span> 活動總集篇
+    </h3>
+    <div class="feature-portrait-wrap">
+      <div class="feature-portrait-card">
+        <video src="all.mp4" controls preload="metadata" playsinline></video>
+        <div class="feature-portrait-label">
+          <span>2026 中秋 Villa Party · 完整回顧</span>
+          <span>▶ 點擊播放</span>
+        </div>
+      </div>
+    </div>
+    <p class="muted text-xs mt-3 text-center">兩天一夜的精華，都在這裡了。</p>
   </div>
-  <p class="muted mt-4">點擊縮圖可看大圖，歡迎下載留存。</p>
+
+  <!-- 泳池遊戲 game01.mp4（橫式，維持網格） -->
+  <div class="mt-10">
+    <h3 class="font-black text-sm text-[#0d9aa8] mb-3">🏊 泳池遊戲</h3>
+    <div class="video-grid">
+      <div class="video-card">
+        <video src="game01.mp4" controls preload="metadata" playsinline></video>
+        <div class="video-label"><span>泳池遊戲 01</span><span>▶</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 煙火 fire01.mp4（直式，限寬居中） -->
+  <div class="mt-10">
+    <h3 class="font-black text-sm text-[#d97d3a] mb-3">🎆 煙火</h3>
+    <div class="portrait-video-wrap">
+      <div class="portrait-video-card">
+        <video src="fire01.mp4" controls preload="metadata" playsinline></video>
+        <div class="portrait-video-label">
+          <span>煙火 01</span>
+          <span>▶ 點擊播放</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- IG 展板 -->
@@ -248,25 +686,30 @@
 
 <!-- 結語與工作人員（合併區塊） -->
 <section id="epilogue" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
-  <!-- 結語卡片 -->
   <div class="glass rounded-[32px] p-8 md:p-12 text-center mb-10">
     <span class="eyebrow">EPILOGUE · 結語</span>
     <h2 class="section-title mt-4">活動結束了，<br /><span class="text-gradient">還有一些話想留下。</span></h2>
     <p class="muted mt-6 max-w-xl mx-auto">謝謝你加入這場中秋相聚。從破冰到煙火，從泳池到調酒，每一個片段，都是因為有你在，才成立。</p>
     <p class="muted mt-4 max-w-xl mx-auto">希望那兩天，有讓你認識新的人，也有讓你留下一些，回去之後還會想起的畫面。</p>
-    <p class="font-black text-[#2dd4e0] mt-6">我們下次見。</p>
+    <p class="font-black text-[#0d9aa8] mt-6">我們下次見。</p>
   </div>
 
-  <!-- 工作人員 -->
   <span class="eyebrow">TEAM · 工作人員</span>
   <h2 class="section-title mt-3">謝謝<span class="text-gradient">每一位夥伴。</span></h2>
   <div class="grid md:grid-cols-2 gap-4 mt-8">
-    <div class="card"><h3 class="font-black text-sm text-[#2dd4e0] mb-1">總召／第十屆會長</h3><p class="muted">加薪</p></div>
-    <div class="card"><h3 class="font-black text-sm text-[#2dd4e0] mb-1">副召／第十屆副會長</h3><p class="muted">陸</p></div>
-    <div class="card"><h3 class="font-black text-sm text-[#2dd4e0] mb-1">副召／第十屆儲備幹部</h3><p class="muted">樹岩、點點凡塵、Rosalind</p></div>
-    <div class="card"><h3 class="font-black text-sm text-[#2dd4e0] mb-1">大廚／食材預定</h3><p class="muted">陈祉涵、Ice Wing</p></div>
-    <div class="card"><h3 class="font-black text-sm text-[#2dd4e0] mb-1">大廚招募／參與會議</h3><p class="muted">Cinnamoroll</p></div>
-    <div class="card"><h3 class="font-black text-sm text-[#2dd4e0] mb-1">贊助－總召的爸媽</h3><p class="muted">提供一箱台灣零食給工作人員挑選</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">總召／交大台生會第十屆會長</h3><p class="muted">@加薪</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">副召／交大台生會第十屆副會長</h3><p class="muted">@陸</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">副召／交大台生會儲備幹部</h3><p class="muted">@樹岩、點點凡塵、Rosalind</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">工作人員／大廚&amp;物料預定</h3><p class="muted">@陈祉涵、Ice Wing</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">工作人員／大廚招募&amp;共同策劃</h3><p class="muted">@Cinnamoroll</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">友校宣傳夥伴／復旦台生</h3><p class="muted">@</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">友校宣傳夥伴／復旦澳生</h3><p class="muted">@</p></div>
+    <div class="card"><h3 class="font-black text-sm text-[#0d9aa8] mb-1">友校宣傳夥伴／上中醫港澳台生</h3><p class="muted">@</p></div>
+    <div class="card md:col-span-2"><h3 class="font-black text-sm text-[#d97d3a] mb-1">各校參與活動的小夥伴</h3><p class="muted">@所有人</p></div>
+  </div>
+  <div class="glass rounded-3xl p-6 mt-6 text-center">
+    <p class="font-black text-[#0d9aa8]">第十屆交大台生會 祝福大家</p>
+    <p class="muted mt-1">國慶假期愉快，下次活動再見</p>
   </div>
 </section>
 
@@ -302,10 +745,9 @@
     </table>
   </div>
 
-  <!-- 下載詳細明細 -->
   <div class="mt-6 text-center">
-    <a href="mingxi.xlsx" download class="btn-outline inline-block px-6 py-3 rounded-full font-bold text-sm">
-      ⬇ 下載活動支出詳細明細（mingxi.xlsx）
+    <a href="mingxi.xlsx" download class="btn-outline inline-block px-6 py-3 rounded-full text-sm">
+      ⬇ 下載投票明細（mingxi.xlsx）
     </a>
   </div>
 </section>
@@ -317,7 +759,6 @@
   <p class="muted mt-4">感謝大家投票決定酒類預算、餐食加價與種類。以下是投票結果的完整整理。</p>
 
   <div class="grid md:grid-cols-2 gap-5 mt-8">
-    <!-- 問題1-1：是否增加餐食預算 -->
     <div class="vote-card">
       <h4>🍽️ 是否增加餐食預算</h4>
       <table class="vote-table">
@@ -328,7 +769,6 @@
       <div class="vote-bar" style="width:62%;"></div>
     </div>
 
-    <!-- 問題1-2：增加的餐食預算額度 -->
     <div class="vote-card">
       <h4>💰 增加的餐食預算額度</h4>
       <table class="vote-table">
@@ -341,7 +781,6 @@
       <div class="vote-bar" style="width:44%;"></div>
     </div>
 
-    <!-- 問題2：選擇餐食種類 -->
     <div class="vote-card">
       <h4>🍕 選擇餐食種類（可多選）</h4>
       <table class="vote-table">
@@ -355,7 +794,6 @@
       <div class="vote-bar" style="width:39%;"></div>
     </div>
 
-    <!-- 問題3：是否要大罐飲料 -->
     <div class="vote-card">
       <h4>🥤 是否要大罐飲料</h4>
       <table class="vote-table">
@@ -367,7 +805,6 @@
       <div class="vote-bar" style="width:65%;"></div>
     </div>
 
-    <!-- 問題4：喝酒參與方式（飲酒風格） -->
     <div class="vote-card">
       <h4>🍸 喝酒參與方式（飲酒風格）</h4>
       <table class="vote-table">
@@ -380,7 +817,6 @@
       <div class="vote-bar" style="width:41%;"></div>
     </div>
 
-    <!-- 問題5：喝酒預算（參與喝酒） -->
     <div class="vote-card">
       <h4>💰 喝酒預算（參與喝酒）</h4>
       <table class="vote-table">
@@ -392,7 +828,6 @@
       <div class="vote-bar" style="width:37%;"></div>
     </div>
 
-    <!-- 問題6：調酒比賽預算 -->
     <div class="vote-card">
       <h4>🍹 調酒比賽預算</h4>
       <table class="vote-table">
@@ -403,6 +838,52 @@
       <div class="vote-bar" style="width:60%;"></div>
     </div>
   </div>
+
+  <!-- 投票明细（放在票数总结后面） -->
+  <div class="mt-10">
+    <div class="card bright-accent" style="border-color:rgba(13,154,168,0.3);">
+      <h3 class="font-black text-lg text-[#0d9aa8] mb-2">📋 投票明細</h3>
+      <p class="muted mb-4">以下是投票的完整明細，包含每一輪的原始數據。</p>
+      <div class="overflow-x-auto">
+        <table class="expense-table">
+          <thead>
+            <tr><th>項目</th><th>明細</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>是否增加餐食預算</td>
+              <td>是，增加 62%；否，不增加 38%</td>
+            </tr>
+            <tr>
+              <td>增加的餐食預算額度</td>
+              <td>增加 40 元 44%；增加 20 元 25%；增加 30 元 25%；增加 50 元 6%</td>
+            </tr>
+            <tr>
+              <td>選擇餐食種類（可多選）</td>
+              <td>燒烤 39%；披薩 23%；任意外賣 16%；滷肉飯 13%；炸雞薯條 10%</td>
+            </tr>
+            <tr>
+              <td>是否要大罐飲料</td>
+              <td>自行解決 65%；想要一點 35%；想要很多 0%</td>
+            </tr>
+            <tr>
+              <td>喝酒參與方式</td>
+              <td>酒桶 41%；各只喝一點 41%；很多啤酒 14%；很多烈酒 5%</td>
+            </tr>
+            <tr>
+              <td>喝酒預算</td>
+              <td>55 元 37%；35 元 32%；75 元 32%</td>
+            </tr>
+            <tr>
+              <td>調酒比賽預算</td>
+              <td>15 元 60%；25 元 40%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted mt-4 text-xs">＊詳細投票檔案請點擊上方按鈕下載。</p>
+    </div>
+  </div>
 </section>
 
 <!-- 意見調查 -->
@@ -410,18 +891,27 @@
   <span class="eyebrow">SURVEY · 意見調查</span>
   <h2 class="section-title mt-3">想聽聽<span class="text-gradient">你的想法。</span></h2>
   <p class="muted mt-4">謝謝你參與這次活動。想聽聽你的想法，讓我們下次辦得更好。</p>
-  <a href="https://v.wjx.cn/vm/OKmqy8S.aspx" target="_blank" rel="noreferrer" class="btn inline-block mt-5 px-6 py-3 rounded-full font-bold text-sm">前往填寫問卷 ➔</a>
+  <a href="https://v.wjx.cn/vm/OKmqy8S.aspx" target="_blank" rel="noreferrer" class="btn inline-block mt-5 px-6 py-3 rounded-full text-sm">前往填寫問卷 ➔</a>
 </section>
 
-<!-- 籌備歷程（按日期順序） -->
+<!-- 籌備歷程 -->
 <section id="prep" class="max-w-5xl mx-auto px-5 sm:px-8 py-10">
   <span class="eyebrow">BEHIND THE SCENES · 籌備歷程</span>
   <h2 class="section-title mt-3">那些沒被拍進<span class="text-gradient">照片裡的畫面。</span></h2>
   <p class="muted mt-4">大家看到的，是兩天一夜的活動。但其實，在這之前，還有很多個晚上。<br />以下是從 8 月底到 9 月中，我們一步步走過的籌備行事曆。</p>
 
+  <!-- 大型文件規模說明 -->
+  <div class="glass rounded-2xl p-5 mt-6 mb-8 text-center" style="border-color:rgba(217,125,58,0.25); background:rgba(255,255,255,0.7);">
+    <p class="text-sm font-bold text-[#d97d3a] mb-1">📂 籌備期間產出的大型文件</p>
+    <p class="muted text-xs leading-relaxed">
+      <strong>轟趴目錄</strong>：包含所有規劃和安排，全文兩萬八千字<br />
+      <strong>活動說明與宣傳網頁</strong>：包含所有活動規劃和詳細安排，代碼全文九萬七千字<br />
+      <a href="https://0230rrr.github.io/2026/0926" target="_blank" class="text-[#0d9aa8] underline font-bold">https://0230rrr.github.io/2026/0926</a>
+    </p>
+  </div>
+
   <div class="card mt-8">
     <div class="timeline">
-      <!-- 8/24 - 8/30 區塊 -->
       <div class="timeline-item">
         <div class="timeline-date">8/24 — 8/30｜確認方向，建立框架</div>
         <div class="timeline-content">
@@ -434,7 +924,7 @@
         <div class="timeline-content">
           對接場地方，談合作。<br />
           拉副召核心群。<br />
-          製作<活動概念>企劃書。
+          製作〈活動概念〉企劃書。
         </div>
       </div>
       <div class="timeline-item">
@@ -452,7 +942,7 @@
       <div class="timeline-item">
         <div class="timeline-date">8/28</div>
         <div class="timeline-content">
-          製作<轟趴目錄>。<br />
+          製作〈轟趴目錄〉。<br />
           初步確定各組分工。
         </div>
       </div>
@@ -466,12 +956,11 @@
       <div class="timeline-item">
         <div class="timeline-date">8/30</div>
         <div class="timeline-content">
-          製作官網稿件（<a href="https://share.gemini.google/TVSGHkxc7B1S" target="_blank" class="text-[#2dd4e0] underline">連結</a>）。<br />
+          製作官網稿件（<a href="https://share.gemini.google/TVSGHkxc7B1S" target="_blank" class="text-[#0d9aa8] underline">連結</a>）。<br />
           製作報名問卷稿件。
         </div>
       </div>
 
-      <!-- 8/31 - 9/6 區塊 -->
       <div class="timeline-item" style="margin-top:18px;">
         <div class="timeline-date">8/31 — 9/6｜確認定價，完善方案</div>
         <div class="timeline-content">
@@ -483,7 +972,7 @@
         <div class="timeline-content">
           投票本周開會時間。<br />
           邀請友校見面談合作。<br />
-          持續完善<轟趴目錄>。
+          持續完善〈轟趴目錄〉。
         </div>
       </div>
       <div class="timeline-item">
@@ -508,7 +997,6 @@
         </div>
       </div>
 
-      <!-- 9/7 - 9/13 區塊 -->
       <div class="timeline-item" style="margin-top:18px;">
         <div class="timeline-date">9/7 — 9/13｜招募夥伴，正式啟動</div>
         <div class="timeline-content">
@@ -538,11 +1026,24 @@
           副召聚，晚上開活動會。
         </div>
       </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/14 — 9/25</div>
+        <div class="timeline-content">
+          <span class="highlight">（持續推進，細節繁多，此處僅列大綱）</span><br />
+          各組分頭籌備：食材採購、物料下單、場地佈置規劃、遊戲設計、調酒菜單確認、報名統計、繳費通知等。
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">9/26 — 9/27</div>
+        <div class="timeline-content">
+          <span class="highlight">活動正式舉行</span> 🎉
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<footer class="py-10 text-center text-xs text-[#5c7a80] border-t border-[rgba(45,212,224,.15)] mt-10">
+<footer class="py-10 text-center text-xs text-[#7a9ba0] border-t border-[rgba(13,154,168,0.1)] mt-10">
   © 2026 中秋宿營 Villa Party · 交大台生會
 </footer>
 
