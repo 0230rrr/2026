@@ -68,6 +68,26 @@
     transform: translateY(-2px);
   }
 
+  /* 手機版卡片內距縮小，讓兩列更舒服 */
+  @media (max-width: 640px) {
+    .ig-card.card {
+      padding: 12px;
+      border-radius: 16px;
+    }
+    .ig-avatar-ring {
+      padding: 2px;
+      border-radius: 12px;
+    }
+    .ig-avatar-inner {
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+    }
+    .ig-avatar-fallback {
+      font-size: 15px;
+    }
+  }
+
   .hero-orb {
     position: absolute;
     border-radius: 9999px;
@@ -114,20 +134,33 @@
     transform: translateY(-2px);
   }
 
-  /* IG 渐变头像框（无照片，仅用于账号徽章） */
+  /* IG 渐变头像框（自动抓取头像 + 失败回退首字母） */
   .ig-avatar-ring {
     background: var(--ig-gradient);
     padding: 3px;
     border-radius: 16px;
     flex-shrink: 0;
   }
-  .ig-avatar-ring > div {
+  .ig-avatar-inner {
     background: #ffffff;
     border-radius: 13px;
     width: 48px;
     height: 48px;
-    display: grid;
+    overflow: hidden;
+    position: relative;
+  }
+  .ig-avatar-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 13px;
+    display: block;
+  }
+  .ig-avatar-fallback {
+    display: none;
     place-items: center;
+    width: 100%;
+    height: 100%;
     font-size: 20px;
     font-weight: 900;
     color: #0d9aa8;
@@ -287,8 +320,8 @@
       </div>
     </div>
 
-    <!-- IG 卡片容器 -->
-    <div id="igGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <!-- IG 卡片容器：手機 2 列，平板 2 列，桌面 3 列 -->
+    <div id="igGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5"></div>
 
     <!-- 空状态提示 -->
     <div id="emptyState" class="hidden text-center py-16">
@@ -312,7 +345,6 @@
       if (input.value.trim() === CORRECT_PASSWORD) {
         lockScreen.classList.add('hidden');
         mainContent.classList.remove('hidden');
-        // 初始渲染（已经包含乱序后的数据）
         renderIGCards();
         error.textContent = '';
       } else {
@@ -323,11 +355,8 @@
     }
 
     // ==========================================
-    // 1. 成员资料库（已加上昵称 + 新增成员）
-    //    ★ 成员1-4保持原序（索引0~3）
-    //    ★ 成员5之后（含新增成员）已由 AI 一键乱序
+    // 1. 成员资料库
     // ==========================================
-    // 成员1-4（固定）
     const FIXED_MEMBERS = [
       { name: "_0230rrr（加薪）", handle: "_0230rrr", link: "https://instagram.com/_0230rrr?cplk=MWg3a2ljY2RnYWMxYw%3D%3D" },
       { name: "sabrinalu0119（陸）", handle: "sabrinalu0119", link: "https://www.instagram.com/sabrinalu0119?srtk=MWlqZGdiMG41eW0wbw==" },
@@ -335,7 +364,6 @@
       { name: "linshuyen16（樹岩）", handle: "linshuyen16", link: "https://www.instagram.com/linshuyen16?cplk=MWgwbzFteWxzcHB1Zw==" }
     ];
 
-    // 其余成员池（已加上昵称，包含所有新增成员）
     const OTHER_MEMBERS_POOL = [
       { name: "YITING.YUAN.39（yiting）", handle: "yiting.yuan.39", link: "https://www.instagram.com/yiting.yuan.39?dlrf=eGJ1aDA4ZGEwbDFk" },
       { name: "CINNAMOROLL_0127（Cinnamoroll）", handle: "cinnamoroll_0127", link: "https://www.instagram.com/cinnamoroll_0127?dlrf=dnVweG4wbGN6emli" },
@@ -363,19 +391,13 @@
       { name: "ying_tsen_（映岑）", handle: "ying_tsen_", link: "https://www.instagram.com/ying_tsen_?mdxt=MjR3d2hkdjJ6bWt1" },
       { name: "CHIAHSUAN310（mojave）", handle: "chiahsuan310", link: "https://www.instagram.com/chiahsuan310?exln=cDEwOWIyYXF3c2x0" },
       { name: "_h.c.y_0602_（Robbie.H）", handle: "_h.c.y_0602_", link: "https://www.instagram.com/_h.c.y_0602_?srtk=N2h5anNsejk5MmNv" },
-      // 新增成员 _jhou.15
       { name: "_jhou.15（洲）", handle: "_jhou.15", link: "https://www.instagram.com/_jhou.15?exln=MWZia2RuZHBmOHgzNg==" },
-      // 新3位成員（已加昵称）
       { name: "yishan（珊）", handle: "yi_shan.08", link: "https://www.instagram.com/yi_shan.08?cplk=MWpnNDl3dDJxaWVyeg==" },
       { name: "Cxy（Daniel）", handle: "cxy__0121", link: "https://www.instagram.com/cxy__0121?mdxt=MXYwMGl5cXQzMjZidw==" },
       { name: "Roo（我在数雪）", handle: "roochierat", link: "https://www.instagram.com/roochierat?obrf=MWdoZG1sbmtqYXZ1Mw==" },
-      // ↓↓↓ 本次新增成員 ↓↓↓
       { name: "shmily__kk（kk）", handle: "shmily__kk", link: "https://www.instagram.com/shmily__kk?psln=bjRiZXR2OGppbGdx" }
     ];
 
-    // ==========================================
-    // 2. 初始乱序
-    // ==========================================
     function shuffleArray(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -385,14 +407,11 @@
       return a;
     }
 
-    // 初始乱序后的其他成员（打乱一次）
     let shuffledOthers = shuffleArray(OTHER_MEMBERS_POOL);
-
-    // 全局 partyMembers = 固定成员 + 乱序后的其他成员
     let partyMembers = [...FIXED_MEMBERS, ...shuffledOthers];
 
     // ==========================================
-    // 3. 渲染卡片
+    // 2. 渲染卡片
     // ==========================================
     function renderIGCards() {
       const container = document.getElementById('igGrid');
@@ -402,9 +421,17 @@
         <div class="ig-card card flex flex-col justify-between" style="border-radius:20px;">
           <div>
             <div class="flex items-center gap-3.5 mb-4">
-              <!-- IG 渐变徽章（无照片，只显示首字母） -->
               <div class="ig-avatar-ring">
-                <div>${m.handle.charAt(0).toUpperCase()}</div>
+                <div class="ig-avatar-inner">
+                  <img
+                    src="https://unavatar.io/instagram/${m.handle}"
+                    alt="${m.name}"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';"
+                  />
+                  <span class="ig-avatar-fallback">${m.handle.charAt(0).toUpperCase()}</span>
+                </div>
               </div>
               <div class="overflow-hidden">
                 <h3 class="font-bold text-[#1a3a42] text-base truncate">${m.name}</h3>
@@ -414,11 +441,9 @@
           </div>
 
           <div class="flex gap-2 pt-3 border-t border-[rgba(13,154,168,0.12)]">
-            <!-- 一键复制 -->
             <button onclick="copyToClipboard('${m.handle}', this)" class="btn-outline flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
               <span>📋</span> 複製帳號
             </button>
-            <!-- 直达 IG -->
             <a href="${m.link}" target="_blank" rel="noreferrer" class="btn flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-center">
               <span>🔗</span> 追蹤 IG
             </a>
@@ -428,7 +453,7 @@
     }
 
     // ==========================================
-    // 4. 一键复制与提示反馈
+    // 3. 一键复制与提示反馈
     // ==========================================
     function copyToClipboard(text, btnElement) {
       navigator.clipboard.writeText(text).then(() => {
@@ -447,7 +472,7 @@
     }
 
     // ==========================================
-    // 5. 即时搜索过滤
+    // 4. 即时搜索过滤
     // ==========================================
     function filterIGCards() {
       const query = document.getElementById('igSearchInput').value.toLowerCase();
@@ -466,19 +491,17 @@
     }
 
     // ==========================================
-    // 6. 一键乱序按钮（仅打乱非成员1-4）
+    // 5. 一键乱序按钮（仅打乱非成员1-4）
     // ==========================================
     function shuffleOthers() {
       if (partyMembers.length <= 4) return;
 
-      const fixed = partyMembers.slice(0, 4);          // 成员1-4
-      const others = partyMembers.slice(4);           // 其余成员
+      const fixed = partyMembers.slice(0, 4);
+      const others = partyMembers.slice(4);
       const shuffled = shuffleArray(others);
       partyMembers = [...fixed, ...shuffled];
 
-      // 重新渲染，并清空搜索（可选）
       renderIGCards();
-      // 清空搜索框，避免过滤状态导致显示不全
       const searchInput = document.getElementById('igSearchInput');
       if (searchInput) {
         searchInput.value = '';
@@ -487,10 +510,9 @@
     }
 
     // ==========================================
-    // 7. 页面初始化与事件绑定
+    // 6. 页面初始化
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
-      // 给乱序按钮绑定事件
       const shuffleBtn = document.getElementById('shuffleBtn');
       if (shuffleBtn) {
         shuffleBtn.addEventListener('click', shuffleOthers);
