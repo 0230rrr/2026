@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>中秋VillaParty · IG 展板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,6 +21,10 @@
     --ig-gradient: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
   }
   * { box-sizing: border-box; }
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
   body {
     margin: 0;
     font-family: 'Noto Sans TC', sans-serif;
@@ -85,6 +89,16 @@
     }
     .ig-avatar-fallback {
       font-size: 15px;
+    }
+    .ig-card h3 {
+      font-size: 13px !important;
+    }
+    .ig-card .text-xs {
+      font-size: 10px !important;
+    }
+    .ig-card button, .ig-card a {
+      font-size: 10px !important;
+      padding: 6px 4px !important;
     }
   }
 
@@ -291,9 +305,9 @@
   </div>
 
   <!-- ============ 主内容 ============ -->
-  <main id="mainContent" class="max-w-5xl mx-auto px-5 sm:px-8 py-12 relative z-10 hidden">
+  <main id="mainContent" class="max-w-5xl mx-auto px-4 sm:px-8 py-12 relative z-10 hidden w-full">
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-      <div>
+      <div class="w-full min-w-0">
         <span class="eyebrow">CONTACT · 聯絡展板</span>
         <h2 class="section-title mt-2">把大家<span class="text-gradient">加起來。</span></h2>
         <p class="muted mt-2">那兩天認識的人，回去之後還可以繼續聯絡！點擊一鍵複製帳號或直達 IG。</p>
@@ -308,8 +322,8 @@
         </div>
       </div>
 
-      <!-- 即时搜索列 -->
-      <div class="relative min-w-[260px]">
+      <!-- 即时搜索列：手机上全宽，桌面上固定宽度 -->
+      <div class="w-full md:w-auto md:min-w-[260px]">
         <input
           type="text"
           id="igSearchInput"
@@ -321,7 +335,7 @@
     </div>
 
     <!-- IG 卡片容器：手機 2 列，平板 2 列，桌面 3 列 -->
-    <div id="igGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5"></div>
+    <div id="igGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full"></div>
 
     <!-- 空状态提示 -->
     <div id="emptyState" class="hidden text-center py-16">
@@ -418,9 +432,9 @@
       if (!container) return;
 
       container.innerHTML = partyMembers.map(m => `
-        <div class="ig-card card flex flex-col justify-between" style="border-radius:20px;">
-          <div>
-            <div class="flex items-center gap-3.5 mb-4">
+        <div class="ig-card card flex flex-col justify-between min-w-0" style="border-radius:20px;">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2.5 sm:gap-3.5 mb-3 sm:mb-4 min-w-0">
               <div class="ig-avatar-ring">
                 <div class="ig-avatar-inner">
                   <img
@@ -433,19 +447,19 @@
                   <span class="ig-avatar-fallback">${m.handle.charAt(0).toUpperCase()}</span>
                 </div>
               </div>
-              <div class="overflow-hidden">
+              <div class="overflow-hidden min-w-0 flex-1">
                 <h3 class="font-bold text-[#1a3a42] text-base truncate">${m.name}</h3>
                 <p class="text-xs text-[#0d9aa8] font-mono mt-0.5 truncate">@${m.handle}</p>
               </div>
             </div>
           </div>
 
-          <div class="flex gap-2 pt-3 border-t border-[rgba(13,154,168,0.12)]">
-            <button onclick="copyToClipboard('${m.handle}', this)" class="btn-outline flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
-              <span>📋</span> 複製帳號
+          <div class="flex gap-1.5 sm:gap-2 pt-2 sm:pt-3 border-t border-[rgba(13,154,168,0.12)]">
+            <button onclick="copyToClipboard('${m.handle}', this)" class="btn-outline flex-1 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all whitespace-nowrap">
+              <span>📋</span> 複製
             </button>
-            <a href="${m.link}" target="_blank" rel="noreferrer" class="btn flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 text-center">
-              <span>🔗</span> 追蹤 IG
+            <a href="${m.link}" target="_blank" rel="noreferrer" class="btn flex-1 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold flex items-center justify-center gap-1 text-center whitespace-nowrap">
+              <span>🔗</span> 追蹤
             </a>
           </div>
         </div>
