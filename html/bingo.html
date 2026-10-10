@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>宾果任务</title>
+<style>
+:root{--bg1:#f7f0fc;--bg2:#e9dff2;--panel:rgba(255,255,255,.7);--border:rgba(255,255,255,.5);--card:rgba(255,255,255,.8);--cardB:rgba(255,255,255,.6);--tp:#2d1b3a;--tm:#9a7ab8;--ac:#8a4fbd;--acH:#6e3a9c;--cell:#fff;--cellS:0 4px 10px rgba(0,0,0,.03),0 0 0 1px rgba(180,130,220,.2);--cellCB:#b27bdf;--reward:#f5edfe;--rewardB:#e0cef5;--input:#fff;--inputB:#d9c2f0;--stats:#2d1b3a;--statsT:#fff;--statsS:#8a4fbd;--resetB:#c7a9e0;--resetT:#6b4b8a;--resetH:#f0e6ff;--toast:#2d1b3a;--toastT:#f0e6ff;--addA:#ffffffc2;--modalBg:rgba(0,0,0,.5)}
+[data-theme="dark"]{--bg1:#1a1025;--bg2:#2a1a3a;--panel:rgba(30,20,45,.8);--border:rgba(100,70,140,.4);--card:rgba(35,25,50,.85);--cardB:rgba(100,70,140,.3);--tp:#e8dff0;--tm:#9a7ab8;--ac:#a66dd4;--acH:#b884e0;--cell:#2a1a3a;--cellS:0 4px 10px rgba(0,0,0,.3),0 0 0 1px rgba(150,100,200,.2);--cellCB:#a66dd4;--reward:#2a1a3a;--rewardB:#4a3065;--input:#1a1025;--inputB:#4a3065;--stats:#120a1a;--statsT:#e8dff0;--statsS:#8a4fbd;--resetB:#5a3a7a;--resetT:#c4a8dd;--resetH:#3d2a5a;--toast:#f0e6ff;--toastT:#2d1b3a;--addA:rgba(40,25,60,.9);--modalBg:rgba(0,0,0,.7)}
+*{box-sizing:border-box;font-family:system-ui,'Segoe UI',Roboto,sans-serif}
+body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;margin:0;padding:2rem 1.5rem;display:flex;justify-content:center;align-items:flex-start;transition:.3s}
+.app{max-width:1300px;width:100%;display:grid;grid-template-columns:1fr 360px;gap:1.8rem;align-items:start}
+.bingo-panel{background:var(--panel);backdrop-filter:blur(10px);border-radius:2.5rem;padding:2rem;box-shadow:0 20px 40px rgba(0,0,0,.15);border:1px solid var(--border);transition:.3s}
+.bingo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;aspect-ratio:1/1;width:100%;margin-bottom:1.5rem}
+.cell{border-radius:20px;padding:8px 6px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--cellS);transition:.2s;cursor:pointer;border:2px solid transparent;position:relative;overflow:visible;min-height:90px;background:var(--cell)}
+.cell:hover{transform:scale(1.02)}
+.cell.completed{border-color:var(--cellCB)}
+.cell.completed::after{content:"✓✓";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);font-size:2rem;font-weight:800;color:rgba(150,80,200,.25);letter-spacing:-4px;pointer-events:none;white-space:nowrap}
+.cell .task-text{font-size:.8rem;font-weight:600;color:var(--tp);line-height:1.2;word-break:break-word;max-height:3.6em;overflow-y:auto;margin-bottom:4px;z-index:2;cursor:text;border-radius:6px;padding:2px 4px;outline:none}
+.cell .task-text:focus{outline:2px solid var(--ac);background:rgba(255,255,255,.7)}
+.cell .category-badge{font-size:.6rem;background:rgba(255,255,255,.55);color:var(--tp);border-radius:30px;padding:2px 6px;align-self:flex-start;font-weight:500;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:2;cursor:pointer;user-select:none}
+.cell.completed .task-text,.cell.completed .category-badge{opacity:.7}
+.cell.readonly{cursor:default}
+.cell.readonly:hover{transform:none}
+.add-task-area{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--addA);border-radius:100px;padding:6px 6px 6px 18px;box-shadow:0 4px 12px rgba(0,0,0,.05);margin-top:8px}
+.add-task-area input{flex:2;min-width:160px;border:none;background:transparent;padding:12px 0;font-size:.95rem;outline:none;color:var(--tp);font-weight:500}
+.add-task-area input::placeholder{color:var(--tm)}
+.add-task-area select{border:1px solid var(--inputB);background:var(--input);border-radius:40px;padding:10px 16px;font-size:.85rem;color:var(--tp);font-weight:500;outline:none;cursor:pointer;flex:.8}
+.add-task-area button{background:var(--ac);border:none;color:#fff;font-weight:600;padding:12px 22px;border-radius:40px;font-size:.9rem;cursor:pointer;transition:.15s}
+.add-task-area button:hover{background:var(--acH)}
+.reward-pool-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:1.5rem;align-items:start}
+.reward-pool-cell{background:var(--reward);border:1px solid var(--rewardB);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:6px;align-self:start}
+.reward-pool-cell .rp-head{font-size:.72rem;font-weight:700;color:var(--tp);display:flex;justify-content:space-between;align-items:center;gap:4px}
+.reward-pool-cell .rp-head .cnt{font-size:.62rem;background:var(--card);border:1px solid var(--rewardB);border-radius:20px;padding:1px 6px;color:var(--tm);font-weight:600}
+.reward-pool-cell textarea{width:100%;border:1px solid var(--inputB);background:var(--input);border-radius:10px;padding:6px 8px;font-size:.72rem;color:var(--tp);outline:none;resize:none;font-weight:500;line-height:1.5;overflow:hidden;height:auto}
+.reward-pool-cell textarea::placeholder{color:var(--tm)}
+.reward-pool-cell .roll-btn{background:var(--ac);color:#fff;border:none;border-radius:30px;padding:6px 10px;font-size:.7rem;font-weight:700;cursor:pointer;transition:.15s;width:100%}
+.reward-pool-cell .roll-btn:hover:not(:disabled){background:var(--acH)}
+.reward-pool-cell .roll-btn:disabled{background:var(--resetB);color:var(--resetT);cursor:not-allowed;opacity:.6}
+.reward-pool-cell .roll-btn.done{background:#3ba55d;cursor:default}
+.reward-pool-cell .roll-btn.reroll{background:var(--resetB);color:var(--resetT);margin-top:4px}
+.reward-pool-cell .roll-btn.reroll:hover{background:var(--resetH)}
+.right-panel{display:flex;flex-direction:column;gap:1.5rem}
+.card{background:var(--card);backdrop-filter:blur(10px);border-radius:2rem;padding:1.5rem 1.3rem;box-shadow:0 12px 28px rgba(0,0,0,.08);border:1px solid var(--cardB);transition:.3s}
+.card h3{margin:0 0 1rem;font-size:1.1rem;font-weight:700;color:var(--tp);display:flex;align-items:center;gap:6px}
+.drawn-item{background:var(--reward);border:1px solid var(--rewardB);border-radius:14px;padding:10px 12px;margin-bottom:8px;color:var(--tp);font-size:.8rem;display:flex;flex-direction:column;gap:4px}
+.drawn-item .dlabel{font-size:.68rem;color:var(--tm);font-weight:600}
+.drawn-item .dval{font-weight:700;color:var(--ac);font-size:.9rem;word-break:break-word}
+.drawn-empty{color:var(--tm);font-size:.8rem;text-align:center;padding:1.5rem 0}
+.big-task-section{display:flex;flex-direction:column;gap:12px}
+.big-task-input-area{display:flex;gap:8px}
+.big-task-input-area input{flex:1;border:1px solid var(--inputB);border-radius:40px;padding:12px 16px;font-size:.85rem;outline:none;background:var(--input);color:var(--tp);min-width:0}
+.big-task-input-area input::placeholder{color:var(--tm)}
+.big-task-input-area button{background:#b27bdf;border:none;border-radius:40px;padding:0 18px;color:#fff;font-weight:600;font-size:.8rem;cursor:pointer;flex-shrink:0}
+.big-task-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.big-tag{padding:6px 14px;border-radius:40px;font-size:.75rem;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--tp)}
+.big-tag .tag-name{cursor:text;border-radius:6px;padding:2px 4px;outline:none}
+.big-tag .tag-name:focus{outline:2px solid var(--ac);background:rgba(255,255,255,.7)}
+.big-tag button{background:none;border:none;font-weight:800;cursor:pointer;font-size:1rem;line-height:1;padding:0 0 0 4px;opacity:.7}
+.stats{background:var(--stats);color:var(--statsT);border-radius:1.5rem;padding:1.2rem;display:flex;justify-content:space-between;font-weight:600;font-size:.9rem}
+.stats span{background:var(--statsS);padding:4px 12px;border-radius:40px}
+.btn{background:transparent;border:1.5px solid var(--resetB);color:var(--resetT);padding:10px;border-radius:40px;width:100%;font-weight:600;cursor:pointer;transition:.15s;margin-top:6px}
+.btn:hover{background:var(--resetH)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--toast);color:var(--toastT);padding:12px 28px;border-radius:60px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;transition:.2s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;bottom:40px}
+.theme-toggle{position:fixed;top:24px;right:28px;z-index:1000;background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--cardB);border-radius:50px;padding:10px 18px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:.85rem;color:var(--tp);box-shadow:0 8px 20px rgba(0,0,0,.1);transition:.3s;user-select:none}
+.theme-toggle:hover{transform:scale(1.05)}
+.modal{position:fixed;inset:0;background:var(--modalBg);backdrop-filter:blur(4px);z-index:2000;display:none;justify-content:center;align-items:center;padding:1rem}
+.modal.show{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--cardB);border-radius:2rem;max-width:800px;width:100%;max-height:85vh;overflow-y:auto;padding:2rem;box-shadow:0 30px 60px rgba(0,0,0,.4)}
+.modal-box h2{margin:0 0 1.5rem;color:var(--tp);display:flex;justify-content:space-between;align-items:center;font-size:1.3rem}
+.modal-box h2 button{background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--tm);line-height:1}
+.stat-group{margin-bottom:1.5rem}
+.stat-group h4{color:var(--ac);margin:0 0 .8rem;font-size:1rem;border-bottom:2px solid var(--rewardB);padding-bottom:.4rem}
+.stat-item{background:var(--reward);border-radius:12px;padding:.6rem 1rem;margin-bottom:.4rem;color:var(--tp);font-size:.85rem;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--rewardB);gap:8px}
+.stat-item .date{color:var(--tm);font-size:.7rem;white-space:nowrap}
+.stat-item:hover{background:var(--resetH)}
+.empty-tip{color:var(--tm);font-size:.85rem;text-align:center;padding:2rem}
+.archive-item{background:var(--reward);border:1px solid var(--rewardB);border-radius:14px;padding:.7rem 1rem;margin-bottom:.5rem;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:5px}
+.archive-item:hover{background:var(--resetH)}
+.archive-item-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.archive-name{font-weight:700;color:var(--tp);font-size:.88rem}
+.archive-tags{display:flex;flex-wrap:wrap;gap:5px}
+.arc-tag{font-size:.68rem;font-weight:600;background:var(--ac);color:#fff;border-radius:20px;padding:2px 9px}
+.archive-time{font-size:.68rem;color:var(--tm)}
+.arc-del{background:none;border:none;cursor:pointer;font-size:.9rem;opacity:.6;padding:2px 4px;line-height:1;border-radius:50%}
+.arc-del:hover{opacity:1;background:var(--resetH)}
+.cat-dropdown{position:absolute;bottom:100%;left:0;margin-bottom:4px;background:var(--card);border:1px solid var(--cardB);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:100;min-width:120px;overflow:hidden;display:none}
+.cat-dropdown.show{display:block}
+.cat-dropdown .cat-option{padding:8px 14px;font-size:.78rem;font-weight:500;color:var(--tp);cursor:pointer;white-space:nowrap}
+.cat-dropdown .cat-option:hover{background:var(--reward)}
+.cat-dropdown .cat-option.active{background:var(--ac);color:#fff}
+.slot-modal{position:fixed;inset:0;background:var(--modalBg);backdrop-filter:blur(5px);z-index:3000;display:none;justify-content:center;align-items:center;padding:1rem}
+.slot-modal.show{display:flex}
+.slot-box{background:var(--card);border:1px solid var(--cardB);border-radius:2rem;padding:2rem 2.2rem;max-width:460px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.45);text-align:center}
+.slot-box h3{margin:0 0 1.2rem;color:var(--tp);font-size:1.1rem}
+.slot-window{position:relative;height:90px;overflow:hidden;border-radius:16px;background:var(--reward);border:2px solid var(--rewardB);margin-bottom:1.2rem}
+.slot-strip{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;will-change:transform}
+.slot-strip .slot-line{height:90px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:800;color:var(--tp);padding:0 1rem;text-align:center;word-break:break-word}
+.slot-window::before,.slot-window::after{content:"";position:absolute;left:0;right:0;height:22px;pointer-events:none;z-index:2}
+.slot-window::before{top:0;background:linear-gradient(to bottom,var(--reward),transparent)}
+.slot-window::after{bottom:0;background:linear-gradient(to top,var(--reward),transparent)}
+.slot-final{font-size:.95rem;color:var(--tp);font-weight:700;min-height:1.4em;margin-bottom:1rem}
+.slot-final b{color:var(--ac);font-size:1.1rem}
+.slot-close{background:var(--ac);color:#fff;border:none;border-radius:40px;padding:10px 28px;font-weight:700;font-size:.9rem;cursor:pointer}
+.slot-close:hover{background:var(--acH)}
+.slot-close:disabled{background:var(--resetB);color:var(--resetT);cursor:not-allowed;opacity:.6}
+.archive-action-btn{background:transparent;border:1.5px solid var(--resetB);color:var(--resetT);padding:8px 18px;border-radius:40px;font-weight:600;cursor:pointer;transition:.15s;font-size:.85rem}
+.archive-action-btn:hover{background:var(--resetH)}
+@media(max-width:900px){.app{grid-template-columns:1fr}.theme-toggle{top:16px;right:16px;padding:8px 14px;font-size:.75rem}.reward-pool-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){body{padding:1rem .8rem}.bingo-panel{padding:1.2rem}.cell .task-text{font-size:.7rem}.reward-pool-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="theme-toggle" id="themeToggle"><span id="themeIcon">🌙</span><span id="themeLabel">深色</span></div>
+
+<div class="app">
+<div class="bingo-panel">
+<div class="bingo-grid" id="bingoGrid"></div>
+<div class="add-task-area">
+<input type="text" id="taskInput" placeholder="写下一个满足好奇心的小任务...">
+<select id="categorySelect"><option value="">选择大任务</option></select>
+<button id="addTaskBtn">➕ 添加</button>
+</div>
+<div style="font-size:.75rem;color:var(--tm);margin-top:10px;padding-left:8px">⚡ 点击格子标记完成 · 双击任务文字编辑 · 点击分类标签选择大任务 · 大任务名可双击编辑</div>
+<div class="reward-pool-grid" id="rewardPoolGrid"></div>
+</div>
+
+<div class="right-panel">
+<div class="card">
+<h3>🎁 已抽到奖励</h3>
+<div id="drawnRewards"></div>
+</div>
+<div class="card">
+<h3>📌 大任务种类</h3>
+<div class="big-task-section">
+<div class="big-task-input-area">
+<input type="text" id="bigTaskInput" placeholder="输入大任务名称...">
+<button id="addBigTaskBtn">添加</button>
+</div>
+<div class="big-task-tags" id="bigTaskTags"></div>
+</div>
+</div>
+<div class="stats">
+<div>✅ 已完成 <span id="completedCount">0</span></div>
+<div>📏 线数 <span id="lineCount">0</span></div>
+</div>
+<button class="btn" id="resetBtn">🔄 重置今日宾果 (清空完成状态)</button>
+<button class="btn" id="shuffleBtn">🔀 一键乱序所有小任务</button>
+<button class="btn" id="newBingoBtn">🆕 新建宾果 (自动存档旧盘)</button>
+<button class="btn" id="archiveBtn">📚 历史宾果</button>
+<button class="btn" id="statsBtn">📊 查看统计</button>
+</div>
+</div>
+
+<div class="modal" id="statsModal">
+<div class="modal-box">
+<h2>📊 任务完成统计 <button id="closeStats">×</button></h2>
+<div id="statsContent"></div>
+</div>
+</div>
+
+<div class="modal" id="archiveModal">
+<div class="modal-box">
+<h2>📚 历史宾果 <button id="closeArchive">×</button></h2>
+<div id="archiveList"></div>
+</div>
+</div>
+
+<div class="modal" id="archiveViewModal">
+<div class="modal-box">
+<h2><span id="archiveViewTitle">快照预览</span> <button id="closeArchiveView">×</button></h2>
+<div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+<button class="archive-action-btn" id="restoreArchiveBtn">♻️ 恢复此宾果</button>
+<button class="archive-action-btn" id="deleteArchiveBtn">🗑️ 删除此快照</button>
+</div>
+<div id="archiveViewBody"></div>
+</div>
+</div>
+
+<div class="slot-modal" id="slotModal">
+<div class="slot-box">
+<h3 id="slotTitle">🎰 抽取奖励</h3>
+<div class="slot-window"><div class="slot-strip" id="slotStrip"></div></div>
+<div class="slot-final" id="slotFinal"></div>
+<button class="slot-close" id="slotClose" disabled>请稍候…</button>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+var DATA_KEY='bingo_data_permanent';
+var THEME_KEY='bingo_theme_permanent';
+
+var htmlEl=document.documentElement;
+var prefersDark=matchMedia('(prefers-color-scheme: dark)');
+var currentTheme='system';
+var themeToggle=document.getElementById('themeToggle');
+var themeIcon=document.getElementById('themeIcon');
+var themeLabel=document.getElementById('themeLabel');
+
+function applyTheme(){
+  var isDark=currentTheme==='system'?prefersDark.matches:currentTheme==='dark';
+  htmlEl.setAttribute('data-theme',isDark?'dark':'light');
+  if(currentTheme==='system'){themeIcon.textContent=isDark?'🌙':'☀️';themeLabel.textContent='跟随系统';}
+  else if(currentTheme==='dark'){themeIcon.textContent='🌙';themeLabel.textContent='深色';}
+  else{themeIcon.textContent='☀️';themeLabel.textContent='浅色';}
+  try{localStorage.setItem(THEME_KEY,currentTheme);}catch(e){}
+}
+applyTheme();
+prefersDark.addEventListener('change',function(){if(currentTheme==='system'){applyTheme();refreshDynamic();}});
+
+var cells=[],bigTasks=[],history=[],archives=[];
+var rewards={task5:[],line2:[],line3:[],line6:[],line10:[]};
+var awarded={task5:false,line2:false,line3:false,line6:false,line10:false};
+var drawn={task5:'',line2:'',line3:'',line6:'',line10:''};
+var roundId='';
+var viewingArchiveId=null;
+
+var REWARD_META=[
+  {key:'task5',label:'完成5个任务',short:'5任务'},
+  {key:'line2',label:'完成2条线',short:'2线'},
+  {key:'line3',label:'完成3条线',short:'3线'},
+  {key:'line6',label:'完成6条线',short:'6线'},
+  {key:'line10',label:'完成10条线',short:'10线'}
+];
+
+var gridEl=document.getElementById('bingoGrid');
+var taskInput=document.getElementById('taskInput');
+var categorySelect=document.getElementById('categorySelect');
+var addTaskBtn=document.getElementById('addTaskBtn');
+var bigTaskInput=document.getElementById('bigTaskInput');
+var addBigTaskBtn=document.getElementById('addBigTaskBtn');
+var bigTaskTags=document.getElementById('bigTaskTags');
+var rewardPoolGrid=document.getElementById('rewardPoolGrid');
+var drawnRewardsEl=document.getElementById('drawnRewards');
+var completedCountEl=document.getElementById('completedCount');
+var lineCountEl=document.getElementById('lineCount');
+var resetBtn=document.getElementById('resetBtn');
+var shuffleBtn=document.getElementById('shuffleBtn');
+var newBingoBtn=document.getElementById('newBingoBtn');
+var archiveBtn=document.getElementById('archiveBtn');
+var statsBtn=document.getElementById('statsBtn');
+var toastEl=document.getElementById('toast');
+var statsModal=document.getElementById('statsModal');
+var statsContent=document.getElementById('statsContent');
+var closeStats=document.getElementById('closeStats');
+var archiveModal=document.getElementById('archiveModal');
+var archiveList=document.getElementById('archiveList');
+var closeArchive=document.getElementById('closeArchive');
+var archiveViewModal=document.getElementById('archiveViewModal');
+var archiveViewTitle=document.getElementById('archiveViewTitle');
+var archiveViewBody=document.getElementById('archiveViewBody');
+var closeArchiveView=document.getElementById('closeArchiveView');
+var restoreArchiveBtn=document.getElementById('restoreArchiveBtn');
+var deleteArchiveBtn=document.getElementById('deleteArchiveBtn');
+var slotModal=document.getElementById('slotModal');
+var slotTitle=document.getElementById('slotTitle');
+var slotStrip=document.getElementById('slotStrip');
+var slotFinal=document.getElementById('slotFinal');
+var slotClose=document.getElementById('slotClose');
+
+var PALETTE_LIGHT=['#f0e6ff','#ffe6f0','#e6f0ff','#e6ffec','#fff0e6','#e6ffff','#fffce6','#ffe6e6','#f5e6ff','#e6ffe6'];
+var PALETTE_DARK=['#3d2a5a','#5a2a42','#2a3a5a','#2a4a35','#5a3a2a','#2a4a4a','#5a5a2a','#5a2a2a','#4a2a5a','#2a5a2a'];
+var LIGHT_TEXT='#2d1b3a';
+var DARK_TEXT='#f0e6ff';
+
+function isDarkMode(){return htmlEl.getAttribute('data-theme')==='dark';}
+function getPalette(){return isDarkMode()?PALETTE_DARK:PALETTE_LIGHT;}
+function getCatColor(cat,list){
+  if(!cat||!cat.trim())return null;
+  var arr=list||bigTasks;
+  var idx=arr.indexOf(cat);
+  if(idx<0)return null;
+  var p=getPalette();
+  return p[idx%p.length];
+}
+
+function genRoundId(){
+  return Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+}
+
+function save(){
+  try{
+    localStorage.setItem(DATA_KEY,JSON.stringify({
+      cells:cells,bigTasks:bigTasks,rewards:rewards,
+      awarded:awarded,drawn:drawn,history:history,roundId:roundId,archives:archives
+    }));
+  }catch(e){}
+}
+
+function normalizeRewards(r){
+  var out={task5:[],line2:[],line3:[],line6:[],line10:[]};
+  if(!r||typeof r!=='object')return out;
+  REWARD_META.forEach(function(m){
+    var v=r[m.key];
+    if(Array.isArray(v)){
+      out[m.key]=v.filter(function(x){return typeof x==='string';});
+    }else if(typeof v==='string'&&v.trim()){
+      out[m.key]=[v];
+    }
+  });
+  return out;
+}
+
+function load(){
+  try{
+    var raw=localStorage.getItem(DATA_KEY);
+    if(!raw)return false;
+    var d=JSON.parse(raw);
+    if(!d||!Array.isArray(d.cells)||d.cells.length!==25)return false;
+    cells=d.cells;
+    bigTasks=d.bigTasks||[];
+    rewards=normalizeRewards(d.rewards);
+    awarded=d.awarded||{task5:false,line2:false,line3:false,line6:false,line10:false};
+    drawn=d.drawn||{task5:'',line2:'',line3:'',line6:'',line10:''};
+    history=d.history||[];
+    roundId=d.roundId||genRoundId();
+    archives=d.archives||[];
+    return true;
+  }catch(e){return false;}
+}
+
+function makeEmptyBingo(){
+  cells=[];
+  for(var i=0;i<25;i++)cells.push({id:i,text:'',category:'',completed:false});
+  awarded={task5:false,line2:false,line3:false,line6:false,line10:false};
+  drawn={task5:'',line2:'',line3:'',line6:'',line10:''};
+  roundId=genRoundId();
+}
+
+function deepCopy(o){return JSON.parse(JSON.stringify(o));}
+
+function isCurrentEmpty(){
+  return cells.every(function(c){
+    return (!c.text||!c.text.trim())&&!c.completed;
+  });
+}
+
+function snapshotCurrent(name){
+  return {
+    id:genRoundId(),
+    name:name||nowStr(),
+    savedAt:nowStr(),
+    cells:deepCopy(cells),
+    bigTasks:deepCopy(bigTasks),
+    rewards:deepCopy(rewards),
+    awarded:deepCopy(awarded),
+    drawn:deepCopy(drawn),
+    roundId:roundId
+  };
+}
+
+function pushArchive(name){
+  if(isCurrentEmpty())return;
+  archives.unshift(snapshotCurrent(name));
+  save();
+}
+
+function topCategories(cells){
+  var cnt={};
+  cells.forEach(function(c){
+    var k=(c.category||'').trim();
+    if(!k)return;
+    cnt[k]=(cnt[k]||0)+1;
+  });
+  var arr=Object.keys(cnt).map(function(k){return{name:k,count:cnt[k]};});
+  arr.sort(function(a,b){return b.count-a.count;});
+  return arr;
+}
+
+function archiveCompleted(){
+  var done=cells.filter(function(c){return c.completed&&c.text&&c.text.trim();});
+  if(done.length===0)return;
+  var timeStr=nowStr();
+  done.forEach(function(c){history.push({task:c.text.trim(),category:c.category||'未分类',time:timeStr});});
+  save();
+}
+
+function renderGrid(){
+  gridEl.innerHTML='';
+  var dark=isDarkMode();
+  cells.forEach(function(cell,index){
+    var color=getCatColor(cell.category);
+    var d=document.createElement('div');
+    d.className='cell'+(cell.completed?' completed':'');
+    d.dataset.index=index;
+    if(color){d.style.background=color;}else{d.style.background='';}
+
+    var t=document.createElement('div');
+    t.className='task-text';
+    t.contentEditable='true';
+    t.spellcheck=false;
+    if(cell.text&&cell.text.trim()){t.textContent=cell.text;}
+    else{t.textContent='双击编辑';t.style.opacity='.5';}
+    if(color){t.style.color=dark?DARK_TEXT:LIGHT_TEXT;}else{t.style.color='';}
+
+    t.addEventListener('click',function(e){e.stopPropagation();});
+    t.addEventListener('focus',function(){if(t.textContent==='双击编辑'){t.textContent='';t.style.opacity='1';}});
+    t.addEventListener('blur',function(){
+      var nt=t.textContent.trim();
+      cells[index].text=nt;
+      if(!nt){t.textContent='双击编辑';t.style.opacity='.5';}
+      else{t.textContent=nt;t.style.opacity='1';}
+      save();updateStats();
+    });
+    t.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();t.blur();}
+      if(e.key==='Escape'){e.preventDefault();t.textContent=cells[index].text||'双击编辑';if(!cells[index].text)t.style.opacity='.5';t.blur();}
+    });
+
+    var b=document.createElement('div');
+    b.className='category-badge';
+    if(cell.category&&cell.category.trim()){b.textContent=cell.category;}
+    else{b.textContent='未分类';b.style.opacity='.4';}
+    if(color){
+      if(dark){b.style.background='rgba(255,255,255,.25)';b.style.color=DARK_TEXT;}
+      else{b.style.background='rgba(255,255,255,.55)';b.style.color=LIGHT_TEXT;}
+    }else{b.style.background='';b.style.color='';}
+
+    b.addEventListener('click',function(e){e.stopPropagation();openCategoryDropdown(index,b);});
+
+    d.appendChild(t);d.appendChild(b);
+    d.addEventListener('click',function(e){
+      if(e.target===t||t.contains(e.target))return;
+      if(e.target===b)return;
+      e.stopPropagation();toggleCell(index);
+    });
+    gridEl.appendChild(d);
+  });
+  updateStats();
+}
+
+function openCategoryDropdown(index,badgeEl){
+  document.querySelectorAll('.cat-dropdown').forEach(function(el){el.remove();});
+  var dd=document.createElement('div');
+  dd.className='cat-dropdown show';
+  var options=[{label:'未分类',value:''}].concat(bigTasks.map(function(t){return{label:t,value:t};}));
+  var current=cells[index].category||'';
+  options.forEach(function(opt){
+    var o=document.createElement('div');
+    o.className='cat-option'+(opt.value===current?' active':'');
+    o.textContent=opt.label;
+    o.addEventListener('click',function(e){
+      e.stopPropagation();
+      cells[index].category=opt.value;
+      save();renderGrid();
+      document.querySelectorAll('.cat-dropdown').forEach(function(el){el.remove();});
+    });
+    dd.appendChild(o);
+  });
+  badgeEl.parentElement.appendChild(dd);
+  setTimeout(function(){
+    document.addEventListener('click',function closeDD(ev){
+      if(!dd.contains(ev.target)){dd.remove();document.removeEventListener('click',closeDD);}
+    });
+  },0);
+}
+
+function toggleCell(i){
+  cells[i].completed=!cells[i].completed;
+  renderGrid();checkRewards();save();
+}
+
+function countDone(){return cells.filter(function(c){return c.completed;}).length;}
+
+function countLines(){
+  var l=0,i;
+  for(var r=0;r<5;r++){var ok=true;for(var c=0;c<5;c++){if(!cells[r*5+c].completed){ok=false;break;}}if(ok)l++;}
+  for(var c=0;c<5;c++){var ok=true;for(var r=0;r<5;r++){if(!cells[r*5+c].completed){ok=false;break;}}if(ok)l++;}
+  var ok=true;for(i=0;i<5;i++){if(!cells[i*5+i].completed){ok=false;break;}}if(ok)l++;
+  ok=true;for(i=0;i<5;i++){if(!cells[i*5+(4-i)].completed){ok=false;break;}}if(ok)l++;
+  return l;
+}
+
+function updateStats(){
+  var d=countDone(),l=countLines();
+  completedCountEl.textContent=d;
+  lineCountEl.textContent=l;
+  return{done:d,lines:l};
+}
+
+function showToast(m){
+  if(!m||!m.trim())return;
+  toastEl.textContent=m;
+  toastEl.classList.add('show');
+  clearTimeout(window.tt);
+  window.tt=setTimeout(function(){toastEl.classList.remove('show');},2200);
+}
+
+function isConditionMet(key){
+  var s=updateStats();
+  if(key==='task5')return s.done>=5;
+  if(key==='line2')return s.lines>=2;
+  if(key==='line3')return s.lines>=3;
+  if(key==='line6')return s.lines>=6;
+  if(key==='line10')return s.lines>=10;
+  return false;
+}
+
+var notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+function checkRewards(){
+  REWARD_META.forEach(function(m){
+    var met=isConditionMet(m.key);
+    if(met&&!notified[m.key]){
+      notified[m.key]=true;
+      if(!awarded[m.key]){
+        showToast('🎉 '+m.label+'达成！去下方投骰子抽奖励吧');
+      }
+    }
+    if(!met)notified[m.key]=false;
+  });
+  renderRewardPool();
+  renderDrawnRewards();
+  save();
+}
+
+function renderRewardPool(){
+  rewardPoolGrid.innerHTML='';
+  REWARD_META.forEach(function(m){
+    var key=m.key;
+    var met=isConditionMet(key);
+    var pool=rewards[key]||[];
+
+    var cell=document.createElement('div');
+    cell.className='reward-pool-cell';
+
+    var head=document.createElement('div');
+    head.className='rp-head';
+    head.innerHTML='<span>🎯 '+m.short+'</span><span class="cnt">'+pool.filter(function(x){return x&&x.trim();}).length+'项</span>';
+    cell.appendChild(head);
+
+    var ta=document.createElement('textarea');
+    ta.placeholder='一行一个奖励...';
+    ta.value=pool.join('\n');
+    function autoGrow(){
+      ta.style.height='auto';
+      ta.style.height=ta.scrollHeight+'px';
+    }
+    ta.addEventListener('input',function(){
+      rewards[key]=ta.value.split('\n');
+      var cnt=head.querySelector('.cnt');
+      if(cnt)cnt.textContent=rewards[key].filter(function(x){return x&&x.trim();}).length+'项';
+      autoGrow();
+      save();
+      updateRollBtn();
+    });
+    cell.appendChild(ta);
+    setTimeout(autoGrow,0);
+
+    var btn=document.createElement('button');
+    btn.className='roll-btn';
+    function updateRollBtn(){
+      var has=rewards[key].some(function(x){return x&&x.trim();});
+      if(awarded[key]){
+        btn.textContent='✅ 已抽取';
+        btn.classList.add('done');
+        btn.disabled=true;
+      }else if(!met){
+        btn.textContent='🎲 未达成';
+        btn.classList.remove('done');
+        btn.disabled=true;
+      }else if(!has){
+        btn.textContent='🎲 无奖励池';
+        btn.classList.remove('done');
+        btn.disabled=true;
+      }else{
+        btn.textContent='🎲 投骰子';
+        btn.classList.remove('done');
+        btn.disabled=false;
+      }
+    }
+    btn.addEventListener('click',function(){startRoll(key);});
+    updateRollBtn();
+    cell.appendChild(btn);
+
+    if(awarded[key]){
+      var reBtn=document.createElement('button');
+      reBtn.className='roll-btn reroll';
+      reBtn.textContent='🔄 重抽';
+      reBtn.addEventListener('click',function(){
+        if(!confirm('确定要重抽「'+m.label+'」吗？当前抽到的奖励会被清空。'))return;
+        awarded[key]=false;
+        drawn[key]='';
+        save();
+        renderRewardPool();
+        renderDrawnRewards();
+        startRoll(key);
+      });
+      cell.appendChild(reBtn);
+    }
+
+    rewardPoolGrid.appendChild(cell);
+  });
+}
+
+function renderDrawnRewards(){
+  drawnRewardsEl.innerHTML='';
+  var hasAny=false;
+  REWARD_META.forEach(function(m){
+    if(drawn[m.key]){
+      hasAny=true;
+      var d=document.createElement('div');
+      d.className='drawn-item';
+      d.innerHTML='<span class="dlabel">'+m.label+'</span><span class="dval">🎁 '+escapeHtml(drawn[m.key])+'</span>';
+      drawnRewardsEl.appendChild(d);
+    }
+  });
+  if(!hasAny){
+    drawnRewardsEl.innerHTML='<div class="drawn-empty">还没有抽到奖励</div>';
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,function(c){
+    return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+var rolling=false;
+function startRoll(key){
+  if(rolling)return;
+  var met=isConditionMet(key);
+  if(!met){showToast('还没达成这个条件哦');return;}
+  if(awarded[key]){showToast('这个奖励本轮已经抽过啦');return;}
+  var pool=(rewards[key]||[]).filter(function(x){return x&&x.trim();});
+  if(pool.length===0){showToast('该类别还没设置奖励');return;}
+
+  var meta=REWARD_META.filter(function(m){return m.key===key;})[0];
+  var winner=pool[Math.floor(Math.random()*pool.length)];
+
+  rolling=true;
+  slotTitle.textContent='🎰 '+meta.label+' · 抽取中';
+  slotFinal.textContent='';
+  slotClose.disabled=true;
+  slotClose.textContent='请稍候…';
+  slotModal.classList.add('show');
+
+  var repeats=8;
+  var lines=[];
+  for(var i=0;i<repeats;i++){
+    var shuffled=pool.slice().sort(function(){return Math.random()-0.5;});
+    shuffled.forEach(function(p){lines.push(p);});
+  }
+  lines.push(winner);
+
+  var LINE_H=90;
+  slotStrip.style.transition='none';
+  slotStrip.style.transform='translateY(0)';
+  slotStrip.innerHTML='';
+  lines.forEach(function(txt){
+    var el=document.createElement('div');
+    el.className='slot-line';
+    el.textContent=txt;
+    slotStrip.appendChild(el);
+  });
+
+  var targetIndex=lines.length-1;
+  var targetY=-targetIndex*LINE_H;
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var duration=2600+Math.random()*600;
+      slotStrip.style.transition='transform '+duration+'ms cubic-bezier(.15,.9,.2,1)';
+      slotStrip.style.transform='translateY('+targetY+'px)';
+    });
+  });
+
+  setTimeout(function(){
+    slotStrip.style.transition='none';
+    slotStrip.style.transform='translateY('+targetY+'px)';
+    slotFinal.innerHTML='🎁 本次奖励：<b>'+escapeHtml(winner)+'</b>';
+    slotTitle.textContent='🎉 '+meta.label+' · 抽取完成';
+    slotClose.disabled=false;
+    slotClose.textContent='收下奖励';
+    rolling=false;
+
+    awarded[key]=true;
+    drawn[key]=winner;
+    history.push({
+      task:'[奖励] '+meta.label+' → '+winner,
+      category:'奖励抽取',
+      time:nowStr(),
+      isReward:true
+    });
+    save();
+    renderRewardPool();
+    renderDrawnRewards();
+  },2900);
+}
+
+function nowStr(){
+  var d=new Date();
+  var pad=function(n){return String(n).padStart(2,'0');};
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+
+slotClose.addEventListener('click',function(){
+  if(slotClose.disabled)return;
+  slotModal.classList.remove('show');
+});
+slotModal.addEventListener('click',function(e){
+  if(e.target===slotModal&&!slotClose.disabled)slotModal.classList.remove('show');
+});
+
+function renderBigTasks(){
+  bigTaskTags.innerHTML='';
+  var dark=isDarkMode();
+  var palette=getPalette();
+  bigTasks.forEach(function(t,i){
+    var color=palette[i%palette.length];
+    var d=document.createElement('div');
+    d.className='big-tag';
+    d.style.background=color;
+    d.style.color=dark?DARK_TEXT:LIGHT_TEXT;
+
+    var nameSpan=document.createElement('span');
+    nameSpan.className='tag-name';
+    nameSpan.contentEditable='true';
+    nameSpan.spellcheck=false;
+    nameSpan.textContent=t;
+    nameSpan.addEventListener('click',function(e){e.stopPropagation();});
+    nameSpan.addEventListener('focus',function(){nameSpan.style.outline='2px solid var(--ac)';});
+    nameSpan.addEventListener('blur',function(){
+      nameSpan.style.outline='none';
+      var nv=nameSpan.textContent.trim();
+      var old=t;
+      if(!nv||nv===old)return;
+      if(bigTasks.indexOf(nv)>=0){showToast('已存在同名大任务');nameSpan.textContent=old;return;}
+      bigTasks[i]=nv;
+      cells.forEach(function(c){if(c.category===old)c.category=nv;});
+      save();renderGrid();renderBigTasks();
+    });
+    nameSpan.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();nameSpan.blur();}
+      if(e.key==='Escape'){e.preventDefault();nameSpan.textContent=bigTasks[i];nameSpan.blur();}
+    });
+
+    var delBtn=document.createElement('button');
+    delBtn.textContent='✕';
+    delBtn.style.color=dark?DARK_TEXT:LIGHT_TEXT;
+    delBtn.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(confirm('删除大任务"'+bigTasks[i]+'"？该分类下的任务会变为未分类')){
+        var removed=bigTasks[i];
+        bigTasks.splice(i,1);
+        cells.forEach(function(c){if(c.category===removed)c.category='';});
+        renderBigTasks();renderGrid();save();
+        showToast('已删除大任务，相关任务变为未分类');
+      }
+    });
+    d.appendChild(nameSpan);d.appendChild(delBtn);
+    bigTaskTags.appendChild(d);
+  });
+  updateCatSelect();
+}
+
+function updateCatSelect(){
+  categorySelect.innerHTML='<option value="">选择大任务</option>';
+  bigTasks.forEach(function(t){
+    var o=document.createElement('option');
+    o.value=t;o.textContent=t;
+    categorySelect.appendChild(o);
+  });
+}
+
+function addBigTask(){
+  var v=bigTaskInput.value.trim();
+  if(!v)return;
+  if(bigTasks.indexOf(v)<0){bigTasks.push(v);renderBigTasks();bigTaskInput.value='';save();}
+  else showToast('已存在');
+}
+
+function addTask(){
+  var txt=taskInput.value.trim();
+  if(!txt){showToast('请输入任务内容～');return;}
+  var cat=categorySelect.value||'';
+  var empties=[];
+  cells.forEach(function(c,i){if(!c.completed&&(!c.text||!c.text.trim()))empties.push(i);});
+  var ti;
+  if(empties.length>0){ti=empties[Math.floor(Math.random()*empties.length)];}
+  else{
+    var uncompleted=[];
+    cells.forEach(function(c,i){if(!c.completed)uncompleted.push(i);});
+    if(uncompleted.length===0){showToast('所有格子都已完成！');return;}
+    ti=uncompleted[Math.floor(Math.random()*uncompleted.length)];
+  }
+  cells[ti].text=txt;cells[ti].category=cat;
+  renderGrid();taskInput.value='';checkRewards();save();
+  showToast('任务已随机添加到格子 '+(ti+1));
+}
+
+function resetDone(){
+  if(!confirm('重置完成状态吗？当前盘会先存档到历史。'))return;
+  pushArchive('重置前 '+nowStr());
+  cells.forEach(function(c){c.completed=false;});
+  awarded={task5:false,line2:false,line3:false,line6:false,line10:false};
+  drawn={task5:'',line2:'',line3:'',line6:'',line10:''};
+  notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+  roundId=genRoundId();
+  renderGrid();checkRewards();save();
+  showToast('✨ 已重置完成状态，旧盘已存档');
+}
+
+function shuffleTasks(){
+  var filledIndexes=[];
+  cells.forEach(function(c,i){if(c.text&&c.text.trim())filledIndexes.push(i);});
+  if(filledIndexes.length<2){showToast('任务太少，不需要乱序');return;}
+  var taskData=filledIndexes.map(function(i){
+    return{text:cells[i].text,category:cells[i].category,completed:cells[i].completed};
+  });
+  for(var i=taskData.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=taskData[i];taskData[i]=taskData[j];taskData[j]=tmp;
+  }
+  filledIndexes.forEach(function(idx,k){
+    cells[idx].text=taskData[k].text;
+    cells[idx].category=taskData[k].category;
+    cells[idx].completed=taskData[k].completed;
+  });
+  renderGrid();save();
+  showToast('🔀 所有小任务已随机乱序');
+}
+
+function newBingo(){
+  if(!confirm('新建宾果吗？当前宾果会完整存档到历史。'))return;
+  pushArchive();
+  archiveCompleted();
+  makeEmptyBingo();
+  notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+  renderGrid();checkRewards();save();
+  showToast('🆕 新宾果已创建');
+}
+
+function showArchives(){
+  archiveList.innerHTML='';
+  if(archives.length===0){
+    archiveList.innerHTML='<div class="empty-tip">还没有历史宾果<br><span style="font-size:.75rem">点“🆕 新建宾果”或“🔄 重置”会自动存档</span></div>';
+    archiveModal.classList.add('show');
+    return;
+  }
+  archives.forEach(function(a){
+    var done=a.cells.filter(function(c){return c.completed;}).length;
+    var tops=topCategories(a.cells);
+    var tagHtml='';
+    if(tops.length>=2){
+      tagHtml='<span class="arc-tag">'+escapeHtml(tops[0].name)+'</span>'+
+              '<span class="arc-tag">'+escapeHtml(tops[1].name)+'</span>';
+    }else if(tops.length===1){
+      tagHtml='<span class="arc-tag">'+escapeHtml(tops[0].name)+'</span>';
+    }
+    var item=document.createElement('div');
+    item.className='archive-item';
+    item.innerHTML=
+      '<div class="archive-item-head">'+
+        '<span class="archive-name">📅 '+escapeHtml(a.name)+'</span>'+
+        '<span style="display:flex;align-items:center;gap:8px">'+
+          '<span class="date">已完成 '+done+'/25</span>'+
+          '<button class="arc-del" title="删除此快照">🗑️</button>'+
+        '</span>'+
+      '</div>'+
+      (tagHtml?'<div class="archive-tags">'+tagHtml+'</div>':'')+
+      '<div class="archive-time">'+escapeHtml(a.savedAt)+'</div>';
+
+    item.addEventListener('click',function(e){
+      if(e.target.classList.contains('arc-del'))return;
+      openArchiveView(a.id);
+    });
+
+    var delBtn=item.querySelector('.arc-del');
+    delBtn.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(!confirm('删除此快照「'+a.name+'」？不可恢复。'))return;
+      archives=archives.filter(function(x){return x.id!==a.id;});
+      save();
+      showArchives();
+      showToast('🗑️ 已删除快照');
+    });
+
+    archiveList.appendChild(item);
+  });
+  archiveModal.classList.add('show');
+}
+
+function openArchiveView(id){
+  var a=archives.filter(function(x){return x.id===id;})[0];
+  if(!a)return;
+  viewingArchiveId=id;
+  archiveViewTitle.textContent='📅 '+a.name;
+  archiveViewBody.innerHTML='';
+
+  var grid=document.createElement('div');
+  grid.className='bingo-grid';
+  grid.style.marginBottom='1rem';
+  var dark=isDarkMode();
+  a.cells.forEach(function(c){
+    var color=getCatColor(c.category,a.bigTasks);
+    var d=document.createElement('div');
+    d.className='cell readonly'+(c.completed?' completed':'');
+    if(color){d.style.background=color;}
+    var t=document.createElement('div');
+    t.className='task-text';
+    t.contentEditable='false';
+    t.textContent=c.text||'（空）';
+    if(!c.text)t.style.opacity='.4';
+    if(color){t.style.color=dark?DARK_TEXT:LIGHT_TEXT;}
+    var b=document.createElement('div');
+    b.className='category-badge';
+    b.textContent=c.category||'未分类';
+    if(!c.category)b.style.opacity='.4';
+    if(color){
+      if(dark){b.style.background='rgba(255,255,255,.25)';b.style.color=DARK_TEXT;}
+      else{b.style.background='rgba(255,255,255,.55)';b.style.color=LIGHT_TEXT;}
+    }
+    d.appendChild(t);d.appendChild(b);
+    grid.appendChild(d);
+  });
+  archiveViewBody.appendChild(grid);
+
+  var drawnHtml='<h4 style="color:var(--ac);margin:.5rem 0">🎁 已抽奖励</h4>';
+  var hasDrawn=false;
+  REWARD_META.forEach(function(m){
+    if(a.drawn&&a.drawn[m.key]){
+      hasDrawn=true;
+      drawnHtml+='<div class="stat-item"><span>'+m.label+'</span><span style="color:var(--ac);font-weight:700">'+escapeHtml(a.drawn[m.key])+'</span></div>';
+    }
+  });
+  if(!hasDrawn)drawnHtml+='<div class="empty-tip" style="padding:.5rem">无</div>';
+  archiveViewBody.insertAdjacentHTML('beforeend',drawnHtml);
+
+  archiveViewModal.classList.add('show');
+}
+
+restoreArchiveBtn.addEventListener('click',function(){
+  var a=archives.filter(function(x){return x.id===viewingArchiveId;})[0];
+  if(!a)return;
+  if(!confirm('恢复此宾果吗？当前宾果会先存档到历史。'))return;
+  pushArchive('恢复前 '+nowStr());
+  cells=deepCopy(a.cells);
+  bigTasks=deepCopy(a.bigTasks);
+  rewards=deepCopy(a.rewards);
+  awarded=deepCopy(a.awarded);
+  drawn=deepCopy(a.drawn);
+  roundId=a.roundId;
+  notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+  save();
+  renderBigTasks();renderGrid();checkRewards();
+  archiveViewModal.classList.remove('show');
+  archiveModal.classList.remove('show');
+  showToast('♻️ 已恢复宾果');
+});
+
+deleteArchiveBtn.addEventListener('click',function(){
+  if(!confirm('删除此快照？不可恢复。'))return;
+  archives=archives.filter(function(x){return x.id!==viewingArchiveId;});
+  save();
+  archiveViewModal.classList.remove('show');
+  showArchives();
+});
+
+function showStats(){
+  var map={};
+  history.forEach(function(h){
+    var c=h.category||'未分类';
+    if(!map[c])map[c]=[];
+    map[c].push(h);
+  });
+  if(Object.keys(map).length===0){
+    statsContent.innerHTML='<div class="empty-tip">还没有已完成的任务记录</div>';
+    statsModal.classList.add('show');
+    return;
+  }
+  var html='';
+  Object.keys(map).sort().forEach(function(cat){
+    html+='<div class="stat-group"><h4>📌 '+escapeHtml(cat)+' ('+map[cat].length+'个)</h4>';
+    map[cat].forEach(function(it){
+      html+='<div class="stat-item"><span>'+escapeHtml(it.task)+'</span><span class="date">'+escapeHtml(it.time)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  statsContent.innerHTML=html;
+  statsModal.classList.add('show');
+}
+
+function refreshDynamic(){
+  renderGrid();
+  renderBigTasks();
+  renderRewardPool();
+  renderDrawnRewards();
+}
+
+themeToggle.addEventListener('click',function(){
+  currentTheme=currentTheme==='system'?'dark':(currentTheme==='dark'?'light':'system');
+  applyTheme();refreshDynamic();
+});
+
+addTaskBtn.addEventListener('click',addTask);
+taskInput.addEventListener('keypress',function(e){if(e.key==='Enter')addTask();});
+addBigTaskBtn.addEventListener('click',addBigTask);
+bigTaskInput.addEventListener('keypress',function(e){if(e.key==='Enter')addBigTask();});
+resetBtn.addEventListener('click',resetDone);
+shuffleBtn.addEventListener('click',shuffleTasks);
+newBingoBtn.addEventListener('click',newBingo);
+archiveBtn.addEventListener('click',showArchives);
+statsBtn.addEventListener('click',showStats);
+closeStats.addEventListener('click',function(){statsModal.classList.remove('show');});
+statsModal.addEventListener('click',function(e){if(e.target===statsModal)statsModal.classList.remove('show');});
+closeArchive.addEventListener('click',function(){archiveModal.classList.remove('show');});
+archiveModal.addEventListener('click',function(e){if(e.target===archiveModal)archiveModal.classList.remove('show');});
+closeArchiveView.addEventListener('click',function(){archiveViewModal.classList.remove('show');});
+archiveViewModal.addEventListener('click',function(e){if(e.target===archiveViewModal)archiveViewModal.classList.remove('show');});
+
+function init(){
+  try{var t=localStorage.getItem(THEME_KEY);if(t)currentTheme=t;}catch(e){}
+  applyTheme();
+  if(!load())makeEmptyBingo();
+  if(!roundId)roundId=genRoundId();
+  if(!Array.isArray(archives))archives=[];
+  renderBigTasks();
+  renderRewardPool();
+  renderDrawnRewards();
+  renderGrid();
+  checkRewards();
+}
+init();
+})();
+</script>
+</body>
+</html>
