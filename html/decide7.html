@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>决策小站 · 七步分析法</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f4f7fc;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0b2b4a;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subhead {
+            color: #2c4b6e;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            background: #e2eaf8;
+            padding: 0.75rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 8px 20px rgba(0, 20, 50, 0.06);
+            border: 1px solid #ffffff70;
+            transition: 0.2s;
+        }
+
+        .step-card:hover {
+            box-shadow: 0 12px 28px rgba(0, 20, 50, 0.1);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .step-num {
+            background: #1e5c9e;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #0a2a44;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            color: #3f5e7c;
+            margin-bottom: 1.25rem;
+            padding-left: 44px;
+            margin-top: -0.5rem;
+        }
+
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 18px;
+            border: 1.5px solid #d9e2ef;
+            background: #fbfdff;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            resize: vertical;
+            color: #0b2b4a;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #1e5c9e;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30, 92, 158, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+        }
+
+        .row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .col {
+            flex: 1 1 180px;
+            min-width: 150px;
+        }
+
+        .options-grid, .criteria-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-item, .criterion-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-item input, .criterion-item input {
+            flex: 1;
+        }
+
+        .option-item .rm, .criterion-item .rm {
+            background: #fee9e7;
+            border: none;
+            color: #b53b2c;
+            font-weight: 600;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 1.1rem;
+        }
+
+        .option-item .rm:hover, .criterion-item .rm:hover {
+            background: #fbd0cb;
+        }
+
+        .btn-add {
+            background: #e8f0fe;
+            border: none;
+            color: #1e5c9e;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.15s;
+            margin-top: 6px;
+            border: 1px solid transparent;
+        }
+
+        .btn-add:hover {
+            background: #d4e2fc;
+            border-color: #b8cef0;
+        }
+
+        .eval-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .eval-table th {
+            text-align: left;
+            font-weight: 600;
+            color: #1f486b;
+            padding: 0.5rem 0.3rem 0.5rem 0;
+            border-bottom: 1px solid #d9e2ef;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .eval-table td {
+            padding: 0.6rem 0.3rem 0.6rem 0;
+            border-bottom: 1px solid #eef3fa;
+            vertical-align: middle;
+        }
+
+        .score-input {
+            width: 80px;
+            padding: 0.5rem 0.4rem;
+            text-align: center;
+            border-radius: 14px;
+            border: 1.5px solid #d9e2ef;
+        }
+
+        .worst-input {
+            width: 100%;
+            min-width: 120px;
+            padding: 0.5rem 0.7rem;
+            border-radius: 14px;
+            border: 1.5px solid #d9e2ef;
+        }
+
+        .reversible-check {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            color: #2e4e6e;
+        }
+
+        .reversible-check input {
+            width: 18px;
+            height: 18px;
+            accent-color: #1e5c9e;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 0.9rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1e5c9e;
+            color: white;
+            box-shadow: 0 8px 16px rgba(30, 92, 158, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #144a83;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1e5c9e;
+            border: 1.5px solid #cbd9eb;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f6ff;
+            border-color: #1e5c9e;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .saved-list {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 20, 50, 0.04);
+            border: 1px solid #ffffff;
+        }
+
+        .saved-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .saved-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0a2a44;
+        }
+
+        .saved-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #eef3fa;
+        }
+
+        .saved-item:last-child {
+            border-bottom: none;
+        }
+
+        .saved-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .saved-title {
+            font-weight: 600;
+            color: #124072;
+        }
+
+        .saved-date {
+            font-size: 0.75rem;
+            color: #6f8aa8;
+        }
+
+        .saved-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 0.45rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .btn-load {
+            background: #e8f0fe;
+            color: #1e5c9e;
+        }
+
+        .btn-load:hover {
+            background: #d4e2fc;
+        }
+
+        .btn-del {
+            background: #fee9e7;
+            color: #b53b2c;
+        }
+
+        .btn-del:hover {
+            background: #fbd0cb;
+        }
+
+        .empty-state {
+            color: #8aa0b8;
+            text-align: center;
+            padding: 1.5rem;
+            font-style: italic;
+        }
+
+        .footer-note {
+            font-size: 0.8rem;
+            color: #8ba0b5;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .required-star {
+            color: #c0392b;
+            margin-left: 4px;
+        }
+
+        /* 小屏优化 */
+        @media (max-width: 650px) {
+            .step-card {
+                padding: 1.25rem;
+            }
+            .eval-table th, .eval-table td {
+                font-size: 0.75rem;
+            }
+            .score-input {
+                width: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <h1>🧭 决策小站</h1>
+    <div class="subhead">七步分析法 · 写下来，就清晰了一半</div>
+
+    <!-- 第一步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">1</div>
+            <div class="step-title">定义问题</div>
+        </div>
+        <div class="step-desc">用一句话写清楚：我到底在决定什么？</div>
+        <textarea id="step1" placeholder="例如：我是否要接受这份新工作？"></textarea>
+    </div>
+
+    <!-- 第二步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">2</div>
+            <div class="step-title">列出选项</div>
+        </div>
+        <div class="step-desc">至少写出 3 个，包括“什么都不做”。</div>
+        <div id="optionsContainer" class="options-grid">
+            <!-- 动态生成选项 -->
+        </div>
+        <button class="btn-add" id="addOptionBtn">+ 添加选项</button>
+    </div>
+
+    <!-- 第三步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">3</div>
+            <div class="step-title">列出标准</div>
+        </div>
+        <div class="step-desc">我最看重什么？哪些是底线，哪些可以妥协？</div>
+        <div id="criteriaContainer" class="criteria-grid">
+            <!-- 动态生成标准 -->
+        </div>
+        <button class="btn-add" id="addCriterionBtn">+ 添加标准</button>
+    </div>
+
+    <!-- 第四步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">4</div>
+            <div class="step-title">评估每个选项</div>
+        </div>
+        <div class="step-desc">每个选项在标准上打几分？最坏结果是什么？可逆吗？</div>
+        <div style="overflow-x: auto;">
+            <table class="eval-table" id="evalTable">
+                <thead>
+                    <tr>
+                        <th>选项</th>
+                        <th>标准评分（1-10）</th>
+                        <th>最坏结果</th>
+                        <th>可逆？</th>
+                    </tr>
+                </thead>
+                <tbody id="evalTableBody">
+                    <!-- 动态行 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 第五步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">5</div>
+            <div class="step-title">收集必要信息</div>
+        </div>
+        <div class="step-desc">只收集能改变决定的信息，设截止时间。</div>
+        <div class="row">
+            <div class="col">
+                <label style="font-size:0.85rem; color:#2c4b6e; display:block; margin-bottom:6px;">要收集的信息</label>
+                <textarea id="step5Info" placeholder="例如：询问前同事关于新团队的氛围；查清楚社保缴纳方式..."></textarea>
+            </div>
+            <div class="col">
+                <label style="font-size:0.85rem; color:#2c4b6e; display:block; margin-bottom:6px;">截止时间</label>
+                <input type="text" id="step5Deadline" placeholder="例如：下周五之前">
+            </div>
+        </div>
+    </div>
+
+    <!-- 第六步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">6</div>
+            <div class="step-title">做决定</div>
+        </div>
+        <div class="step-desc">可以选“最优解”，也可以选“足够好且能承受”的解。</div>
+        <textarea id="step6" placeholder="写下你的决定，以及为什么（可以不是最优，但必须能承受）"></textarea>
+    </div>
+
+    <!-- 第七步 -->
+    <div class="step-card">
+        <div class="step-header">
+            <div class="step-num">7</div>
+            <div class="step-title">执行并留后路</div>
+        </div>
+        <div class="step-desc">设一个回顾时间点：3 个月后、半年后，再看这个决定对不对，需不需要调整。</div>
+        <textarea id="step7" placeholder="例如：3个月后回顾：如果新工作加班太多且没成长，就开始看机会。"></textarea>
+    </div>
+
+    <!-- 操作栏 -->
+    <div class="action-bar">
+        <div class="btn-group">
+            <button class="btn-primary" id="saveBtn">💾 保存当前分析</button>
+            <button class="btn-secondary" id="clearBtn">🧹 清空所有</button>
+        </div>
+        <button class="btn-secondary" id="loadLatestBtn">📂 载入最近一次</button>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="saved-list">
+        <div class="saved-header">
+            <h3>📋 过去的分析</h3>
+        </div>
+        <div id="savedListContainer">
+            <div class="empty-state">还没有保存过记录</div>
+        </div>
+    </div>
+    <div class="footer-note">数据保存在浏览器本地，不会上传</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 数据模型 ----------
+        // 每个选项和标准都使用唯一id (简单的字符串)
+        let optionIdCounter = 0;
+        let criterionIdCounter = 0;
+
+        // 当前编辑中的数据结构
+        let currentOptions = [];   // [{ id, text }]
+        let currentCriteria = [];  // [{ id, text }]
+        // 评估数据: 以选项id为key -> { scores: { criterionId: value }, worst: string, reversible: boolean }
+        let currentEvaluations = {};
+
+        // ---------- DOM 元素 ----------
+        const step1 = document.getElementById('step1');
+        const step5Info = document.getElementById('step5Info');
+        const step5Deadline = document.getElementById('step5Deadline');
+        const step6 = document.getElementById('step6');
+        const step7 = document.getElementById('step7');
+
+        const optionsContainer = document.getElementById('optionsContainer');
+        const criteriaContainer = document.getElementById('criteriaContainer');
+        const evalTableBody = document.getElementById('evalTableBody');
+        const savedListContainer = document.getElementById('savedListContainer');
+
+        // ---------- 初始化默认数据 ----------
+        function initDefaultData() {
+            // 如果当前没有选项，默认加3个（包含“什么都不做”）
+            if (currentOptions.length === 0) {
+                currentOptions = [
+                    { id: 'opt_' + (++optionIdCounter), text: '接受新工作' },
+                    { id: 'opt_' + (++optionIdCounter), text: '拒绝，留在原公司' },
+                    { id: 'opt_' + (++optionIdCounter), text: '什么都不做（维持现状）' }
+                ];
+                // 初始化评估
+                currentOptions.forEach(opt => {
+                    if (!currentEvaluations[opt.id]) {
+                        currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
+                    }
+                });
+            }
+            // 标准默认3个
+            if (currentCriteria.length === 0) {
+                currentCriteria = [
+                    { id: 'cri_' + (++criterionIdCounter), text: '薪资待遇' },
+                    { id: 'cri_' + (++criterionIdCounter), text: '成长空间' },
+                    { id: 'cri_' + (++criterionIdCounter), text: '工作生活平衡' }
+                ];
+            }
+        }
+
+        // ---------- 渲染选项 ----------
+        function renderOptions() {
+            optionsContainer.innerHTML = '';
+            currentOptions.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                div.dataset.id = opt.id;
+                div.innerHTML = `
+                    <input type="text" value="${escapeHtml(opt.text)}" placeholder="选项描述" class="option-input">
+                    <button class="rm" title="删除选项">✕</button>
+                `;
+                // 输入事件更新数据
+                const input = div.querySelector('.option-input');
+                input.addEventListener('input', (e) => {
+                    opt.text = e.target.value;
+                });
+                // 删除按钮
+                const rmBtn = div.querySelector('.rm');
+                rmBtn.addEventListener('click', () => {
+                    if (currentOptions.length <= 2) {
+                        alert('至少保留2个选项（建议包含“什么都不做”）');
+                        return;
+                    }
+                    // 移除选项
+                    currentOptions = currentOptions.filter(o => o.id !== opt.id);
+                    // 删除评估数据
+                    delete currentEvaluations[opt.id];
+                    renderOptions();
+                    renderEvaluationTable();
+                });
+                optionsContainer.appendChild(div);
+            });
+            // 如果选项为空显示提示（但初始化后不会）
+        }
+
+        // ---------- 渲染标准 ----------
+        function renderCriteria() {
+            criteriaContainer.innerHTML = '';
+            currentCriteria.forEach(cri => {
+                const div = document.createElement('div');
+                div.className = 'criterion-item';
+                div.dataset.id = cri.id;
+                div.innerHTML = `
+                    <input type="text" value="${escapeHtml(cri.text)}" placeholder="标准描述" class="criterion-input">
+                    <button class="rm" title="删除标准">✕</button>
+                `;
+                const input = div.querySelector('.criterion-input');
+                input.addEventListener('input', (e) => {
+                    cri.text = e.target.value;
+                });
+                const rmBtn = div.querySelector('.rm');
+                rmBtn.addEventListener('click', () => {
+                    if (currentCriteria.length <= 1) {
+                        alert('至少保留1个标准');
+                        return;
+                    }
+                    currentCriteria = currentCriteria.filter(c => c.id !== cri.id);
+                    // 从评估分数中删除对应标准
+                    Object.keys(currentEvaluations).forEach(optId => {
+                        if (currentEvaluations[optId]?.scores) {
+                            delete currentEvaluations[optId].scores[cri.id];
+                        }
+                    });
+                    renderCriteria();
+                    renderEvaluationTable();
+                });
+                criteriaContainer.appendChild(div);
+            });
+        }
+
+        // ---------- 渲染评估表格 ----------
+        function renderEvaluationTable() {
+            if (!evalTableBody) return;
+            const tbody = evalTableBody;
+            tbody.innerHTML = '';
+
+            if (currentOptions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#8aa0b8; padding:1rem;">请先添加选项</td></tr>';
+                return;
+            }
+
+            currentOptions.forEach(opt => {
+                // 确保评估对象存在
+                if (!currentEvaluations[opt.id]) {
+                    currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
+                }
+                const evalData = currentEvaluations[opt.id];
+
+                const tr = document.createElement('tr');
+
+                // 选项名称列（只读文本展示，但也可以编辑用选项输入，这里展示当前文本）
+                const tdName = document.createElement('td');
+                tdName.style.fontWeight = '500';
+                tdName.style.color = '#0b2b4a';
+                tdName.textContent = opt.text || '(未命名选项)';
+                tr.appendChild(tdName);
+
+                // 标准评分列 (使用滑块/数字输入? 这里用数字输入简化, 每个标准一个输入框)
+                const tdScores = document.createElement('td');
+                tdScores.style.minWidth = '160px';
+                // 为每个标准生成评分输入
+                currentCriteria.forEach(cri => {
+                    const scoreValue = evalData.scores[cri.id] !== undefined ? evalData.scores[cri.id] : '';
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'flex';
+                    wrapper.style.alignItems = 'center';
+                    wrapper.style.gap = '6px';
+                    wrapper.style.marginBottom = '4px';
+
+                    const label = document.createElement('span');
+                    label.style.fontSize = '0.75rem';
+                    label.style.color = '#3f5e7c';
+                    label.style.minWidth = '70px';
+                    label.textContent = cri.text || '标准';
+                    // 截断长文本
+                    if (label.textContent.length > 8) label.textContent = label.textContent.slice(0, 7) + '…';
+
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.min = '1';
+                    input.max = '10';
+                    input.step = '1';
+                    input.className = 'score-input';
+                    input.placeholder = '1-10';
+                    input.value = scoreValue;
+                    input.style.width = '70px';
+
+                    input.addEventListener('input', (e) => {
+                        let val = e.target.value.trim();
+                        if (val === '') {
+                            delete evalData.scores[cri.id];
+                        } else {
+                            let num = Number(val);
+                            if (isNaN(num)) num = '';
+                            if (num < 1) num = 1;
+                            if (num > 10) num = 10;
+                            e.target.value = num;
+                            evalData.scores[cri.id] = num;
+                        }
+                    });
+
+                    wrapper.appendChild(label);
+                    wrapper.appendChild(input);
+                    tdScores.appendChild(wrapper);
+                });
+
+                if (currentCriteria.length === 0) {
+                    tdScores.textContent = '暂无标准';
+                }
+
+                tr.appendChild(tdScores);
+
+                // 最坏结果列
+                const tdWorst = document.createElement('td');
+                const worstInput = document.createElement('input');
+                worstInput.type = 'text';
+                worstInput.className = 'worst-input';
+                worstInput.placeholder = '最坏结果';
+                worstInput.value = evalData.worst || '';
+                worstInput.addEventListener('input', (e) => {
+                    evalData.worst = e.target.value;
+                });
+                tdWorst.appendChild(worstInput);
+                tr.appendChild(tdWorst);
+
+                // 可逆列
+                const tdRev = document.createElement('td');
+                const revLabel = document.createElement('label');
+                revLabel.className = 'reversible-check';
+                const revCheck = document.createElement('input');
+                revCheck.type = 'checkbox';
+                revCheck.checked = evalData.reversible || false;
+                revCheck.addEventListener('change', (e) => {
+                    evalData.reversible = e.target.checked;
+                });
+                revLabel.appendChild(revCheck);
+                revLabel.appendChild(document.createTextNode(' 可逆'));
+                tdRev.appendChild(revLabel);
+                tr.appendChild(tdRev);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 辅助：转义HTML
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // ---------- 渲染所有动态部分 (选项、标准、表格) ----------
+        function renderAll() {
+            renderOptions();
+            renderCriteria();
+            renderEvaluationTable();
+        }
+
+        // ---------- 从表单收集完整数据 (用于保存) ----------
+        function collectCurrentData() {
+            // 确保选项和标准数据已同步（因为是实时同步，没问题）
+            return {
+                step1: step1.value,
+                options: currentOptions.map(o => ({ id: o.id, text: o.text })),
+                criteria: currentCriteria.map(c => ({ id: c.id, text: c.text })),
+                evaluations: JSON.parse(JSON.stringify(currentEvaluations)), // 深拷贝
+                step5Info: step5Info.value,
+                step5Deadline: step5Deadline.value,
+                step6: step6.value,
+                step7: step7.value,
+                // 保存计数器 (可选，但为了避免id冲突，载入时可以重新生成id? 但为了简单，保留id并更新计数器)
+                optionIdCounter: optionIdCounter,
+                criterionIdCounter: criterionIdCounter
+            };
+        }
+
+        // ---------- 将数据填充到表单 (用于载入) ----------
+        function loadDataIntoForm(data) {
+            // 清空当前所有
+            // 重置计数器为最大值(确保安全)
+            if (data.optionIdCounter) optionIdCounter = data.optionIdCounter;
+            if (data.criterionIdCounter) criterionIdCounter = data.criterionIdCounter;
+
+            // 恢复步骤1/5/6/7
+            step1.value = data.step1 || '';
+            step5Info.value = data.step5Info || '';
+            step5Deadline.value = data.step5Deadline || '';
+            step6.value = data.step6 || '';
+            step7.value = data.step7 || '';
+
+            // 恢复选项
+            currentOptions = (data.options || []).map(o => ({ id: o.id, text: o.text }));
+            // 恢复标准
+            currentCriteria = (data.criteria || []).map(c => ({ id: c.id, text: c.text }));
+            // 恢复评估数据
+            currentEvaluations = data.evaluations || {};
+
+            // 补齐缺失的评估对象
+            currentOptions.forEach(opt => {
+                if (!currentEvaluations[opt.id]) {
+                    currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
+                } else {
+                    // 确保scores存在
+                    if (!currentEvaluations[opt.id].scores) currentEvaluations[opt.id].scores = {};
+                    if (currentEvaluations[opt.id].worst === undefined) currentEvaluations[opt.id].worst = '';
+                    if (currentEvaluations[opt.id].reversible === undefined) currentEvaluations[opt.id].reversible = false;
+                }
+            });
+
+            // 移除已不存在的选项对应的评估数据
+            Object.keys(currentEvaluations).forEach(optId => {
+                if (!currentOptions.some(o => o.id === optId)) {
+                    delete currentEvaluations[optId];
+                }
+            });
+
+            // 如果选项为空，给默认
+            if (currentOptions.length === 0) {
+                currentOptions = [
+                    { id: 'opt_' + (++optionIdCounter), text: '选项A' },
+                    { id: 'opt_' + (++optionIdCounter), text: '选项B' },
+                    { id: 'opt_' + (++optionIdCounter), text: '什么都不做' }
+                ];
+                currentOptions.forEach(opt => {
+                    currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
+                });
+            }
+
+            if (currentCriteria.length === 0) {
+                currentCriteria = [
+                    { id: 'cri_' + (++criterionIdCounter), text: '标准1' },
+                    { id: 'cri_' + (++criterionIdCounter), text: '标准2' }
+                ];
+            }
+
+            renderAll();
+        }
+
+        // ---------- 清空表单 (重置为默认) ----------
+        function clearForm() {
+            // 重置计数器
+            optionIdCounter = 0;
+            criterionIdCounter = 0;
+
+            step1.value = '';
+            step5Info.value = '';
+            step5Deadline.value = '';
+            step6.value = '';
+            step7.value = '';
+
+            // 重置为默认选项/标准
+            currentOptions = [
+                { id: 'opt_' + (++optionIdCounter), text: '接受新工作' },
+                { id: 'opt_' + (++optionIdCounter), text: '拒绝，留在原公司' },
+                { id: 'opt_' + (++optionIdCounter), text: '什么都不做（维持现状）' }
+            ];
+            currentCriteria = [
+                { id: 'cri_' + (++criterionIdCounter), text: '薪资待遇' },
+                { id: 'cri_' + (++criterionIdCounter), text: '成长空间' },
+                { id: 'cri_' + (++criterionIdCounter), text: '工作生活平衡' }
+            ];
+            currentEvaluations = {};
+            currentOptions.forEach(opt => {
+                currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
+            });
+
+            renderAll();
+        }
+
+        // ---------- 保存到 localStorage ----------
+        function saveAnalysis() {
+            const data = collectCurrentData();
+
+            // 获取现有记录
+            let records = [];
+            try {
+                const stored = localStorage.getItem('decision_records');
+                if (stored) records = JSON.parse(stored);
+                if (!Array.isArray(records)) records = [];
+            } catch (e) {
+                records = [];
+            }
+
+            // 生成标题：用step1内容或者“未命名分析”
+            const title = (data.step1 || '').trim() || '未命名分析';
+            const newRecord = {
+                id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                title: title,
+                timestamp: Date.now(),
+                data: data
+            };
+
+            records.unshift(newRecord); // 最新的在前
+            // 限制最多保存20条
+            if (records.length > 20) records = records.slice(0, 20);
+
+            localStorage.setItem('decision_records', JSON.stringify(records));
+
+            renderSavedList();
+            alert('✅ 分析已保存');
+        }
+
+        // ---------- 渲染历史记录列表 ----------
+        function renderSavedList() {
+            if (!savedListContainer) return;
+            let records = [];
+            try {
+                const stored = localStorage.getItem('decision_records');
+                if (stored) records = JSON.parse(stored);
+                if (!Array.isArray(records)) records = [];
+            } catch (e) {
+                records = [];
+            }
+
+            if (records.length === 0) {
+                savedListContainer.innerHTML = '<div class="empty-state">还没有保存过记录</div>';
+                return;
+            }
+
+            savedListContainer.innerHTML = '';
+            records.forEach((rec, index) => {
+                const item = document.createElement('div');
+                item.className = 'saved-item';
+
+                const date = new Date(rec.timestamp);
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+
+                item.innerHTML = `
+                    <div class="saved-info">
+                        <div class="saved-title">${escapeHtml(rec.title)}</div>
+                        <div class="saved-date">${dateStr}</div>
+                    </div>
+                    <div class="saved-actions">
+                        <button class="btn-sm btn-load" data-id="${rec.id}">载入</button>
+                        <button class="btn-sm btn-del" data-id="${rec.id}">删除</button>
+                    </div>
+                `;
+
+                // 载入按钮事件
+                item.querySelector('.btn-load').addEventListener('click', (e) => {
+                    const recordId = e.target.dataset.id;
+                    const targetRecord = records.find(r => r.id === recordId);
+                    if (targetRecord) {
+                        loadDataIntoForm(targetRecord.data);
+                        alert('已载入分析');
+                    }
+                });
+
+                // 删除按钮事件
+                item.querySelector('.btn-del').addEventListener('click', (e) => {
+                    const recordId = e.target.dataset.id;
+                    const newRecords = records.filter(r => r.id !== recordId);
+                    localStorage.setItem('decision_records', JSON.stringify(newRecords));
+                    renderSavedList();
+                });
+
+                savedListContainer.appendChild(item);
+            });
+        }
+
+        // ---------- 载入最近一条记录 ----------
+        function loadLatest() {
+            try {
+                const stored = localStorage.getItem('decision_records');
+                if (!stored) {
+                    alert('还没有保存过任何分析');
+                    return;
+                }
+                const records = JSON.parse(stored);
+                if (!Array.isArray(records) || records.length === 0) {
+                    alert('还没有保存过任何分析');
+                    return;
+                }
+                // 按时间倒序第一个就是最新的(保存时unshift)
+                const latest = records[0];
+                loadDataIntoForm(latest.data);
+                alert('已载入最近一次分析');
+            } catch (e) {
+                alert('载入失败');
+            }
+        }
+
+        // ---------- 事件监听绑定 ----------
+        function bindEvents() {
+            // 添加选项
+            document.getElementById('addOptionBtn').addEventListener('click', () => {
+                const newId = 'opt_' + (++optionIdCounter);
+                currentOptions.push({ id: newId, text: '' });
+                currentEvaluations[newId] = { scores: {}, worst: '', reversible: false };
+                renderOptions();
+                renderEvaluationTable();
+            });
+
+            // 添加标准
+            document.getElementById('addCriterionBtn').addEventListener('click', () => {
+                const newId = 'cri_' + (++criterionIdCounter);
+                currentCriteria.push({ id: newId, text: '' });
+                renderCriteria();
+                renderEvaluationTable();
+            });
+
+            // 保存
+            document.getElementById('saveBtn').addEventListener('click', saveAnalysis);
+
+            // 清空
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                if (confirm('确定清空所有当前内容？已保存的记录不会丢失。')) {
+                    clearForm();
+                }
+            });
+
+            // 载入最近
+            document.getElementById('loadLatestBtn').addEventListener('click', loadLatest);
+        }
+
+        // ---------- 启动应用 ----------
+        function init() {
+            // 初始化默认数据
+            initDefaultData();
+            // 渲染界面
+            renderAll();
+            // 渲染历史记录
+            renderSavedList();
+            // 绑定事件
+            bindEvents();
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
+          
