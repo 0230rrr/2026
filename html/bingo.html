@@ -493,20 +493,23 @@ function openCategoryDropdown(index,badgeEl){
 function toggleCell(i){
   cells[i].completed=!cells[i].completed;
   renderGrid();
-  var newLines=countLines();
-  if(newLines>lastLineCount){
-    for(var k=lastLineCount+1;k<=newLines;k++){
-      lineLog.push({
-        line:k,
-        atTask:countDone(),
-        time:nowStr()
-      });
-    }
-  }
-  lastLineCount=newLines;
+  recordLineProgress();
   renderLineLog();
   checkRewards();
   save();
+}
+
+function recordLineProgress(){
+  var newLines=countLines();
+  var done=countDone();
+  for(var k=1;k<=newLines;k++){
+    var exists=lineLog.some(function(x){return x.line===k;});
+    if(!exists){
+      lineLog.push({line:k,atTask:done,time:nowStr()});
+    }
+  }
+  lineLog.sort(function(a,b){return a.line-b.line;});
+  lastLineCount=newLines;
 }
 
 function countDone(){return cells.filter(function(c){return c.completed;}).length;}
@@ -1171,9 +1174,10 @@ function init(){
   renderLineLog();
   renderGrid();
   checkRewards();
-  renderNoteVersionSelect();
+  renderNoteVersionSelector();
   renderNoteText();
 }
+function renderNoteVersionSelector(){renderNoteVersionSelect();}
 init();
 })();
 </script>
