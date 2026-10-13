@@ -107,6 +107,9 @@ body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;m
 .slot-close:disabled{background:var(--resetB);color:var(--resetT);cursor:not-allowed;opacity:.6}
 .archive-action-btn{background:transparent;border:1.5px solid var(--resetB);color:var(--resetT);padding:8px 18px;border-radius:40px;font-weight:600;cursor:pointer;transition:.15s;font-size:.85rem}
 .archive-action-btn:hover{background:var(--resetH)}
+#lineLogView .drawn-item{flex-direction:row;justify-content:space-between;align-items:center}
+#lineLogView .drawn-item .dlabel{font-size:.75rem}
+#lineLogView .drawn-item .dval{font-size:.8rem}
 #noteVersionSelect{width:100%;border:1px solid var(--inputB);background:var(--input);border-radius:40px;padding:10px 16px;font-size:.82rem;color:var(--tp);outline:none;margin-bottom:8px;cursor:pointer}
 #noteText{width:100%;min-height:120px;border:1px solid var(--inputB);background:var(--input);border-radius:16px;padding:10px 12px;font-size:.8rem;color:var(--tp);outline:none;resize:vertical;line-height:1.6;font-family:inherit}
 #noteText::placeholder{color:var(--tm)}
@@ -133,6 +136,10 @@ body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;m
 <div class="card">
 <h3>🎁 已抽到奖励</h3>
 <div id="drawnRewards"></div>
+</div>
+<div class="card">
+<h3>📏 线条达成进度</h3>
+<div id="lineLogView"></div>
 </div>
 <div class="card">
 <h3>📌 大任务种类</h3>
@@ -221,7 +228,8 @@ function applyTheme(){
 applyTheme();
 prefersDark.addEventListener('change',function(){if(currentTheme==='system'){applyTheme();refreshDynamic();}});
 
-var cells=[],bigTasks=[],history=[],archives=[];
+var cells=[],bigTasks=[],history=[],archives=[],lineLog=[];
+var lastLineCount=0;
 var rewards={task5:[],line2:[],line3:[],line5:[],line10:[]};
 var awarded={task5:false,line2:false,line3:false,line5:false,line10:false};
 var drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
@@ -247,6 +255,7 @@ var addBigTaskBtn=document.getElementById('addBigTaskBtn');
 var bigTaskTags=document.getElementById('bigTaskTags');
 var rewardPoolGrid=document.getElementById('rewardPoolGrid');
 var drawnRewardsEl=document.getElementById('drawnRewards');
+var lineLogView=document.getElementById('lineLogView');
 var completedCountEl=document.getElementById('completedCount');
 var lineCountEl=document.getElementById('lineCount');
 var resetBtn=document.getElementById('resetBtn');
@@ -300,7 +309,7 @@ function save(){
     localStorage.setItem(DATA_KEY,JSON.stringify({
       cells:cells,bigTasks:bigTasks,rewards:rewards,
       awarded:awarded,drawn:drawn,history:history,roundId:roundId,archives:archives,
-      noteCurrent:noteCurrent
+      noteCurrent:noteCurrent,lineLog:lineLog,lastLineCount:lastLineCount
     }));
   }catch(e){}
 }
@@ -334,6 +343,8 @@ function load(){
     roundId=d.roundId||genRoundId();
     archives=d.archives||[];
     noteCurrent=d.noteCurrent||'';
+    lineLog=d.lineLog||[];
+    lastLineCount=d.lastLineCount||0;
     return true;
   }catch(e){return false;}
 }
@@ -344,6 +355,8 @@ function makeEmptyBingo(){
   awarded={task5:false,line2:false,line3:false,line5:false,line10:false};
   drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
   roundId=genRoundId();
+  lineLog=[];
+  lastLineCount=0;
 }
 
 function deepCopy(o){return JSON.parse(JSON.stringify(o));}
@@ -365,7 +378,9 @@ function snapshotCurrent(name){
     awarded:deepCopy(awarded),
     drawn:deepCopy(drawn),
     roundId:roundId,
-    note:noteCurrent||''
+    note:noteCurrent||'',
+    lineLog:deepCopy(lineLog),
+    lastLineCount:lastLineCount
   };
 }
 
@@ -477,7 +492,21 @@ function openCategoryDropdown(index,badgeEl){
 
 function toggleCell(i){
   cells[i].completed=!cells[i].completed;
-  renderGrid();checkRewards();save();
+  renderGrid();
+  var newLines=countLines();
+  if(newLines>lastLineCount){
+    for(var k=lastLineCount+1;k<=newLines;k++){
+      lineLog.push({
+        line:k,
+        atTask:countDone(),
+        time:nowStr()
+      });
+    }
+  }
+  lastLineCount=newLines;
+  renderLineLog();
+  checkRewards();
+  save();
 }
 
 function countDone(){return cells.filter(function(c){return c.completed;}).length;}
@@ -496,6 +525,21 @@ function updateStats(){
   completedCountEl.textContent=d;
   lineCountEl.textContent=l;
   return{done:d,lines:l};
+}
+
+function renderLineLog(){
+  lineLogView.innerHTML='';
+  if(lineLog.length===0){
+    lineLogView.innerHTML='<div class="drawn-empty">还没有完成任何线</div>';
+    return;
+  }
+  lineLog.forEach(function(l){
+    var d=document.createElement('div');
+    d.className='drawn-item';
+    d.innerHTML='<span class="dlabel">第 '+l.line+' 条线</span>'+
+                '<span class="dval">第 '+l.atTask+' 个任务</span>';
+    lineLogView.appendChild(d);
+  });
 }
 
 function showToast(m){
@@ -815,7 +859,9 @@ function resetDone(){
   drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
   roundId=genRoundId();
-  renderGrid();checkRewards();save();
+  lineLog=[];
+  lastLineCount=0;
+  renderGrid();renderLineLog();checkRewards();save();
   showToast('✨ 已重置完成状态，旧盘已存档');
 }
 
@@ -846,7 +892,7 @@ function newBingo(){
   makeEmptyBingo();
   noteCurrent='';
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
-  renderGrid();checkRewards();save();
+  renderGrid();renderLineLog();checkRewards();save();
   renderNoteVersionSelect();
   renderNoteText();
   showToast('🆕 新宾果已创建');
@@ -951,6 +997,16 @@ function openArchiveView(id){
   if(!hasDrawn)drawnHtml+='<div class="empty-tip" style="padding:.5rem">无</div>';
   archiveViewBody.insertAdjacentHTML('beforeend',drawnHtml);
 
+  var lineHtml='<h4 style="color:var(--ac);margin:.5rem 0">📏 线条达成进度</h4>';
+  if(a.lineLog&&a.lineLog.length>0){
+    a.lineLog.forEach(function(l){
+      lineHtml+='<div class="stat-item"><span>第 '+l.line+' 条线</span><span class="date">第 '+l.atTask+' 个任务 · '+escapeHtml(l.time)+'</span></div>';
+    });
+  }else{
+    lineHtml+='<div class="empty-tip" style="padding:.5rem">无</div>';
+  }
+  archiveViewBody.insertAdjacentHTML('beforeend',lineHtml);
+
   var noteHtml='<h4 style="color:var(--ac);margin:.5rem 0">📝 版本备注</h4>';
   if(a.note&&a.note.trim()){
     noteHtml+='<div class="stat-item" style="white-space:pre-wrap">'+escapeHtml(a.note)+'</div>';
@@ -974,9 +1030,11 @@ restoreArchiveBtn.addEventListener('click',function(){
   drawn=deepCopy(a.drawn);
   roundId=a.roundId;
   noteCurrent=a.note||'';
+  lineLog=deepCopy(a.lineLog||[]);
+  lastLineCount=a.lastLineCount||0;
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
   save();
-  renderBigTasks();renderGrid();checkRewards();
+  renderBigTasks();renderGrid();renderLineLog();checkRewards();
   renderNoteVersionSelect();
   renderNoteText();
   archiveViewModal.classList.remove('show');
@@ -1003,12 +1061,19 @@ function showStats(){
     if(!map[c])map[c]=[];
     map[c].push(h);
   });
-  if(Object.keys(map).length===0){
+  if(Object.keys(map).length===0 && lineLog.length===0){
     statsContent.innerHTML='<div class="empty-tip">还没有已完成的任务记录</div>';
     statsModal.classList.add('show');
     return;
   }
   var html='';
+  if(lineLog.length>0){
+    html+='<div class="stat-group"><h4>📏 线条达成进度</h4>';
+    lineLog.forEach(function(l){
+      html+='<div class="stat-item"><span>第 '+l.line+' 条线</span><span class="date">第 '+l.atTask+' 个任务 · '+escapeHtml(l.time)+'</span></div>';
+    });
+    html+='</div>';
+  }
   Object.keys(map).sort().forEach(function(cat){
     html+='<div class="stat-group"><h4>📌 '+escapeHtml(cat)+' ('+map[cat].length+'个)</h4>';
     map[cat].forEach(function(it){
@@ -1067,6 +1132,7 @@ function refreshDynamic(){
   renderBigTasks();
   renderRewardPool();
   renderDrawnRewards();
+  renderLineLog();
   renderNoteVersionSelect();
   renderNoteText();
 }
@@ -1098,9 +1164,11 @@ function init(){
   if(!load())makeEmptyBingo();
   if(!roundId)roundId=genRoundId();
   if(!Array.isArray(archives))archives=[];
+  if(!Array.isArray(lineLog))lineLog=[];
   renderBigTasks();
   renderRewardPool();
   renderDrawnRewards();
+  renderLineLog();
   renderGrid();
   checkRewards();
   renderNoteVersionSelect();
