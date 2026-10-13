@@ -228,8 +228,9 @@ function applyTheme(){
 applyTheme();
 prefersDark.addEventListener('change',function(){if(currentTheme==='system'){applyTheme();refreshDynamic();}});
 
-var cells=[],bigTasks=[],history=[],archives=[],lineLog=[];
-var lastLineCount=0;
+var cells=[],bigTasks=[],history=[],archives=[];
+var milestones={};
+var MILESTONE_LINES=[2,3,4,5,6,10];
 var rewards={task5:[],line2:[],line3:[],line5:[],line10:[]};
 var awarded={task5:false,line2:false,line3:false,line5:false,line10:false};
 var drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
@@ -309,7 +310,7 @@ function save(){
     localStorage.setItem(DATA_KEY,JSON.stringify({
       cells:cells,bigTasks:bigTasks,rewards:rewards,
       awarded:awarded,drawn:drawn,history:history,roundId:roundId,archives:archives,
-      noteCurrent:noteCurrent,lineLog:lineLog,lastLineCount:lastLineCount
+      noteCurrent:noteCurrent,milestones:milestones
     }));
   }catch(e){}
 }
@@ -343,8 +344,7 @@ function load(){
     roundId=d.roundId||genRoundId();
     archives=d.archives||[];
     noteCurrent=d.noteCurrent||'';
-    lineLog=d.lineLog||[];
-    lastLineCount=d.lastLineCount||0;
+    milestones=d.milestones||{};
     return true;
   }catch(e){return false;}
 }
@@ -355,8 +355,7 @@ function makeEmptyBingo(){
   awarded={task5:false,line2:false,line3:false,line5:false,line10:false};
   drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
   roundId=genRoundId();
-  lineLog=[];
-  lastLineCount=0;
+  milestones={};
 }
 
 function deepCopy(o){return JSON.parse(JSON.stringify(o));}
@@ -379,8 +378,7 @@ function snapshotCurrent(name){
     drawn:deepCopy(drawn),
     roundId:roundId,
     note:noteCurrent||'',
-    lineLog:deepCopy(lineLog),
-    lastLineCount:lastLineCount
+    milestones:deepCopy(milestones)
   };
 }
 
@@ -493,23 +491,20 @@ function openCategoryDropdown(index,badgeEl){
 function toggleCell(i){
   cells[i].completed=!cells[i].completed;
   renderGrid();
-  recordLineProgress();
+  recordMilestones();
   renderLineLog();
   checkRewards();
   save();
 }
 
-function recordLineProgress(){
+function recordMilestones(){
   var newLines=countLines();
   var done=countDone();
-  for(var k=1;k<=newLines;k++){
-    var exists=lineLog.some(function(x){return x.line===k;});
-    if(!exists){
-      lineLog.push({line:k,atTask:done,time:nowStr()});
+  MILESTONE_LINES.forEach(function(m){
+    if(newLines>=m && !milestones[m]){
+      milestones[m]={atTask:done,time:nowStr()};
     }
-  }
-  lineLog.sort(function(a,b){return a.line-b.line;});
-  lastLineCount=newLines;
+  });
 }
 
 function countDone(){return cells.filter(function(c){return c.completed;}).length;}
@@ -532,15 +527,16 @@ function updateStats(){
 
 function renderLineLog(){
   lineLogView.innerHTML='';
-  if(lineLog.length===0){
-    lineLogView.innerHTML='<div class="drawn-empty">还没有完成任何线</div>';
-    return;
-  }
-  lineLog.forEach(function(l){
+  MILESTONE_LINES.forEach(function(m){
     var d=document.createElement('div');
     d.className='drawn-item';
-    d.innerHTML='<span class="dlabel">第 '+l.line+' 条线</span>'+
-                '<span class="dval">第 '+l.atTask+' 个任务</span>';
+    if(milestones[m]){
+      d.innerHTML='<span class="dlabel">'+m+' 条线</span>'+
+                  '<span class="dval">第 '+milestones[m].atTask+' 个任务</span>';
+    }else{
+      d.innerHTML='<span class="dlabel">'+m+' 条线</span>'+
+                  '<span class="dval" style="opacity:.4">未达成</span>';
+    }
     lineLogView.appendChild(d);
   });
 }
@@ -862,8 +858,7 @@ function resetDone(){
   drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
   roundId=genRoundId();
-  lineLog=[];
-  lastLineCount=0;
+  milestones={};
   renderGrid();renderLineLog();checkRewards();save();
   showToast('✨ 已重置完成状态，旧盘已存档');
 }
@@ -1001,13 +996,14 @@ function openArchiveView(id){
   archiveViewBody.insertAdjacentHTML('beforeend',drawnHtml);
 
   var lineHtml='<h4 style="color:var(--ac);margin:.5rem 0">📏 线条达成进度</h4>';
-  if(a.lineLog&&a.lineLog.length>0){
-    a.lineLog.forEach(function(l){
-      lineHtml+='<div class="stat-item"><span>第 '+l.line+' 条线</span><span class="date">第 '+l.atTask+' 个任务 · '+escapeHtml(l.time)+'</span></div>';
-    });
-  }else{
-    lineHtml+='<div class="empty-tip" style="padding:.5rem">无</div>';
-  }
+  MILESTONE_LINES.forEach(function(m){
+    var ms=a.milestones&&a.milestones[m];
+    if(ms){
+      lineHtml+='<div class="stat-item"><span>'+m+' 条线</span><span class="date">第 '+ms.atTask+' 个任务 · '+escapeHtml(ms.time)+'</span></div>';
+    }else{
+      lineHtml+='<div class="stat-item"><span>'+m+' 条线</span><span class="date" style="opacity:.4">未达成</span></div>';
+    }
+  });
   archiveViewBody.insertAdjacentHTML('beforeend',lineHtml);
 
   var noteHtml='<h4 style="color:var(--ac);margin:.5rem 0">📝 版本备注</h4>';
@@ -1033,8 +1029,7 @@ restoreArchiveBtn.addEventListener('click',function(){
   drawn=deepCopy(a.drawn);
   roundId=a.roundId;
   noteCurrent=a.note||'';
-  lineLog=deepCopy(a.lineLog||[]);
-  lastLineCount=a.lastLineCount||0;
+  milestones=deepCopy(a.milestones||{});
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
   save();
   renderBigTasks();renderGrid();renderLineLog();checkRewards();
@@ -1064,19 +1059,21 @@ function showStats(){
     if(!map[c])map[c]=[];
     map[c].push(h);
   });
-  if(Object.keys(map).length===0 && lineLog.length===0){
+  if(Object.keys(map).length===0){
     statsContent.innerHTML='<div class="empty-tip">还没有已完成的任务记录</div>';
     statsModal.classList.add('show');
     return;
   }
-  var html='';
-  if(lineLog.length>0){
-    html+='<div class="stat-group"><h4>📏 线条达成进度</h4>';
-    lineLog.forEach(function(l){
-      html+='<div class="stat-item"><span>第 '+l.line+' 条线</span><span class="date">第 '+l.atTask+' 个任务 · '+escapeHtml(l.time)+'</span></div>';
-    });
-    html+='</div>';
-  }
+  var html='<div class="stat-group"><h4>📏 线条达成进度</h4>';
+  MILESTONE_LINES.forEach(function(m){
+    var ms=milestones[m];
+    if(ms){
+      html+='<div class="stat-item"><span>'+m+' 条线</span><span class="date">第 '+ms.atTask+' 个任务 · '+escapeHtml(ms.time)+'</span></div>';
+    }else{
+      html+='<div class="stat-item"><span>'+m+' 条线</span><span class="date" style="opacity:.4">未达成</span></div>';
+    }
+  });
+  html+='</div>';
   Object.keys(map).sort().forEach(function(cat){
     html+='<div class="stat-group"><h4>📌 '+escapeHtml(cat)+' ('+map[cat].length+'个)</h4>';
     map[cat].forEach(function(it){
@@ -1167,17 +1164,16 @@ function init(){
   if(!load())makeEmptyBingo();
   if(!roundId)roundId=genRoundId();
   if(!Array.isArray(archives))archives=[];
-  if(!Array.isArray(lineLog))lineLog=[];
+  if(!milestones||typeof milestones!=='object')milestones={};
   renderBigTasks();
   renderRewardPool();
   renderDrawnRewards();
   renderLineLog();
   renderGrid();
   checkRewards();
-  renderNoteVersionSelector();
+  renderNoteVersionSelect();
   renderNoteText();
 }
-function renderNoteVersionSelector(){renderNoteVersionSelect();}
 init();
 })();
 </script>
