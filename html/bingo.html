@@ -213,16 +213,16 @@ applyTheme();
 prefersDark.addEventListener('change',function(){if(currentTheme==='system'){applyTheme();refreshDynamic();}});
 
 var cells=[],bigTasks=[],history=[],archives=[];
-var rewards={task5:[],line2:[],line3:[],line6:[],line10:[]};
-var awarded={task5:false,line2:false,line3:false,line6:false,line10:false};
-var drawn={task5:'',line2:'',line3:'',line6:'',line10:''};
+var rewards={task5:[],line2:[],line4:[],line6:[],line10:[]};
+var awarded={task5:false,line2:false,line4:false,line6:false,line10:false};
+var drawn={task5:'',line2:'',line4:'',line6:'',line10:''};
 var roundId='';
 var viewingArchiveId=null;
 
 var REWARD_META=[
   {key:'task5',label:'完成5个任务',short:'5任务'},
   {key:'line2',label:'完成2条线',short:'2线'},
-  {key:'line3',label:'完成3条线',short:'3线'},
+  {key:'line4',label:'完成4条线',short:'4线'},
   {key:'line6',label:'完成6条线',short:'6线'},
   {key:'line10',label:'完成10条线',short:'10线'}
 ];
@@ -292,7 +292,7 @@ function save(){
 }
 
 function normalizeRewards(r){
-  var out={task5:[],line2:[],line3:[],line6:[],line10:[]};
+  var out={task5:[],line2:[],line4:[],line6:[],line10:[]};
   if(!r||typeof r!=='object')return out;
   REWARD_META.forEach(function(m){
     var v=r[m.key];
@@ -314,8 +314,8 @@ function load(){
     cells=d.cells;
     bigTasks=d.bigTasks||[];
     rewards=normalizeRewards(d.rewards);
-    awarded=d.awarded||{task5:false,line2:false,line3:false,line6:false,line10:false};
-    drawn=d.drawn||{task5:'',line2:'',line3:'',line6:'',line10:''};
+    awarded=d.awarded||{task5:false,line2:false,line4:false,line6:false,line10:false};
+    drawn=d.drawn||{task5:'',line2:'',line4:'',line6:'',line10:''};
     history=d.history||[];
     roundId=d.roundId||genRoundId();
     archives=d.archives||[];
@@ -326,8 +326,8 @@ function load(){
 function makeEmptyBingo(){
   cells=[];
   for(var i=0;i<25;i++)cells.push({id:i,text:'',category:'',completed:false});
-  awarded={task5:false,line2:false,line3:false,line6:false,line10:false};
-  drawn={task5:'',line2:'',line3:'',line6:'',line10:''};
+  awarded={task5:false,line2:false,line4:false,line6:false,line10:false};
+  drawn={task5:'',line2:'',line4:'',line6:'',line10:''};
   roundId=genRoundId();
 }
 
@@ -494,13 +494,13 @@ function isConditionMet(key){
   var s=updateStats();
   if(key==='task5')return s.done>=5;
   if(key==='line2')return s.lines>=2;
-  if(key==='line3')return s.lines>=3;
+  if(key==='line4')return s.lines>=4;
   if(key==='line6')return s.lines>=6;
   if(key==='line10')return s.lines>=10;
   return false;
 }
 
-var notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+var notified={task5:false,line2:false,line4:false,line6:false,line10:false};
 function checkRewards(){
   REWARD_META.forEach(function(m){
     var met=isConditionMet(m.key);
@@ -795,9 +795,9 @@ function resetDone(){
   if(!confirm('重置完成状态吗？当前盘会先存档到历史。'))return;
   pushArchive('重置前 '+nowStr());
   cells.forEach(function(c){c.completed=false;});
-  awarded={task5:false,line2:false,line3:false,line6:false,line10:false};
-  drawn={task5:'',line2:'',line3:'',line6:'',line10:''};
-  notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+  awarded={task5:false,line2:false,line4:false,line6:false,line10:false};
+  drawn={task5:'',line2:'',line4:'',line6:'',line10:''};
+  notified={task5:false,line2:false,line4:false,line6:false,line10:false};
   roundId=genRoundId();
   renderGrid();checkRewards();save();
   showToast('✨ 已重置完成状态，旧盘已存档');
@@ -828,7 +828,7 @@ function newBingo(){
   pushArchive();
   archiveCompleted();
   makeEmptyBingo();
-  notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+  notified={task5:false,line2:false,line4:false,line6:false,line10:false};
   renderGrid();checkRewards();save();
   showToast('🆕 新宾果已创建');
 }
@@ -943,7 +943,7 @@ restoreArchiveBtn.addEventListener('click',function(){
   awarded=deepCopy(a.awarded);
   drawn=deepCopy(a.drawn);
   roundId=a.roundId;
-  notified={task5:false,line2:false,line3:false,line6:false,line10:false};
+  notified={task5:false,line2:false,line4:false,line6:false,line10:false};
   save();
   renderBigTasks();renderGrid();checkRewards();
   archiveViewModal.classList.remove('show');
