@@ -137,7 +137,7 @@
 
         .option-item, .criterion-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
         }
 
@@ -159,6 +159,8 @@
             cursor: pointer;
             transition: 0.15s;
             font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 4px;
         }
 
         .option-item .rm:hover, .criterion-item .rm:hover {
@@ -208,20 +210,21 @@
         .eval-table td {
             padding: 0.6rem 0.3rem 0.6rem 0;
             border-bottom: 1px solid #eef3fa;
-            vertical-align: middle;
+            vertical-align: top;
         }
 
         .score-input {
-            width: 80px;
+            width: 70px;
             padding: 0.5rem 0.4rem;
             text-align: center;
             border-radius: 14px;
             border: 1.5px solid #d9e2ef;
+            flex-shrink: 0;
         }
 
         .worst-input {
             width: 100%;
-            min-width: 120px;
+            min-width: 140px;
             padding: 0.5rem 0.7rem;
             border-radius: 14px;
             border: 1.5px solid #d9e2ef;
@@ -233,12 +236,30 @@
             gap: 5px;
             font-size: 0.85rem;
             color: #2e4e6e;
+            white-space: nowrap;
         }
 
         .reversible-check input {
             width: 18px;
             height: 18px;
             accent-color: #1e5c9e;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: #2c4b6e;
+            min-width: 100px;
+            max-width: 180px;
+            line-height: 1.5;
+            word-break: break-word;
+            padding-top: 8px;
         }
 
         .action-bar {
@@ -475,7 +496,7 @@
             background: #dde7f2;
         }
 
-        @media (max-width: 650px) {
+        @media (max-width: 750px) {
             .step-card {
                 padding: 1.25rem;
             }
@@ -484,6 +505,11 @@
             }
             .score-input {
                 width: 55px;
+            }
+            .score-label {
+                min-width: 70px;
+                max-width: 120px;
+                font-size: 0.7rem;
             }
             .saved-item {
                 flex-direction: column;
@@ -676,6 +702,7 @@
                 const input = div.querySelector('.criterion-input');
                 input.addEventListener('input', (e) => {
                     cri.text = e.target.value;
+                    renderEvaluationTable();
                 });
                 const rmBtn = div.querySelector('.rm');
                 rmBtn.addEventListener('click', () => {
@@ -717,25 +744,22 @@
                 const tdName = document.createElement('td');
                 tdName.style.fontWeight = '500';
                 tdName.style.color = '#0b2b4a';
+                tdName.style.minWidth = '100px';
+                tdName.style.wordBreak = 'break-word';
                 tdName.textContent = opt.text || '(未命名选项)';
                 tr.appendChild(tdName);
 
                 const tdScores = document.createElement('td');
-                tdScores.style.minWidth = '160px';
+                tdScores.style.minWidth = '220px';
                 currentCriteria.forEach(cri => {
                     const scoreValue = evalData.scores[cri.id] !== undefined ? evalData.scores[cri.id] : '';
                     const wrapper = document.createElement('div');
-                    wrapper.style.display = 'flex';
-                    wrapper.style.alignItems = 'center';
-                    wrapper.style.gap = '6px';
-                    wrapper.style.marginBottom = '4px';
+                    wrapper.className = 'score-row';
 
                     const label = document.createElement('span');
-                    label.style.fontSize = '0.75rem';
-                    label.style.color = '#3f5e7c';
-                    label.style.minWidth = '70px';
+                    label.className = 'score-label';
                     label.textContent = cri.text || '标准';
-                    if (label.textContent.length > 8) label.textContent = label.textContent.slice(0, 7) + '…';
+                    label.title = cri.text || '标准';
 
                     const input = document.createElement('input');
                     input.type = 'number';
@@ -745,7 +769,6 @@
                     input.className = 'score-input';
                     input.placeholder = '1-10';
                     input.value = scoreValue;
-                    input.style.width = '70px';
 
                     input.addEventListener('input', (e) => {
                         let val = e.target.value.trim();
@@ -773,6 +796,7 @@
                 tr.appendChild(tdScores);
 
                 const tdWorst = document.createElement('td');
+                tdWorst.style.minWidth = '160px';
                 const worstInput = document.createElement('input');
                 worstInput.type = 'text';
                 worstInput.className = 'worst-input';
@@ -785,6 +809,7 @@
                 tr.appendChild(tdWorst);
 
                 const tdRev = document.createElement('td');
+                tdRev.style.minWidth = '80px';
                 const revLabel = document.createElement('label');
                 revLabel.className = 'reversible-check';
                 const revCheck = document.createElement('input');
