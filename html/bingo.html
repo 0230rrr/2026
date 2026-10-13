@@ -737,12 +737,22 @@ function startRoll(key){
 
     awarded[key]=true;
     drawn[key]=winner;
+
+    // 删掉该门槛的旧奖励记录（含重抽遗留），再插入最新一条
+    history=history.filter(function(h){
+      if(!h.isReward)return true;
+      if(h.rewardKey===key)return false;
+      if(!h.rewardKey && h.task && h.task.indexOf('[奖励] '+meta.label+' →')===0)return false;
+      return true;
+    });
     history.push({
       task:'[奖励] '+meta.label+' → '+winner,
       category:'奖励抽取',
       time:nowStr(),
-      isReward:true
+      isReward:true,
+      rewardKey:key
     });
+
     save();
     renderRewardPool();
     renderDrawnRewards();
