@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>决策小站 · 七步分析法</title>
+    <title>Decide7 · 七步分析法</title>
     <style>
         * {
             box-sizing: border-box;
@@ -320,6 +320,8 @@
             align-items: center;
             padding: 0.75rem 0.5rem;
             border-bottom: 1px solid #eef3fa;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .saved-item:last-child {
@@ -330,16 +332,28 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            flex: 1;
+            min-width: 200px;
         }
 
         .saved-title {
             font-weight: 600;
             color: #124072;
+            font-size: 1rem;
         }
 
-        .saved-date {
+        .saved-meta {
             font-size: 0.75rem;
             color: #6f8aa8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .saved-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
         }
 
         .saved-actions {
@@ -389,12 +403,78 @@
             margin-top: 2rem;
         }
 
-        .required-star {
-            color: #c0392b;
-            margin-left: 4px;
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 20, 40, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
         }
 
-        /* 小屏优化 */
+        .modal-box {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+            animation: fadeUp 0.2s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-box h3 {
+            font-size: 1.3rem;
+            color: #0a2a44;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-box input {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .modal-actions button {
+            padding: 0.7rem 1.6rem;
+            border-radius: 30px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .modal-actions .confirm {
+            background: #1e5c9e;
+            color: white;
+        }
+
+        .modal-actions .confirm:hover {
+            background: #144a83;
+        }
+
+        .modal-actions .cancel {
+            background: #eef3fa;
+            color: #3f5e7c;
+        }
+
+        .modal-actions .cancel:hover {
+            background: #dde7f2;
+        }
+
         @media (max-width: 650px) {
             .step-card {
                 padding: 1.25rem;
@@ -405,15 +485,21 @@
             .score-input {
                 width: 55px;
             }
+            .saved-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .saved-actions {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
 <body>
 <div class="app">
-    <h1>🧭 决策小站</h1>
+    <h1>🧭 Decide7</h1>
     <div class="subhead">七步分析法 · 写下来，就清晰了一半</div>
 
-    <!-- 第一步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">1</div>
@@ -423,33 +509,26 @@
         <textarea id="step1" placeholder="例如：我是否要接受这份新工作？"></textarea>
     </div>
 
-    <!-- 第二步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">2</div>
             <div class="step-title">列出选项</div>
         </div>
         <div class="step-desc">至少写出 3 个，包括“什么都不做”。</div>
-        <div id="optionsContainer" class="options-grid">
-            <!-- 动态生成选项 -->
-        </div>
+        <div id="optionsContainer" class="options-grid"></div>
         <button class="btn-add" id="addOptionBtn">+ 添加选项</button>
     </div>
 
-    <!-- 第三步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">3</div>
             <div class="step-title">列出标准</div>
         </div>
         <div class="step-desc">我最看重什么？哪些是底线，哪些可以妥协？</div>
-        <div id="criteriaContainer" class="criteria-grid">
-            <!-- 动态生成标准 -->
-        </div>
+        <div id="criteriaContainer" class="criteria-grid"></div>
         <button class="btn-add" id="addCriterionBtn">+ 添加标准</button>
     </div>
 
-    <!-- 第四步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">4</div>
@@ -466,14 +545,11 @@
                         <th>可逆？</th>
                     </tr>
                 </thead>
-                <tbody id="evalTableBody">
-                    <!-- 动态行 -->
-                </tbody>
+                <tbody id="evalTableBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- 第五步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">5</div>
@@ -492,7 +568,6 @@
         </div>
     </div>
 
-    <!-- 第六步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">6</div>
@@ -502,7 +577,6 @@
         <textarea id="step6" placeholder="写下你的决定，以及为什么（可以不是最优，但必须能承受）"></textarea>
     </div>
 
-    <!-- 第七步 -->
     <div class="step-card">
         <div class="step-header">
             <div class="step-num">7</div>
@@ -512,19 +586,16 @@
         <textarea id="step7" placeholder="例如：3个月后回顾：如果新工作加班太多且没成长，就开始看机会。"></textarea>
     </div>
 
-    <!-- 操作栏 -->
     <div class="action-bar">
         <div class="btn-group">
-            <button class="btn-primary" id="saveBtn">💾 保存当前分析</button>
+            <button class="btn-primary" id="saveBtn">💾 保存分析</button>
             <button class="btn-secondary" id="clearBtn">🧹 清空所有</button>
         </div>
-        <button class="btn-secondary" id="loadLatestBtn">📂 载入最近一次</button>
     </div>
 
-    <!-- 历史记录 -->
     <div class="saved-list">
         <div class="saved-header">
-            <h3>📋 过去的分析</h3>
+            <h3>📋 历史记录</h3>
         </div>
         <div id="savedListContainer">
             <div class="empty-state">还没有保存过记录</div>
@@ -535,18 +606,13 @@
 
 <script>
     (function() {
-        // ---------- 数据模型 ----------
-        // 每个选项和标准都使用唯一id (简单的字符串)
         let optionIdCounter = 0;
         let criterionIdCounter = 0;
 
-        // 当前编辑中的数据结构
-        let currentOptions = [];   // [{ id, text }]
-        let currentCriteria = [];  // [{ id, text }]
-        // 评估数据: 以选项id为key -> { scores: { criterionId: value }, worst: string, reversible: boolean }
+        let currentOptions = [];
+        let currentCriteria = [];
         let currentEvaluations = {};
 
-        // ---------- DOM 元素 ----------
         const step1 = document.getElementById('step1');
         const step5Info = document.getElementById('step5Info');
         const step5Deadline = document.getElementById('step5Deadline');
@@ -558,33 +624,16 @@
         const evalTableBody = document.getElementById('evalTableBody');
         const savedListContainer = document.getElementById('savedListContainer');
 
-        // ---------- 初始化默认数据 ----------
-        function initDefaultData() {
-            // 如果当前没有选项，默认加3个（包含“什么都不做”）
-            if (currentOptions.length === 0) {
-                currentOptions = [
-                    { id: 'opt_' + (++optionIdCounter), text: '接受新工作' },
-                    { id: 'opt_' + (++optionIdCounter), text: '拒绝，留在原公司' },
-                    { id: 'opt_' + (++optionIdCounter), text: '什么都不做（维持现状）' }
-                ];
-                // 初始化评估
-                currentOptions.forEach(opt => {
-                    if (!currentEvaluations[opt.id]) {
-                        currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
-                    }
-                });
-            }
-            // 标准默认3个
-            if (currentCriteria.length === 0) {
-                currentCriteria = [
-                    { id: 'cri_' + (++criterionIdCounter), text: '薪资待遇' },
-                    { id: 'cri_' + (++criterionIdCounter), text: '成长空间' },
-                    { id: 'cri_' + (++criterionIdCounter), text: '工作生活平衡' }
-                ];
-            }
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        // ---------- 渲染选项 ----------
         function renderOptions() {
             optionsContainer.innerHTML = '';
             currentOptions.forEach(opt => {
@@ -595,31 +644,25 @@
                     <input type="text" value="${escapeHtml(opt.text)}" placeholder="选项描述" class="option-input">
                     <button class="rm" title="删除选项">✕</button>
                 `;
-                // 输入事件更新数据
                 const input = div.querySelector('.option-input');
                 input.addEventListener('input', (e) => {
                     opt.text = e.target.value;
                 });
-                // 删除按钮
                 const rmBtn = div.querySelector('.rm');
                 rmBtn.addEventListener('click', () => {
-                    if (currentOptions.length <= 2) {
-                        alert('至少保留2个选项（建议包含“什么都不做”）');
+                    if (currentOptions.length <= 1) {
+                        alert('至少保留1个选项');
                         return;
                     }
-                    // 移除选项
                     currentOptions = currentOptions.filter(o => o.id !== opt.id);
-                    // 删除评估数据
                     delete currentEvaluations[opt.id];
                     renderOptions();
                     renderEvaluationTable();
                 });
                 optionsContainer.appendChild(div);
             });
-            // 如果选项为空显示提示（但初始化后不会）
         }
 
-        // ---------- 渲染标准 ----------
         function renderCriteria() {
             criteriaContainer.innerHTML = '';
             currentCriteria.forEach(cri => {
@@ -641,7 +684,6 @@
                         return;
                     }
                     currentCriteria = currentCriteria.filter(c => c.id !== cri.id);
-                    // 从评估分数中删除对应标准
                     Object.keys(currentEvaluations).forEach(optId => {
                         if (currentEvaluations[optId]?.scores) {
                             delete currentEvaluations[optId].scores[cri.id];
@@ -654,7 +696,6 @@
             });
         }
 
-        // ---------- 渲染评估表格 ----------
         function renderEvaluationTable() {
             if (!evalTableBody) return;
             const tbody = evalTableBody;
@@ -666,7 +707,6 @@
             }
 
             currentOptions.forEach(opt => {
-                // 确保评估对象存在
                 if (!currentEvaluations[opt.id]) {
                     currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
                 }
@@ -674,17 +714,14 @@
 
                 const tr = document.createElement('tr');
 
-                // 选项名称列（只读文本展示，但也可以编辑用选项输入，这里展示当前文本）
                 const tdName = document.createElement('td');
                 tdName.style.fontWeight = '500';
                 tdName.style.color = '#0b2b4a';
                 tdName.textContent = opt.text || '(未命名选项)';
                 tr.appendChild(tdName);
 
-                // 标准评分列 (使用滑块/数字输入? 这里用数字输入简化, 每个标准一个输入框)
                 const tdScores = document.createElement('td');
                 tdScores.style.minWidth = '160px';
-                // 为每个标准生成评分输入
                 currentCriteria.forEach(cri => {
                     const scoreValue = evalData.scores[cri.id] !== undefined ? evalData.scores[cri.id] : '';
                     const wrapper = document.createElement('div');
@@ -698,7 +735,6 @@
                     label.style.color = '#3f5e7c';
                     label.style.minWidth = '70px';
                     label.textContent = cri.text || '标准';
-                    // 截断长文本
                     if (label.textContent.length > 8) label.textContent = label.textContent.slice(0, 7) + '…';
 
                     const input = document.createElement('input');
@@ -736,7 +772,6 @@
 
                 tr.appendChild(tdScores);
 
-                // 最坏结果列
                 const tdWorst = document.createElement('td');
                 const worstInput = document.createElement('input');
                 worstInput.type = 'text';
@@ -749,7 +784,6 @@
                 tdWorst.appendChild(worstInput);
                 tr.appendChild(tdWorst);
 
-                // 可逆列
                 const tdRev = document.createElement('td');
                 const revLabel = document.createElement('label');
                 revLabel.className = 'reversible-check';
@@ -768,88 +802,82 @@
             });
         }
 
-        // 辅助：转义HTML
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // ---------- 渲染所有动态部分 (选项、标准、表格) ----------
         function renderAll() {
             renderOptions();
             renderCriteria();
             renderEvaluationTable();
         }
 
-        // ---------- 从表单收集完整数据 (用于保存) ----------
+        function countAllChars() {
+            let count = 0;
+            count += step1.value.length;
+            currentOptions.forEach(o => count += (o.text || '').length);
+            currentCriteria.forEach(c => count += (c.text || '').length);
+            Object.values(currentEvaluations).forEach(ev => {
+                if (ev.worst) count += ev.worst.length;
+                if (ev.scores) {
+                    Object.values(ev.scores).forEach(s => {
+                        count += String(s).length;
+                    });
+                }
+            });
+            count += step5Info.value.length;
+            count += step5Deadline.value.length;
+            count += step6.value.length;
+            count += step7.value.length;
+            return count;
+        }
+
         function collectCurrentData() {
-            // 确保选项和标准数据已同步（因为是实时同步，没问题）
             return {
                 step1: step1.value,
                 options: currentOptions.map(o => ({ id: o.id, text: o.text })),
                 criteria: currentCriteria.map(c => ({ id: c.id, text: c.text })),
-                evaluations: JSON.parse(JSON.stringify(currentEvaluations)), // 深拷贝
+                evaluations: JSON.parse(JSON.stringify(currentEvaluations)),
                 step5Info: step5Info.value,
                 step5Deadline: step5Deadline.value,
                 step6: step6.value,
                 step7: step7.value,
-                // 保存计数器 (可选，但为了避免id冲突，载入时可以重新生成id? 但为了简单，保留id并更新计数器)
                 optionIdCounter: optionIdCounter,
                 criterionIdCounter: criterionIdCounter
             };
         }
 
-        // ---------- 将数据填充到表单 (用于载入) ----------
         function loadDataIntoForm(data) {
-            // 清空当前所有
-            // 重置计数器为最大值(确保安全)
             if (data.optionIdCounter) optionIdCounter = data.optionIdCounter;
             if (data.criterionIdCounter) criterionIdCounter = data.criterionIdCounter;
 
-            // 恢复步骤1/5/6/7
             step1.value = data.step1 || '';
             step5Info.value = data.step5Info || '';
             step5Deadline.value = data.step5Deadline || '';
             step6.value = data.step6 || '';
             step7.value = data.step7 || '';
 
-            // 恢复选项
             currentOptions = (data.options || []).map(o => ({ id: o.id, text: o.text }));
-            // 恢复标准
             currentCriteria = (data.criteria || []).map(c => ({ id: c.id, text: c.text }));
-            // 恢复评估数据
             currentEvaluations = data.evaluations || {};
 
-            // 补齐缺失的评估对象
             currentOptions.forEach(opt => {
                 if (!currentEvaluations[opt.id]) {
                     currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
                 } else {
-                    // 确保scores存在
                     if (!currentEvaluations[opt.id].scores) currentEvaluations[opt.id].scores = {};
                     if (currentEvaluations[opt.id].worst === undefined) currentEvaluations[opt.id].worst = '';
                     if (currentEvaluations[opt.id].reversible === undefined) currentEvaluations[opt.id].reversible = false;
                 }
             });
 
-            // 移除已不存在的选项对应的评估数据
             Object.keys(currentEvaluations).forEach(optId => {
                 if (!currentOptions.some(o => o.id === optId)) {
                     delete currentEvaluations[optId];
                 }
             });
 
-            // 如果选项为空，给默认
             if (currentOptions.length === 0) {
                 currentOptions = [
-                    { id: 'opt_' + (++optionIdCounter), text: '选项A' },
-                    { id: 'opt_' + (++optionIdCounter), text: '选项B' },
-                    { id: 'opt_' + (++optionIdCounter), text: '什么都不做' }
+                    { id: 'opt_' + (++optionIdCounter), text: '' },
+                    { id: 'opt_' + (++optionIdCounter), text: '' },
+                    { id: 'opt_' + (++optionIdCounter), text: '' }
                 ];
                 currentOptions.forEach(opt => {
                     currentEvaluations[opt.id] = { scores: {}, worst: '', reversible: false };
@@ -858,17 +886,15 @@
 
             if (currentCriteria.length === 0) {
                 currentCriteria = [
-                    { id: 'cri_' + (++criterionIdCounter), text: '标准1' },
-                    { id: 'cri_' + (++criterionIdCounter), text: '标准2' }
+                    { id: 'cri_' + (++criterionIdCounter), text: '' },
+                    { id: 'cri_' + (++criterionIdCounter), text: '' }
                 ];
             }
 
             renderAll();
         }
 
-        // ---------- 清空表单 (重置为默认) ----------
         function clearForm() {
-            // 重置计数器
             optionIdCounter = 0;
             criterionIdCounter = 0;
 
@@ -878,16 +904,14 @@
             step6.value = '';
             step7.value = '';
 
-            // 重置为默认选项/标准
             currentOptions = [
-                { id: 'opt_' + (++optionIdCounter), text: '接受新工作' },
-                { id: 'opt_' + (++optionIdCounter), text: '拒绝，留在原公司' },
-                { id: 'opt_' + (++optionIdCounter), text: '什么都不做（维持现状）' }
+                { id: 'opt_' + (++optionIdCounter), text: '' },
+                { id: 'opt_' + (++optionIdCounter), text: '' },
+                { id: 'opt_' + (++optionIdCounter), text: '' }
             ];
             currentCriteria = [
-                { id: 'cri_' + (++criterionIdCounter), text: '薪资待遇' },
-                { id: 'cri_' + (++criterionIdCounter), text: '成长空间' },
-                { id: 'cri_' + (++criterionIdCounter), text: '工作生活平衡' }
+                { id: 'cri_' + (++criterionIdCounter), text: '' },
+                { id: 'cri_' + (++criterionIdCounter), text: '' }
             ];
             currentEvaluations = {};
             currentOptions.forEach(opt => {
@@ -897,40 +921,69 @@
             renderAll();
         }
 
-        // ---------- 保存到 localStorage ----------
-        function saveAnalysis() {
-            const data = collectCurrentData();
+        function showSaveModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>💾 保存分析</h3>
+                    <input type="text" id="saveNameInput" placeholder="输入主题名称，例如：要不要换工作" value="${escapeHtml(step1.value.trim() || '')}">
+                    <div class="modal-actions">
+                        <button class="cancel">取消</button>
+                        <button class="confirm">保存</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
 
-            // 获取现有记录
-            let records = [];
-            try {
-                const stored = localStorage.getItem('decision_records');
-                if (stored) records = JSON.parse(stored);
-                if (!Array.isArray(records)) records = [];
-            } catch (e) {
-                records = [];
-            }
+            const nameInput = overlay.querySelector('#saveNameInput');
+            nameInput.focus();
+            nameInput.select();
 
-            // 生成标题：用step1内容或者“未命名分析”
-            const title = (data.step1 || '').trim() || '未命名分析';
-            const newRecord = {
-                id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-                title: title,
-                timestamp: Date.now(),
-                data: data
+            const close = () => overlay.remove();
+
+            overlay.querySelector('.cancel').addEventListener('click', close);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) close();
+            });
+
+            const doSave = () => {
+                const name = nameInput.value.trim() || '未命名分析';
+                const data = collectCurrentData();
+                const charCount = countAllChars();
+
+                let records = [];
+                try {
+                    const stored = localStorage.getItem('decision_records');
+                    if (stored) records = JSON.parse(stored);
+                    if (!Array.isArray(records)) records = [];
+                } catch (e) {
+                    records = [];
+                }
+
+                const newRecord = {
+                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                    title: name,
+                    timestamp: Date.now(),
+                    charCount: charCount,
+                    data: data
+                };
+
+                records.unshift(newRecord);
+                if (records.length > 50) records = records.slice(0, 50);
+
+                localStorage.setItem('decision_records', JSON.stringify(records));
+                close();
+                renderSavedList();
             };
 
-            records.unshift(newRecord); // 最新的在前
-            // 限制最多保存20条
-            if (records.length > 20) records = records.slice(0, 20);
-
-            localStorage.setItem('decision_records', JSON.stringify(records));
-
-            renderSavedList();
-            alert('✅ 分析已保存');
+            overlay.querySelector('.confirm').addEventListener('click', doSave);
+            nameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') doSave();
+                if (e.key === 'Escape') close();
+            });
         }
 
-        // ---------- 渲染历史记录列表 ----------
         function renderSavedList() {
             if (!savedListContainer) return;
             let records = [];
@@ -948,17 +1001,22 @@
             }
 
             savedListContainer.innerHTML = '';
-            records.forEach((rec, index) => {
+            records.forEach((rec) => {
                 const item = document.createElement('div');
                 item.className = 'saved-item';
 
                 const date = new Date(rec.timestamp);
-                const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+                const timeStr = `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
 
                 item.innerHTML = `
                     <div class="saved-info">
                         <div class="saved-title">${escapeHtml(rec.title)}</div>
-                        <div class="saved-date">${dateStr}</div>
+                        <div class="saved-meta">
+                            <span>📅 ${dateStr}</span>
+                            <span>🕐 ${timeStr}</span>
+                            <span>📝 ${rec.charCount || 0} 字</span>
+                        </div>
                     </div>
                     <div class="saved-actions">
                         <button class="btn-sm btn-load" data-id="${rec.id}">载入</button>
@@ -966,18 +1024,17 @@
                     </div>
                 `;
 
-                // 载入按钮事件
                 item.querySelector('.btn-load').addEventListener('click', (e) => {
                     const recordId = e.target.dataset.id;
                     const targetRecord = records.find(r => r.id === recordId);
                     if (targetRecord) {
                         loadDataIntoForm(targetRecord.data);
-                        alert('已载入分析');
+                        alert('已载入分析：' + targetRecord.title);
                     }
                 });
 
-                // 删除按钮事件
                 item.querySelector('.btn-del').addEventListener('click', (e) => {
+                    if (!confirm('确定删除这条记录？')) return;
                     const recordId = e.target.dataset.id;
                     const newRecords = records.filter(r => r.id !== recordId);
                     localStorage.setItem('decision_records', JSON.stringify(newRecords));
@@ -988,31 +1045,7 @@
             });
         }
 
-        // ---------- 载入最近一条记录 ----------
-        function loadLatest() {
-            try {
-                const stored = localStorage.getItem('decision_records');
-                if (!stored) {
-                    alert('还没有保存过任何分析');
-                    return;
-                }
-                const records = JSON.parse(stored);
-                if (!Array.isArray(records) || records.length === 0) {
-                    alert('还没有保存过任何分析');
-                    return;
-                }
-                // 按时间倒序第一个就是最新的(保存时unshift)
-                const latest = records[0];
-                loadDataIntoForm(latest.data);
-                alert('已载入最近一次分析');
-            } catch (e) {
-                alert('载入失败');
-            }
-        }
-
-        // ---------- 事件监听绑定 ----------
         function bindEvents() {
-            // 添加选项
             document.getElementById('addOptionBtn').addEventListener('click', () => {
                 const newId = 'opt_' + (++optionIdCounter);
                 currentOptions.push({ id: newId, text: '' });
@@ -1021,7 +1054,6 @@
                 renderEvaluationTable();
             });
 
-            // 添加标准
             document.getElementById('addCriterionBtn').addEventListener('click', () => {
                 const newId = 'cri_' + (++criterionIdCounter);
                 currentCriteria.push({ id: newId, text: '' });
@@ -1029,29 +1061,18 @@
                 renderEvaluationTable();
             });
 
-            // 保存
-            document.getElementById('saveBtn').addEventListener('click', saveAnalysis);
+            document.getElementById('saveBtn').addEventListener('click', showSaveModal);
 
-            // 清空
             document.getElementById('clearBtn').addEventListener('click', () => {
                 if (confirm('确定清空所有当前内容？已保存的记录不会丢失。')) {
                     clearForm();
                 }
             });
-
-            // 载入最近
-            document.getElementById('loadLatestBtn').addEventListener('click', loadLatest);
         }
 
-        // ---------- 启动应用 ----------
         function init() {
-            // 初始化默认数据
-            initDefaultData();
-            // 渲染界面
-            renderAll();
-            // 渲染历史记录
+            clearForm();
             renderSavedList();
-            // 绑定事件
             bindEvents();
         }
 
