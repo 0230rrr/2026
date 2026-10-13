@@ -107,6 +107,9 @@ body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;m
 .slot-close:disabled{background:var(--resetB);color:var(--resetT);cursor:not-allowed;opacity:.6}
 .archive-action-btn{background:transparent;border:1.5px solid var(--resetB);color:var(--resetT);padding:8px 18px;border-radius:40px;font-weight:600;cursor:pointer;transition:.15s;font-size:.85rem}
 .archive-action-btn:hover{background:var(--resetH)}
+#noteVersionSelect{width:100%;border:1px solid var(--inputB);background:var(--input);border-radius:40px;padding:10px 16px;font-size:.82rem;color:var(--tp);outline:none;margin-bottom:8px;cursor:pointer}
+#noteText{width:100%;min-height:120px;border:1px solid var(--inputB);background:var(--input);border-radius:16px;padding:10px 12px;font-size:.8rem;color:var(--tp);outline:none;resize:vertical;line-height:1.6;font-family:inherit}
+#noteText::placeholder{color:var(--tm)}
 @media(max-width:900px){.app{grid-template-columns:1fr}.theme-toggle{top:16px;right:16px;padding:8px 14px;font-size:.75rem}.reward-pool-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){body{padding:1rem .8rem}.bingo-panel{padding:1.2rem}.cell .task-text{font-size:.7rem}.reward-pool-grid{grid-template-columns:1fr}}
 </style>
@@ -150,6 +153,12 @@ body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;m
 <button class="btn" id="newBingoBtn">🆕 新建宾果 (自动存档旧盘)</button>
 <button class="btn" id="archiveBtn">📚 历史宾果</button>
 <button class="btn" id="statsBtn">📊 查看统计</button>
+
+<div class="card" style="margin-top:0">
+<h3>📝 版本备注</h3>
+<select id="noteVersionSelect"></select>
+<textarea id="noteText" placeholder="记录这一版做完后遗留的问题、下一版想改什么..."></textarea>
+</div>
 </div>
 </div>
 
@@ -218,6 +227,8 @@ var awarded={task5:false,line2:false,line3:false,line5:false,line10:false};
 var drawn={task5:'',line2:'',line3:'',line5:'',line10:''};
 var roundId='';
 var viewingArchiveId=null;
+var noteCurrent='';
+var noteViewingId='current';
 
 var REWARD_META=[
   {key:'task5',label:'完成5个任务',short:'5任务'},
@@ -261,6 +272,8 @@ var slotTitle=document.getElementById('slotTitle');
 var slotStrip=document.getElementById('slotStrip');
 var slotFinal=document.getElementById('slotFinal');
 var slotClose=document.getElementById('slotClose');
+var noteVersionSelect=document.getElementById('noteVersionSelect');
+var noteText=document.getElementById('noteText');
 
 var PALETTE_LIGHT=['#f0e6ff','#ffe6f0','#e6f0ff','#e6ffec','#fff0e6','#e6ffff','#fffce6','#ffe6e6','#f5e6ff','#e6ffe6'];
 var PALETTE_DARK=['#3d2a5a','#5a2a42','#2a3a5a','#2a4a35','#5a3a2a','#2a4a4a','#5a5a2a','#5a2a2a','#4a2a5a','#2a5a2a'];
@@ -286,7 +299,8 @@ function save(){
   try{
     localStorage.setItem(DATA_KEY,JSON.stringify({
       cells:cells,bigTasks:bigTasks,rewards:rewards,
-      awarded:awarded,drawn:drawn,history:history,roundId:roundId,archives:archives
+      awarded:awarded,drawn:drawn,history:history,roundId:roundId,archives:archives,
+      noteCurrent:noteCurrent
     }));
   }catch(e){}
 }
@@ -319,6 +333,7 @@ function load(){
     history=d.history||[];
     roundId=d.roundId||genRoundId();
     archives=d.archives||[];
+    noteCurrent=d.noteCurrent||'';
     return true;
   }catch(e){return false;}
 }
@@ -349,7 +364,8 @@ function snapshotCurrent(name){
     rewards:deepCopy(rewards),
     awarded:deepCopy(awarded),
     drawn:deepCopy(drawn),
-    roundId:roundId
+    roundId:roundId,
+    note:noteCurrent||''
   };
 }
 
@@ -828,8 +844,11 @@ function newBingo(){
   pushArchive();
   archiveCompleted();
   makeEmptyBingo();
+  noteCurrent='';
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
   renderGrid();checkRewards();save();
+  renderNoteVersionSelect();
+  renderNoteText();
   showToast('🆕 新宾果已创建');
 }
 
@@ -873,8 +892,11 @@ function showArchives(){
       e.stopPropagation();
       if(!confirm('删除此快照「'+a.name+'」？不可恢复。'))return;
       archives=archives.filter(function(x){return x.id!==a.id;});
+      if(noteViewingId===a.id){noteViewingId='current';}
       save();
       showArchives();
+      renderNoteVersionSelect();
+      renderNoteText();
       showToast('🗑️ 已删除快照');
     });
 
@@ -929,6 +951,14 @@ function openArchiveView(id){
   if(!hasDrawn)drawnHtml+='<div class="empty-tip" style="padding:.5rem">无</div>';
   archiveViewBody.insertAdjacentHTML('beforeend',drawnHtml);
 
+  var noteHtml='<h4 style="color:var(--ac);margin:.5rem 0">📝 版本备注</h4>';
+  if(a.note&&a.note.trim()){
+    noteHtml+='<div class="stat-item" style="white-space:pre-wrap">'+escapeHtml(a.note)+'</div>';
+  }else{
+    noteHtml+='<div class="empty-tip" style="padding:.5rem">无</div>';
+  }
+  archiveViewBody.insertAdjacentHTML('beforeend',noteHtml);
+
   archiveViewModal.classList.add('show');
 }
 
@@ -943,9 +973,12 @@ restoreArchiveBtn.addEventListener('click',function(){
   awarded=deepCopy(a.awarded);
   drawn=deepCopy(a.drawn);
   roundId=a.roundId;
+  noteCurrent=a.note||'';
   notified={task5:false,line2:false,line3:false,line5:false,line10:false};
   save();
   renderBigTasks();renderGrid();checkRewards();
+  renderNoteVersionSelect();
+  renderNoteText();
   archiveViewModal.classList.remove('show');
   archiveModal.classList.remove('show');
   showToast('♻️ 已恢复宾果');
@@ -953,10 +986,14 @@ restoreArchiveBtn.addEventListener('click',function(){
 
 deleteArchiveBtn.addEventListener('click',function(){
   if(!confirm('删除此快照？不可恢复。'))return;
-  archives=archives.filter(function(x){return x.id!==viewingArchiveId;});
+  var delId=viewingArchiveId;
+  archives=archives.filter(function(x){return x.id!==delId;});
+  if(noteViewingId===delId)noteViewingId='current';
   save();
   archiveViewModal.classList.remove('show');
   showArchives();
+  renderNoteVersionSelect();
+  renderNoteText();
 });
 
 function showStats(){
@@ -983,11 +1020,55 @@ function showStats(){
   statsModal.classList.add('show');
 }
 
+function renderNoteVersionSelect(){
+  noteVersionSelect.innerHTML='';
+  var optCur=document.createElement('option');
+  optCur.value='current';
+  optCur.textContent='📌 当前版本';
+  noteVersionSelect.appendChild(optCur);
+  archives.forEach(function(a){
+    var o=document.createElement('option');
+    o.value=a.id;
+    o.textContent='📅 '+a.name;
+    noteVersionSelect.appendChild(o);
+  });
+  var exists=noteViewingId==='current'||archives.some(function(x){return x.id===noteViewingId;});
+  if(!exists)noteViewingId='current';
+  noteVersionSelect.value=noteViewingId;
+}
+
+function renderNoteText(){
+  if(noteViewingId==='current'){
+    noteText.value=noteCurrent;
+  }else{
+    var a=archives.filter(function(x){return x.id===noteViewingId;})[0];
+    noteText.value=a?(a.note||''):'';
+  }
+}
+
+noteVersionSelect.addEventListener('change',function(){
+  noteViewingId=this.value;
+  renderNoteText();
+});
+
+noteText.addEventListener('input',function(){
+  var v=this.value;
+  if(noteViewingId==='current'){
+    noteCurrent=v;
+  }else{
+    var a=archives.filter(function(x){return x.id===noteViewingId;})[0];
+    if(a)a.note=v;
+  }
+  save();
+});
+
 function refreshDynamic(){
   renderGrid();
   renderBigTasks();
   renderRewardPool();
   renderDrawnRewards();
+  renderNoteVersionSelect();
+  renderNoteText();
 }
 
 themeToggle.addEventListener('click',function(){
@@ -1022,6 +1103,8 @@ function init(){
   renderDrawnRewards();
   renderGrid();
   checkRewards();
+  renderNoteVersionSelect();
+  renderNoteText();
 }
 init();
 })();
