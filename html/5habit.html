@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 習慣追蹤器</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#1a1e26; --card2:#222833; --line:#2a3140;
+    --text:#e8eaed; --muted:#9aa3b2; --accent:#ffd166; --accent2:#4cc9f0; --ok:#3ddc97;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei",sans-serif;
+    background:linear-gradient(180deg,#0f1115,#141925);color:var(--text);line-height:1.6;
+    padding:0 16px 80px;
+  }
+  .wrap{max-width:820px;margin:0 auto}
+  header{padding:44px 0 20px;text-align:center}
+  header h1{font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:1px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);margin-top:8px;font-size:.92rem}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+  .stat{background:var(--card);border-radius:14px;padding:14px;text-align:center}
+  .stat b{display:block;font-size:1.5rem;color:var(--accent)}
+  .stat span{color:var(--muted);font-size:.78rem}
+
+  .datebar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:var(--card);border-radius:14px;padding:12px 16px;margin-bottom:18px}
+  .datebar input{background:var(--card2);border:1px solid var(--line);color:var(--text);
+    padding:8px 12px;border-radius:10px;font-size:.95rem}
+  .datebar .label{color:var(--muted);font-size:.85rem}
+
+  .habit{background:var(--card);border-radius:16px;margin-bottom:14px;padding:18px 20px;
+    border:1px solid transparent;transition:.2s}
+  .habit.done{border-color:var(--ok);background:linear-gradient(180deg,#16241f,#1a1e26)}
+  .habit-head{display:flex;align-items:center;gap:14px}
+  .habit-head input{width:24px;height:24px;accent-color:var(--ok);cursor:pointer;flex:0 0 auto}
+  .habit-head .num{flex:0 0 32px;height:32px;border-radius:9px;background:var(--card2);
+    display:grid;place-items:center;color:var(--accent);font-weight:700;font-size:.9rem}
+  .habit-head h3{font-size:1.05rem;flex:1}
+  .habit-head h3 small{display:block;color:var(--muted);font-weight:400;font-size:.8rem;margin-top:2px}
+
+  .field{margin-top:14px}
+  .field label{display:block;color:var(--accent2);font-size:.8rem;font-weight:600;
+    margin-bottom:6px;letter-spacing:.5px}
+  .field textarea{
+    width:100%;min-height:72px;resize:vertical;background:var(--card2);
+    border:1px solid var(--line);border-radius:10px;color:var(--text);
+    padding:10px 12px;font-family:inherit;font-size:.92rem;
+  }
+  .field textarea:focus{outline:none;border-color:var(--accent2)}
+  .autosave{color:var(--ok);font-size:.75rem;margin-top:5px;min-height:1em}
+
+  .actions{display:flex;gap:12px;margin:26px 0 38px;flex-wrap:wrap}
+  .btn{flex:1;min-width:130px;padding:14px;border-radius:12px;border:none;cursor:pointer;
+    font-size:1rem;font-weight:600;transition:.2s}
+  .btn-primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#111}
+  .btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+
+  h2.section-title{font-size:1.15rem;margin:0 0 14px;padding-left:10px;border-left:4px solid var(--accent2)}
+  .history{background:var(--card);border-radius:16px;padding:8px 18px}
+  .dayrow{padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  .dayrow:last-child{border-bottom:none}
+  .dayrow-main{display:flex;align-items:center;gap:14px}
+  .dayrow .d{flex:0 0 92px;color:var(--muted);font-size:.85rem}
+  .dots{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+  .dot{width:18px;height:18px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+    display:grid;place-items:center;font-size:.6rem;color:#5c6675}
+  .dot.on{background:var(--ok);border-color:var(--ok);color:#0b1a14}
+  .dayrow .score{color:var(--accent);font-size:.85rem;font-weight:600;min-width:44px;text-align:right}
+  .detail{display:none;margin-top:10px;color:var(--muted);font-size:.85rem;white-space:pre-wrap;
+    background:var(--card2);border-radius:10px;padding:10px 14px}
+  .dayrow.expanded .detail{display:block}
+  .empty{color:var(--muted);text-align:center;padding:24px 0;font-size:.9rem}
+
+  footer{text-align:center;margin-top:44px;color:var(--muted);font-size:.85rem}
+  footer strong{color:var(--accent)}
+
+  @media(max-width:520px){
+    .stats{grid-template-columns:1fr 1fr}
+    .dayrow .d{flex-basis:70px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>5 習慣<span>追蹤器</span></h1>
+    <p>每個習慣都有專屬記錄欄位，邊做邊寫，自動儲存</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="s-streak">0</b><span>連續達標天數</span></div>
+    <div class="stat"><b id="s-total">0</b><span>累計記錄天數</span></div>
+    <div class="stat"><b id="s-rate">0%</b><span>平均完成率</span></div>
+  </div>
+
+  <div class="datebar">
+    <span class="label">記錄日期</span>
+    <input type="date" id="datePicker">
+  </div>
+
+  <div id="habits"></div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="saveBtn">儲存今天的記錄</button>
+    <button class="btn btn-ghost" id="exportBtn">匯出資料</button>
+    <button class="btn btn-ghost" id="clearBtn">清空全部</button>
+  </div>
+
+  <h2 class="section-title">歷史紀錄</h2>
+  <div class="history" id="history"></div>
+
+  <footer>
+    <p><strong>還在自我攻擊嗎？我們該鬆綁了。</strong></p>
+  </footer>
+</div>
+
+<script>
+const HABITS = [
+  {
+    key:'win', n:'01', name:'記小贏',
+    desc:'每天記下一件「我還行」的小事',
+    fields:[
+      { id:'wins', label:'今天的小贏（一行一件）', ph:'洗了碗\n沒遲到\n跟同事說了一句話', rows:4 }
+    ]
+  },
+  {
+    key:'dump', n:'02', name:'記屁賬',
+    desc:'把破事、爛情緒、亂想法全部倒出來',
+    fields:[
+      { id:'dumpText', label:'倒出來的破事／情緒', ph:'罵人也寫、哭也寫，寫完就不堵了…', rows:5 }
+    ]
+  },
+  {
+    key:'impulse', n:'03', name:'戒掉衝動的習慣',
+    desc:'衝動來了先認出來，立刻轉移去做別的事',
+    fields:[
+      { id:'impulseCount', label:'今天衝動出現幾次', ph:'例：3 次', rows:1 },
+      { id:'impulseAction', label:'當下怎麼轉移', ph:'例：認出來 → 做 20 個俯臥撐 / 去洗衣服 / 衝澡', rows:3 }
+    ]
+  },
+  {
+    key:'social', n:'04', name:'找罵練習',
+    desc:'主動跟陌生人說一句話',
+    fields:[
+      { id:'socialWho', label:'今天跟誰說了什麼', ph:'例：跟樓下保安說「今天好熱呀」，他回了一個「嗯」', rows:3 },
+      { id:'socialFeel', label:'當下感覺／緊張程度', ph:'例：手心出汗，但第二次就好多了', rows:2 }
+    ]
+  },
+  {
+    key:'move', n:'05', name:'動一下你就跑',
+    desc:'深蹲 20 個／爬兩趟樓梯／扭一首歌',
+    fields:[
+      { id:'moveWhat', label:'做了什麼運動', ph:'例：深蹲 20 個＋爬兩趟樓梯', rows:2 },
+      { id:'moveMin', label:'幾分鐘', ph:'例：5 分鐘', rows:1 },
+      { id:'moveFeel', label:'動完之後的感覺', ph:'例：那半小時看誰都非常順眼', rows:2 }
+    ]
+  }
+];
+
+const STORE_KEY = 'habitTracker.v2';
+let data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+let currentDate = todayStr();
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtDate(s){ const [y,m,d] = s.split('-'); return `${m}/${d}`; }
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+
+/* ---------- 建立習慣卡片（每個習慣自己的輸入框） ---------- */
+const habitsEl = document.getElementById('habits');
+habitsEl.innerHTML = HABITS.map(h => {
+  const fields = h.fields.map(f => `
+    <div class="field">
+      <label for="${h.key}-${f.id}">${f.label}</label>
+      <textarea id="${h.key}-${f.id}" data-habit="${h.key}" data-field="${f.id}"
+        rows="${f.rows}" placeholder="${f.ph}"></textarea>
+    </div>
+  `).join('');
+  return `
+    <div class="habit" data-key="${h.key}">
+      <div class="habit-head">
+        <input type="checkbox" data-check="${h.key}" title="標記這個習慣今天完成了">
+        <div class="num">${h.n}</div>
+        <h3>${h.name}<small>${h.desc}</small></h3>
+      </div>
+      ${fields}
+    </div>
+  `;
+}).join('');
+
+/* ---------- 載入某天資料 ---------- */
+function loadDay(dateStr){
+  const day = data[dateStr] || { checks:{}, fields:{} };
+  HABITS.forEach(h => {
+    const cb = document.querySelector(`[data-check="${h.key}"]`);
+    cb.checked = !!day.checks[h.key];
+    cb.closest('.habit').classList.toggle('done', cb.checked);
+    h.fields.forEach(f => {
+      const ta = document.getElementById(`${h.key}-${f.id}`);
+      ta.value = (day.fields && day.fields[`${h.key}.${f.id}`]) || '';
+    });
+  });
+}
+
+/* ---------- 收集表單 ---------- */
+function collectDay(){
+  const checks = {}, fields = {};
+  HABITS.forEach(h => {
+    checks[h.key] = document.querySelector(`[data-check="${h.key}"]`).checked;
+    h.fields.forEach(f => {
+      const v = document.getElementById(`${h.key}-${f.id}`).value.trim();
+      if(v) fields[`${h.key}.${f.id}`] = v;
+    });
+  });
+  return { checks, fields, updated: Date.now() };
+}
+
+/* ---------- 統計 ---------- */
+function calcStats(){
+  const dates = Object.keys(data).sort();
+  const total = dates.length;
+  let sum = 0;
+  dates.forEach(d => {
+    sum += HABITS.filter(h => data[d].checks[h.key]).length / HABITS.length;
+  });
+  let streak = 0, cursor = new Date();
+  while(true){
+    const s = cursor.getFullYear() + '-' + String(cursor.getMonth()+1).padStart(2,'0') + '-' + String(cursor.getDate()).padStart(2,'0');
+    const day = data[s];
+    if(day && HABITS.every(h => day.checks[h.key])){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else break;
+  }
+  document.getElementById('s-streak').textContent = streak;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-rate').textContent = total ? Math.round(sum/total*100) + '%' : '0%';
+}
+
+/* ---------- 歷史紀錄 ---------- */
+function renderHistory(){
+  const el = document.getElementById('history');
+  const dates = Object.keys(data).sort().reverse();
+  if(!dates.length){
+    el.innerHTML = '<div class="empty">還沒有記錄。勾選習慣、在各欄位寫下內容，按「儲存今天的記錄」開始吧。</div>';
+    return;
+  }
+  el.innerHTML = dates.map(d => {
+    const day = data[d];
+    const done = HABITS.filter(h => day.checks[h.key]).length;
+    const dots = HABITS.map(h =>
+      `<span class="dot ${day.checks[h.key]?'on':''}" title="${h.name}">${h.n.replace(/^0/,'')}</span>`
+    ).join('');
+    const lines = [];
+    HABITS.forEach(h => {
+      h.fields.forEach(f => {
+        const v = day.fields && day.fields[`${h.key}.${f.id}`];
+        if(v) lines.push(`【${h.name}·${f.label}】\n${v}`);
+      });
+    });
+    return `
+      <div class="dayrow" data-day="${d}">
+        <div class="dayrow-main">
+          <span class="d">${fmtDate(d)}</span>
+          <div class="dots">${dots}</div>
+          <span class="score">${done}/5</span>
+        </div>
+        <div class="detail">${lines.length ? lines.join('\n\n').replace(/</g,'&lt;') : '（無文字記錄）'}</div>
+      </div>`;
+  }).join('');
+
+  el.querySelectorAll('.dayrow').forEach(row => {
+    row.addEventListener('click', () => row.classList.toggle('expanded'));
+  });
+}
+
+/* ---------- 事件 ---------- */
+document.getElementById('datePicker').value = currentDate;
+document.getElementById('datePicker').addEventListener('change', e => {
+  currentDate = e.target.value || todayStr();
+  loadDay(currentDate);
+});
+
+document.querySelectorAll('[data-check]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    cb.closest('.habit').classList.toggle('done', cb.checked);
+  });
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  data[currentDate] = collectDay();
+  save();
+  calcStats();
+  renderHistory();
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '✓ 已儲存';
+  setTimeout(() => btn.textContent = '儲存今天的記錄', 1500);
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'habit-tracker-backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if(!confirm('確定要清空所有記錄嗎？此動作無法復原。')) return;
+  data = {};
+  save();
+  loadDay(currentDate);
+  calcStats();
+  renderHistory();
+});
+
+/* ---------- 初始化 ---------- */
+loadDay(currentDate);
+calcStats();
+renderHistory();
+</script>
+</body>
+</html>
