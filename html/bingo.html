@@ -123,6 +123,26 @@ body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;m
 .pick-item:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 .pick-item.current{background:var(--ac);color:#fff;border-color:var(--ac)}
 .pick-item.current::after{content:" ✓";font-weight:800}
+.habit-item{background:var(--reward);border:1px solid var(--rewardB);border-radius:12px;padding:.5rem .7rem;margin-bottom:.4rem;display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--tp)}
+.habit-item .h-text{flex:1;font-weight:600;word-break:break-word;cursor:text;border-radius:4px;padding:1px 3px;outline:none}
+.habit-item .h-text:focus{outline:2px solid var(--ac);background:rgba(255,255,255,.6)}
+.habit-item .h-cat{font-size:.62rem;background:var(--card);border:1px solid var(--rewardB);border-radius:20px;padding:1px 7px;color:var(--tm);font-weight:600;white-space:nowrap}
+.habit-item .h-copy,.habit-item .h-del{background:none;border:none;cursor:pointer;font-size:.9rem;padding:2px 4px;line-height:1;border-radius:50%}
+.habit-item .h-copy:hover{background:var(--resetH)}
+.habit-item .h-del{opacity:.6}
+.habit-item .h-del:hover{opacity:1;background:var(--resetH)}
+.habit-add-area{display:flex;flex-direction:column;gap:6px;margin-bottom:.6rem}
+.habit-add-row{display:flex;gap:6px}
+.habit-add-row input{flex:1;border:1px solid var(--inputB);background:var(--input);border-radius:40px;padding:8px 12px;font-size:.78rem;outline:none;color:var(--tp);min-width:0}
+.habit-add-row input::placeholder{color:var(--tm)}
+.habit-add-row select{border:1px solid var(--inputB);background:var(--input);border-radius:40px;padding:8px 10px;font-size:.75rem;color:var(--tp);outline:none;cursor:pointer;max-width:110px}
+.habit-add-row button{background:var(--ac);border:none;color:#fff;font-weight:600;padding:0 14px;border-radius:40px;font-size:.78rem;cursor:pointer;flex-shrink:0}
+.habit-add-row button:hover{background:var(--acH)}
+.habit-fill-row{display:flex;gap:6px;margin-top:.4rem}
+.habit-fill-row select{flex:1;border:1px solid var(--inputB);background:var(--input);border-radius:40px;padding:8px 12px;font-size:.75rem;color:var(--tp);outline:none;cursor:pointer}
+.habit-fill-row button{background:#b27bdf;border:none;color:#fff;font-weight:600;padding:0 14px;border-radius:40px;font-size:.75rem;cursor:pointer;flex-shrink:0}
+.habit-fill-row button:hover{background:var(--acH)}
+.habit-list{max-height:240px;overflow-y:auto;padding-right:2px}
 #lineLogView .drawn-item{flex-direction:row;justify-content:space-between;align-items:center}
 #lineLogView .drawn-item .dlabel{font-size:.75rem}
 #lineLogView .drawn-item .dval{font-size:.8rem}
@@ -166,6 +186,21 @@ body{background:linear-gradient(145deg,var(--bg1),var(--bg2));min-height:100vh;m
 </div>
 <div class="big-task-tags" id="bigTaskTags"></div>
 </div>
+</div>
+<div class="card">
+<h3>📚 习惯库</h3>
+<div class="habit-add-area">
+<div class="habit-add-row">
+<input type="text" id="habitInput" placeholder="输入一个固定习惯...">
+<select id="habitCatSelect"><option value="">未分类</option></select>
+<button id="addHabitBtn">添加</button>
+</div>
+<div class="habit-fill-row">
+<select id="habitFillSelect"><option value="__all__">全部习惯</option></select>
+<button id="fillHabitBtn">⚡ 一键填空格</button>
+</div>
+</div>
+<div class="habit-list" id="habitList"></div>
 </div>
 <div class="stats">
 <div>✅ 已完成 <span id="completedCount">0</span></div>
@@ -260,7 +295,7 @@ function applyTheme(){
 applyTheme();
 prefersDark.addEventListener('change',function(){if(currentTheme==='system'){applyTheme();refreshDynamic();}});
 
-var cells=[],bigTasks=[],history=[],archives=[];
+var cells=[],bigTasks=[],history=[],archives=[],habitLibrary=[];
 var bigTaskWeights={};
 var statsSortMode='doneDesc';
 var milestones={};
@@ -325,6 +360,12 @@ var slotFinal=document.getElementById('slotFinal');
 var slotClose=document.getElementById('slotClose');
 var noteVersionSelect=document.getElementById('noteVersionSelect');
 var noteText=document.getElementById('noteText');
+var habitInput=document.getElementById('habitInput');
+var habitCatSelect=document.getElementById('habitCatSelect');
+var addHabitBtn=document.getElementById('addHabitBtn');
+var habitFillSelect=document.getElementById('habitFillSelect');
+var fillHabitBtn=document.getElementById('fillHabitBtn');
+var habitList=document.getElementById('habitList');
 
 var PALETTE_LIGHT=['#f0e6ff','#ffe6f0','#e6f0ff','#e6ffec','#fff0e6','#e6ffff','#fffce6','#ffe6e6','#f5e6ff','#e6ffe6'];
 var PALETTE_DARK=['#3d2a5a','#5a2a42','#2a3a5a','#2a4a35','#5a3a2a','#2a4a4a','#5a5a2a','#5a2a2a','#4a2a5a','#2a5a2a'];
@@ -352,7 +393,8 @@ function save(){
       cells:cells,bigTasks:bigTasks,rewards:rewards,
       awarded:awarded,drawn:drawn,history:history,roundId:roundId,archives:archives,
       noteCurrent:noteCurrent,milestones:milestones,
-      bigTaskWeights:bigTaskWeights,statsSortMode:statsSortMode
+      bigTaskWeights:bigTaskWeights,statsSortMode:statsSortMode,
+      habitLibrary:habitLibrary
     }));
   }catch(e){}
 }
@@ -389,6 +431,7 @@ function load(){
     milestones=d.milestones||{};
     bigTaskWeights=d.bigTaskWeights||{};
     statsSortMode=d.statsSortMode||'doneDesc';
+    habitLibrary=d.habitLibrary||[];
     return true;
   }catch(e){return false;}
 }
@@ -889,8 +932,9 @@ function renderBigTasks(){
       if(bigTasks.indexOf(nv)>=0){showToast('已存在同名大任务');nameSpan.textContent=old;return;}
       bigTasks[i]=nv;
       cells.forEach(function(c){if(c.category===old)c.category=nv;});
+      habitLibrary.forEach(function(h){if(h.category===old)h.category=nv;});
       if(bigTaskWeights[old]!==undefined){bigTaskWeights[nv]=bigTaskWeights[old];delete bigTaskWeights[old];}
-      save();renderGrid();renderBigTasks();
+      save();renderGrid();renderBigTasks();renderHabitLibrary();
     });
     nameSpan.addEventListener('keydown',function(e){
       if(e.key==='Enter'){e.preventDefault();nameSpan.blur();}
@@ -921,7 +965,8 @@ function renderBigTasks(){
         bigTasks.splice(i,1);
         delete bigTaskWeights[removed];
         cells.forEach(function(c){if(c.category===removed)c.category='';});
-        renderBigTasks();renderGrid();save();
+        habitLibrary.forEach(function(h){if(h.category===removed)h.category='';});
+        renderBigTasks();renderGrid();renderHabitLibrary();save();
         showToast('已删除大任务，相关任务变为未分类');
       }
     });
@@ -940,6 +985,18 @@ function updateCatSelect(){
     o.value=t;o.textContent=t;
     categorySelect.appendChild(o);
   });
+  habitCatSelect.innerHTML='<option value="">未分类</option>';
+  bigTasks.forEach(function(t){
+    var o=document.createElement('option');
+    o.value=t;o.textContent=t;
+    habitCatSelect.appendChild(o);
+  });
+  habitFillSelect.innerHTML='<option value="__all__">全部习惯</option>';
+  bigTasks.forEach(function(t){
+    var o=document.createElement('option');
+    o.value=t;o.textContent=t;
+    habitFillSelect.appendChild(o);
+  });
 }
 
 function addBigTask(){
@@ -948,6 +1005,125 @@ function addBigTask(){
   if(bigTasks.indexOf(v)<0){bigTasks.push(v);renderBigTasks();bigTaskInput.value='';save();}
   else showToast('已存在');
 }
+
+/* ============ 习惯库 ============ */
+
+function renderHabitLibrary(){
+  habitList.innerHTML='';
+  if(habitLibrary.length===0){
+    habitList.innerHTML='<div class="empty-tip" style="padding:1rem">习惯库是空的，先添加几个吧</div>';
+    return;
+  }
+  habitLibrary.forEach(function(h,idx){
+    var d=document.createElement('div');
+    d.className='habit-item';
+
+    var txt=document.createElement('span');
+    txt.className='h-text';
+    txt.contentEditable='true';
+    txt.spellcheck=false;
+    txt.textContent=h.text;
+    txt.addEventListener('click',function(e){e.stopPropagation();});
+    txt.addEventListener('blur',function(){
+      var nv=txt.textContent.trim();
+      if(!nv){txt.textContent=h.text;return;}
+      h.text=nv;
+      save();
+    });
+    txt.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();txt.blur();}
+      if(e.key==='Escape'){e.preventDefault();txt.textContent=h.text;txt.blur();}
+    });
+
+    var cat=document.createElement('span');
+    cat.className='h-cat';
+    cat.textContent=h.category||'未分类';
+
+    var copyBtn=document.createElement('button');
+    copyBtn.className='h-copy';
+    copyBtn.title='随机填入一个空格子';
+    copyBtn.textContent='📋';
+    copyBtn.addEventListener('click',function(e){
+      e.stopPropagation();
+      copyHabitToCell(h);
+    });
+
+    var delBtn=document.createElement('button');
+    delBtn.className='h-del';
+    delBtn.title='从习惯库删除';
+    delBtn.textContent='✕';
+    delBtn.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(!confirm('从习惯库删除「'+h.text+'」？'))return;
+      habitLibrary.splice(idx,1);
+      save();renderHabitLibrary();
+      showToast('🗑️ 已从习惯库删除');
+    });
+
+    d.appendChild(txt);
+    d.appendChild(cat);
+    d.appendChild(copyBtn);
+    d.appendChild(delBtn);
+    habitList.appendChild(d);
+  });
+}
+
+function addHabit(){
+  var v=habitInput.value.trim();
+  if(!v){showToast('请输入习惯内容');return;}
+  var cat=habitCatSelect.value||'';
+  habitLibrary.push({text:v,category:cat});
+  habitInput.value='';
+  save();
+  renderHabitLibrary();
+  showToast('📚 已加入习惯库');
+}
+
+function copyHabitToCell(habit){
+  var empties=[];
+  cells.forEach(function(c,i){
+    if(!c.completed&&(!c.text||!c.text.trim()))empties.push(i);
+  });
+  if(empties.length===0){showToast('没有空格子了');return;}
+  var ti=empties[Math.floor(Math.random()*empties.length)];
+  cells[ti].text=habit.text;
+  cells[ti].category=habit.category||'';
+  renderGrid();checkRewards();save();
+  showToast('📋 已随机填入格子 '+(ti+1));
+}
+
+function fillHabitByCategory(){
+  var val=habitFillSelect.value;
+  var list=habitLibrary.filter(function(h){
+    return val==='__all__' ? true : (h.category||'')===val;
+  });
+  if(list.length===0){showToast('这个分类下没有习惯');return;}
+  var empties=[];
+  cells.forEach(function(c,i){
+    if(!c.completed&&(!c.text||!c.text.trim()))empties.push(i);
+  });
+  if(empties.length===0){showToast('没有空格子了');return;}
+  var shuffled=empties.slice().sort(function(){return Math.random()-0.5;});
+  var n=0;
+  for(var i=0;i<list.length && i<shuffled.length;i++){
+    var ti=shuffled[i];
+    cells[ti].text=list[i].text;
+    cells[ti].category=list[i].category||'';
+    n++;
+  }
+  renderGrid();checkRewards();save();
+  if(n<list.length){
+    showToast('⚡ 已填入 '+n+' 个，还有 '+(list.length-n)+' 个放不下');
+  }else{
+    showToast('⚡ 已填入 '+n+' 个习惯');
+  }
+}
+
+addHabitBtn.addEventListener('click',addHabit);
+habitInput.addEventListener('keypress',function(e){if(e.key==='Enter')addHabit();});
+fillHabitBtn.addEventListener('click',fillHabitByCategory);
+
+/* ============ 任务添加 ============ */
 
 function addTask(){
   var txt=taskInput.value.trim();
@@ -1364,6 +1540,7 @@ function refreshDynamic(){
   renderRewardPool();
   renderDrawnRewards();
   renderLineLog();
+  renderHabitLibrary();
   renderNoteVersionSelect();
   renderNoteText();
 }
@@ -1396,6 +1573,7 @@ function init(){
   if(!load())makeEmptyBingo();
   if(!roundId)roundId=genRoundId();
   if(!Array.isArray(archives))archives=[];
+  if(!Array.isArray(habitLibrary))habitLibrary=[];
   if(!milestones||typeof milestones!=='object')milestones={};
   if(!bigTaskWeights||typeof bigTaskWeights!=='object')bigTaskWeights={};
   statsSortSelect.value=statsSortMode;
@@ -1403,6 +1581,7 @@ function init(){
   renderRewardPool();
   renderDrawnRewards();
   renderLineLog();
+  renderHabitLibrary();
   renderGrid();
   checkRewards();
   renderNoteVersionSelect();
