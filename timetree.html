@@ -212,12 +212,7 @@ let tags = [];
 const STORAGE_KEY = 'timeline_events_v1';
 const TAGS_KEY = 'timeline_tags_v1';
 let tlView = 'week';
-let tlWeekCount = 1;
-let tlTwoWeekCount = 1;
-let tlMonthCount = 1;
-let tlQuarterCount = 1;
-let tlHalfYearCount = 1;
-let tlYearCount = 1;
+let tlCount = 1;
 let tlAnchor = new Date();
 let dragIndex = -1;
 let editingId = null;
@@ -243,8 +238,6 @@ function parseDate(str) { if (!str) return null; const d = new Date(str + 'T00:0
 function dateKey(d) { const dt = new Date(d); return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0'); }
 function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate() + n); return d; }
 function addMonths(date, n) { const d = new Date(date); d.setMonth(d.getMonth() + n); return d; }
-function startOfWeek(date) { const d = new Date(date); const day = d.getDay(); const diff = d.getDate() - day + (day === 0 ? -6 : 1); d.setDate(diff); d.setHours(0,0,0,0); return d; }
-function startOfMonth(date) { return new Date(date.getFullYear(), date.getMonth(), 1); }
 function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text == null ? '' : text; return div.innerHTML; }
 function getTagById(id) { return tags.find(t => t.id === id); }
 function getContrastText(hex) {
@@ -540,50 +533,44 @@ function updateTlCountSelect() {
   let opts = '';
   for (let i = 1; i <= c.max; i++) opts += `<option value="${i}">${i} ${c.suffix}</option>`;
   sel.innerHTML = opts;
-  sel.value = tlView === 'week' ? tlWeekCount : tlView === 'twoweek' ? tlTwoWeekCount : tlView === 'month' ? tlMonthCount : tlView === 'quarter' ? tlQuarterCount : tlView === 'halfyear' ? tlHalfYearCount : tlYearCount;
+  sel.value = tlCount;
 }
 
 function buildStackBlocks() {
   const blocks = [];
   if (tlView === 'week') {
-    const baseStart = startOfWeek(tlAnchor);
-    for (let w = 0; w < tlWeekCount; w++) {
-      const start = addDays(baseStart, w * 7);
+    for (let w = 0; w < tlCount; w++) {
+      const start = addDays(tlAnchor, w * 7);
       const end = addDays(start, 6);
       blocks.push({ start, end, unit: 'day', label: `${start.getFullYear()}年${start.getMonth()+1}月${start.getDate()}日 – ${end.getFullYear()}年${end.getMonth()+1}月${end.getDate()}日` });
     }
   } else if (tlView === 'twoweek') {
-    const baseStart = startOfWeek(tlAnchor);
-    for (let w = 0; w < tlTwoWeekCount; w++) {
-      const start = addDays(baseStart, w * 14);
+    for (let w = 0; w < tlCount; w++) {
+      const start = addDays(tlAnchor, w * 14);
       const end = addDays(start, 13);
       blocks.push({ start, end, unit: 'day', label: `${start.getFullYear()}年${start.getMonth()+1}月${start.getDate()}日 – ${end.getFullYear()}年${end.getMonth()+1}月${end.getDate()}日（兩週）` });
     }
   } else if (tlView === 'month') {
-    const baseStart = startOfMonth(tlAnchor);
-    for (let m = 0; m < tlMonthCount; m++) {
-      const start = addMonths(baseStart, m);
+    for (let m = 0; m < tlCount; m++) {
+      const start = addMonths(tlAnchor, m);
       const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
-      blocks.push({ start, end, unit: 'day', label: `${start.getFullYear()}年${start.getMonth()+1}月` });
+      blocks.push({ start, end, unit: 'day', label: `${start.getFullYear()}年${start.getMonth()+1}月${start.getDate()}日 – ${end.getFullYear()}年${end.getMonth()+1}月${end.getDate()}日` });
     }
   } else if (tlView === 'quarter') {
-    const baseStart = startOfMonth(tlAnchor);
-    for (let q = 0; q < tlQuarterCount; q++) {
-      const start = addMonths(baseStart, q * 3);
+    for (let q = 0; q < tlCount; q++) {
+      const start = addMonths(tlAnchor, q * 3);
       const end = new Date(start.getFullYear(), start.getMonth() + 3, 0);
       blocks.push({ start, end, unit: 'month', label: `${start.getFullYear()}年 ${start.getMonth()+1}月–${end.getMonth()+1}月` });
     }
   } else if (tlView === 'halfyear') {
-    const baseStart = startOfMonth(tlAnchor);
-    for (let h = 0; h < tlHalfYearCount; h++) {
-      const start = addMonths(baseStart, h * 6);
+    for (let h = 0; h < tlCount; h++) {
+      const start = addMonths(tlAnchor, h * 6);
       const end = new Date(start.getFullYear(), start.getMonth() + 6, 0);
       blocks.push({ start, end, unit: 'month', label: `${start.getFullYear()}年 ${start.getMonth()+1}月–${end.getMonth()+1}月` });
     }
   } else if (tlView === 'year') {
-    const baseStart = startOfMonth(tlAnchor);
-    for (let y = 0; y < tlYearCount; y++) {
-      const start = addMonths(baseStart, y * 12);
+    for (let y = 0; y < tlCount; y++) {
+      const start = addMonths(tlAnchor, y * 12);
       const end = new Date(start.getFullYear(), start.getMonth() + 12, 0);
       blocks.push({ start, end, unit: 'month', label: `${start.getFullYear()}年${start.getMonth()+1}月 – ${end.getFullYear()}年${end.getMonth()+1}月` });
     }
@@ -808,25 +795,17 @@ document.querySelectorAll('[data-tl-view]').forEach(tab => {
 });
 
 document.getElementById('tlCountSelect').addEventListener('change', function() {
-  const val = parseInt(this.value) || 1;
-  if (tlView === 'week') tlWeekCount = val;
-  else if (tlView === 'twoweek') tlTwoWeekCount = val;
-  else if (tlView === 'month') tlMonthCount = val;
-  else if (tlView === 'quarter') tlQuarterCount = val;
-  else if (tlView === 'halfyear') tlHalfYearCount = val;
-  else if (tlView === 'year') tlYearCount = val;
+  tlCount = parseInt(this.value) || 1;
   renderTimeline();
 });
 
 document.getElementById('tlPrev').addEventListener('click', function() {
-  if (tlView === 'week') tlAnchor = addDays(tlAnchor, -7);
-  else if (tlView === 'twoweek') tlAnchor = addDays(tlAnchor, -14);
+  if (tlView === 'week' || tlView === 'twoweek' || tlView === 'month') tlAnchor = addDays(tlAnchor, -1);
   else tlAnchor = addMonths(tlAnchor, -1);
   renderTimeline();
 });
 document.getElementById('tlNext').addEventListener('click', function() {
-  if (tlView === 'week') tlAnchor = addDays(tlAnchor, 7);
-  else if (tlView === 'twoweek') tlAnchor = addDays(tlAnchor, 14);
+  if (tlView === 'week' || tlView === 'twoweek' || tlView === 'month') tlAnchor = addDays(tlAnchor, 1);
   else tlAnchor = addMonths(tlAnchor, 1);
   renderTimeline();
 });
