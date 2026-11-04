@@ -48,43 +48,33 @@ body.dark .event-item .ev-edit-input { background: rgba(50,44,34,0.95); border-c
 .event-item .ev-edit-input:focus { border-color: #b9822e; box-shadow: 0 0 0 2px rgba(185,130,46,0.15); }
 .event-item .ev-edit-input[type="color"] { padding: 0.1rem; width: 42px; height: 1.9rem; cursor: pointer; }
 .event-item .ev-edit-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; width: 100%; }
-.toolbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.toolbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .filter-label { font-size: 0.7rem; letter-spacing: 0.15em; color: #947957; text-transform: uppercase; font-family: Georgia, serif; }
 body.dark .filter-label { color: #b09a7a; }
 .custom-select { padding: 0.35rem 0.7rem; border-radius: 1.5rem; border: 1px solid rgba(178,133,69,0.4); background: rgba(255,249,237,0.9); font-family: "Noto Serif TC", serif; font-size: 0.75rem; color: #5b3d1d; outline: none; cursor: pointer; }
 body.dark .custom-select { background: rgba(50,44,34,0.9); border-color: rgba(180,140,80,0.4); color: #e8dcc8; }
 .toolbar-nav { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
 .nav-arrow { padding: 0.25rem 0.7rem; border-radius: 50%; font-size: 1rem; line-height: 1; }
-.toolbar-date { font-family: Georgia, serif; font-size: 0.78rem; color: #5b3d1d; min-width: 230px; text-align: center; }
+.toolbar-date { font-family: Georgia, serif; font-size: 0.78rem; color: #5b3d1d; min-width: 220px; text-align: center; }
 body.dark .toolbar-date { color: #e8dcc8; }
 .btn-today { padding: 0.35rem 0.9rem; font-size: 0.72rem; }
-.timeline-wrap { overflow-x: auto; padding-bottom: 0.6rem; }
-.timeline-grid { display: grid; grid-template-columns: 74px 1fr; min-width: 720px; }
-.time-header { grid-column: 1 / -1; display: grid; grid-template-columns: 74px 1fr; margin-bottom: 0.5rem; }
+.timeline-wrap { overflow-x: auto; padding-bottom: 0.5rem; }
+.timeline-grid { display: grid; grid-template-columns: 70px 1fr; min-width: 700px; }
+.time-header { grid-column: 1 / -1; display: grid; grid-template-columns: 70px 1fr; margin-bottom: 0.4rem; }
 .time-header-cells { display: grid; gap: 0; }
-.time-header-cell { position: relative; text-align: center; padding: 0.45rem 2px; border-left: 1px solid rgba(133,91,39,0.12); font-family: Georgia, serif; overflow: hidden; min-width: 0; }
-body.dark .time-header-cell { border-left-color: rgba(180,140,80,0.12); }
-.time-header-cell .cell-label { display: block; font-size: 0.72rem; font-weight: 600; color: #7a5c38; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-body.dark .time-header-cell .cell-label { color: #d8c8a8; }
-.time-header-cell .cell-sub { display: block; font-size: 0.52rem; color: #b09a7a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-body.dark .time-header-cell .cell-sub { color: #8a7658; }
-.time-header-cell.major { background: rgba(221,184,108,0.1); }
-body.dark .time-header-cell.major { background: rgba(221,184,108,0.08); }
-.time-header-cell.major .cell-label { color: #b9822e; }
-body.dark .time-header-cell.major .cell-label { color: #e0b060; }
-.time-header-cell.today-col { background: rgba(168,80,60,0.08); }
-body.dark .time-header-cell.today-col { background: rgba(200,110,90,0.1); }
+.time-header-cell { text-align: center; font-size: 0.58rem; color: #947957; padding: 0.35rem 0; border-left: 1px solid rgba(133,91,39,0.15); font-family: Georgia, serif; overflow: hidden; }
+body.dark .time-header-cell { color: #b09a7a; border-left-color: rgba(180,140,80,0.15); }
+.time-header-cell .cell-label { display: block; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.time-header-cell .cell-sub { display: block; font-size: 0.5rem; opacity: 0.75; white-space: nowrap; }
 .track-label { display: flex; align-items: center; padding: 0.6rem 0.5rem 0.6rem 0; font-family: "Noto Serif TC", serif; font-size: 0.75rem; font-weight: 600; color: #5b3d1d; border-bottom: 1px solid rgba(133,91,39,0.15); }
 body.dark .track-label { color: #e8dcc8; border-bottom-color: rgba(180,140,80,0.15); }
 .track-label .dot { width: 9px; height: 9px; border-radius: 50%; margin-right: 0.4rem; flex-shrink: 0; }
-.track-bars { position: relative; border-bottom: 1px solid rgba(133,91,39,0.15); display: flex; flex-direction: column; padding: 0.4rem 0; min-height: 48px; }
+.track-bars { position: relative; border-bottom: 1px solid rgba(133,91,39,0.15); display: flex; flex-direction: column; padding: 0.3rem 0; min-height: 44px; }
 body.dark .track-bars { border-bottom-color: rgba(180,140,80,0.15); }
 .cell-grid { position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: grid; pointer-events: none; z-index: 0; }
-.cell-grid > div { border-left: 1px solid rgba(185,130,46,0.07); }
-body.dark .cell-grid > div { border-left-color: rgba(180,140,80,0.07); }
-.cell-grid > div.major { border-left-color: rgba(185,130,46,0.16); }
-body.dark .cell-grid > div.major { border-left-color: rgba(180,140,80,0.16); }
-.time-bar { position: relative; height: 26px; border-radius: 13px; margin: 3px 0; display: flex; align-items: center; padding: 0 0.7rem; font-size: 0.68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; z-index: 2; font-family: "Noto Serif TC", serif; border: 1px solid rgba(255,249,237,0.3); box-shadow: 0 2px 6px rgba(105,72,31,0.15); }
+.cell-grid > div { border-left: 1px solid rgba(185,130,46,0.08); }
+body.dark .cell-grid > div { border-left-color: rgba(180,140,80,0.08); }
+.time-bar { position: relative; height: 26px; border-radius: 13px; margin: 2px 0; display: flex; align-items: center; padding: 0 0.7rem; font-size: 0.68rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default; z-index: 2; font-family: "Noto Serif TC", serif; border: 1px solid rgba(255,249,237,0.3); box-shadow: 0 2px 6px rgba(105,72,31,0.15); }
 .time-bar:hover { filter: brightness(0.92); }
 .now-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(168,80,60,0.7); z-index: 3; pointer-events: none; }
 .empty-state { text-align: center; padding: 1.5rem; color: #947957; font-style: italic; font-size: 0.82rem; }
@@ -125,9 +115,6 @@ body.dark .empty-state { color: #b09a7a; }
 <option value="168">1 週</option>
 <option value="336">2 週</option>
 <option value="720">1 個月</option>
-<option value="2160">3 個月</option>
-<option value="4320">半年</option>
-<option value="8760">1 年</option>
 </select>
 <span class="filter-label">刻度</span>
 <select id="tickSelect" class="custom-select">
@@ -138,6 +125,8 @@ body.dark .empty-state { color: #b09a7a; }
 <option value="360">6 小時</option>
 <option value="720">12 小時</option>
 <option value="1440">1 天</option>
+<option value="2880">2 天</option>
+<option value="4320">3 天</option>
 <option value="10080">1 週</option>
 <option value="43200">1 個月</option>
 </select>
@@ -254,32 +243,20 @@ function addEvent() {
 function getRangeStart() { return new Date(anchor); }
 function getRangeEnd() { return new Date(anchor.getTime() + rangeHours * 3600 * 1000); }
 
-const TICK_LABELS = {
-  15: { main: function(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }, sub: null },
-  30: { main: function(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }, sub: null },
-  60: { main: function(d) { return pad(d.getHours()) + ':00'; }, sub: function(d) { return (d.getMonth()+1) + '/' + d.getDate(); } },
-  120: { main: function(d) { return pad(d.getHours()) + ':00'; }, sub: null },
-  360: { main: function(d) { return pad(d.getHours()) + ':00'; }, sub: function(d) { return (d.getMonth()+1) + '/' + d.getDate(); } },
-  720: { main: function(d) { return pad(d.getHours()) + ':00'; }, sub: function(d) { return (d.getMonth()+1) + '/' + d.getDate(); } },
-  1440: { main: function(d) { return (d.getMonth()+1) + '/' + d.getDate(); }, sub: null },
-  10080: { main: function(d) { return (d.getMonth()+1) + '/' + d.getDate(); }, sub: null },
-  43200: { main: function(d) { return (d.getMonth()+1) + '月'; }, sub: function(d) { return d.getFullYear() + '年'; } }
-};
-
-function isMajorTick(d, tickMinutes) {
-  if (tickMinutes <= 60) return d.getHours() % 6 === 0 && d.getMinutes() === 0;
-  if (tickMinutes <= 720) return d.getHours() === 0;
-  if (tickMinutes === 1440) return d.getDate() === 1;
-  if (tickMinutes === 10080) return d.getDate() <= 7;
-  return d.getMonth() === 0;
-}
-
-function shouldShowLabel(cellIndex, cellStart, tickMinutes) {
-  const maxLabels = 12;
-  if (tickMinutes >= 43200) return true;
-  if (tickMinutes >= 10080) return true;
-  if (tickMinutes >= 1440) return true;
-  return cellIndex % Math.max(1, Math.ceil(24 / (tickMinutes / 60) / 4)) === 0 || cellIndex === 0;
+function formatCellLabel(cellStart, tickMinutes) {
+  if (tickMinutes >= 43200) {
+    return { main: `${cellStart.getFullYear()}年${cellStart.getMonth()+1}月`, sub: '' };
+  }
+  if (tickMinutes >= 10080) {
+    return { main: `${cellStart.getMonth()+1}/${cellStart.getDate()}`, sub: `第${Math.ceil(cellStart.getDate()/7)}週` };
+  }
+  if (tickMinutes >= 1440) {
+    return { main: `${cellStart.getMonth()+1}/${cellStart.getDate()}`, sub: `${cellStart.getFullYear()}` };
+  }
+  if (tickMinutes >= 60) {
+    return { main: `${pad(cellStart.getHours())}:${pad(cellStart.getMinutes())}`, sub: `${cellStart.getMonth()+1}/${cellStart.getDate()}` };
+  }
+  return { main: `${pad(cellStart.getHours())}:${pad(cellStart.getMinutes())}`, sub: '' };
 }
 
 function buildTickCells() {
@@ -307,29 +284,18 @@ function renderTimeline() {
   if (cells.length === 0) { grid.innerHTML = '<div class="empty-state">無法顯示。</div>'; return; }
   document.getElementById('tlDateRange').textContent = `${fmtDateTime(start)} – ${fmtDateTime(end)}`;
 
-  const labelCfg = TICK_LABELS[tickMinutes] || TICK_LABELS[30];
+  const showSub = tickMinutes >= 60;
   let html = '<div class="time-header"><div></div><div class="time-header-cells" style="grid-template-columns: repeat(' + cells.length + ', 1fr);">';
-  cells.forEach((c, i) => {
-    const major = isMajorTick(c.start, tickMinutes);
-    const showLabel = shouldShowLabel(i, c.start, tickMinutes);
-    const main = labelCfg.main(c.start);
-    const sub = labelCfg.sub ? labelCfg.sub(c.start) : '';
-    html += '<div class="time-header-cell' + (major ? ' major' : '') + '">';
-    if (showLabel) {
-      html += '<span class="cell-label">' + main + '</span>';
-      if (sub) html += '<span class="cell-sub">' + sub + '</span>';
-    }
-    html += '</div>';
+  cells.forEach(c => {
+    const lbl = formatCellLabel(c.start, tickMinutes);
+    html += '<div class="time-header-cell"><span class="cell-label">' + lbl.main + '</span>' + (showSub && lbl.sub ? '<span class="cell-sub">' + lbl.sub + '</span>' : '') + '</div>';
   });
   html += '</div></div>';
 
   html += '<div class="track-label"><span class="dot" style="background:#b9822e;"></span>事件</div>';
   html += '<div class="track-bars">';
   html += '<div class="cell-grid" style="grid-template-columns: repeat(' + cells.length + ', 1fr);">';
-  cells.forEach(c => {
-    const major = isMajorTick(c.start, tickMinutes);
-    html += '<div' + (major ? ' class="major"' : '') + '></div>';
-  });
+  cells.forEach(() => { html += '<div></div>'; });
   html += '</div>';
 
   const now = new Date();
@@ -354,9 +320,9 @@ function renderTimeline() {
   if (visible.length === 0) {
     html += '<div class="empty-state" style="position:relative;z-index:2;">此範圍內沒有事件</div>';
   } else {
-    html += '<div class="bars-layer" style="position:relative; z-index:2; min-height:' + (visible.length * 32 + 10) + 'px;">';
+    html += '<div class="bars-layer" style="position:relative; z-index:2; min-height:' + (visible.length * 30 + 8) + 'px;">';
     visible.forEach((item, row) => {
-      const top = row * 32 + 4;
+      const top = row * 30 + 3;
       const bg = item.ev.color || '#b9822e';
       const fg = getContrastText(bg);
       const widthPct = Math.max(item.rightPct - item.leftPct, 0.4);
