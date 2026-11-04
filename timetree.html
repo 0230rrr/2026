@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>時間軸 · 事件</title>
-<style> 
+<style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Noto Sans SC", "Noto Sans TC", "Microsoft YaHei", sans-serif; background: #f7eedc; color: #5b3d1d; min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem; transition: background .2s, color .2s; }
 body.dark { background: #1e1a14; color: #e8dcc8; }
@@ -269,6 +269,22 @@ window.moveEvent = function(index, dir) {
   renderAll();
 };
 window.deleteEvent = function(id) { events = events.filter(ev => ev.id !== id); saveEvents(); renderAll(); };
+window.copyEvent = function(id) {
+  const ev = events.find(e => e.id === id);
+  if (!ev) return;
+  const copy = {
+    id: generateId(),
+    title: ev.title + '（複製）',
+    start: ev.start,
+    end: ev.end,
+    color: ev.color || '#b9822e',
+    tags: Array.isArray(ev.tags) ? ev.tags.slice() : []
+  };
+  const idx = events.indexOf(ev);
+  events.splice(idx + 1, 0, copy);
+  saveEvents();
+  renderAll();
+};
 window.startEdit = function(id) {
   editingId = id;
   const ev = events.find(e => e.id === id);
@@ -462,6 +478,7 @@ function renderEventList() {
           <button ${i === 0 ? 'disabled' : ''} onclick="window.moveEvent(${i}, -1)">▲</button>
           <button ${i === events.length - 1 ? 'disabled' : ''} onclick="window.moveEvent(${i}, 1)">▼</button>
         </span>
+        <button class="small" onclick="window.copyEvent('${ev.id}')">複製</button>
         <button class="small" onclick="window.startEdit('${ev.id}')">編輯</button>
         <button class="danger small" onclick="window.deleteEvent('${ev.id}')">刪除</button>
       </div>`;
