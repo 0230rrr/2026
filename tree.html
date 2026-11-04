@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>時間軸 · 事件</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Noto Sans SC", "Noto Sans TC", "Microsoft YaHei", sans-serif; background: #f7eedc; color: #5b3d1d; min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem; transition: background .2s, color .2s; }
+body.dark { background: #1e1a14; color: #e8dcc8; }
+.app { max-width: 1200px; width: 100%; display: flex; flex-direction: column; gap: 2rem; }
+.panel { background: rgba(255,249,237,0.85); backdrop-filter: blur(10px); border-radius: 12px; padding: 1.8rem 2rem; border: 1px solid rgba(178,133,69,0.3); box-shadow: 0 12px 35px rgba(105,72,31,0.08); transition: background .2s, border-color .2s; }
+body.dark .panel { background: rgba(40,34,26,0.85); border-color: rgba(180,140,80,0.3); box-shadow: 0 12px 35px rgba(0,0,0,0.3); }
+h1 { font-family: "Noto Serif TC", Georgia, serif; font-size: 1.6rem; font-weight: 600; letter-spacing: 0.1em; margin-bottom: 1.5rem; color: #5b3d1d; }
+body.dark h1 { color: #e8dcc8; }
+h2 { font-family: "Noto Serif TC", Georgia, serif; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.08em; margin-bottom: 0.9rem; color: #5b3d1d; }
+body.dark h2 { color: #e8dcc8; }
+.form-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.form-field { flex: 1 1 180px; display: flex; flex-direction: column; gap: 0.3rem; }
+.form-field label { font-size: 0.7rem; letter-spacing: 0.15em; color: #947957; text-transform: uppercase; font-family: Georgia, serif; }
+body.dark .form-field label { color: #b09a7a; }
+.form-field input, .form-field select { padding: 0.55rem 0.8rem; border: 1px solid rgba(178,133,69,0.4); border-radius: 6px; background: rgba(255,249,237,0.9); font-family: "Noto Serif TC", serif; font-size: 0.85rem; color: #5b3d1d; outline: none; transition: background .2s, border-color .2s, color .2s; }
+body.dark .form-field input, body.dark .form-field select { background: rgba(50,44,34,0.9); border-color: rgba(180,140,80,0.4); color: #e8dcc8; }
+.form-field input:focus, .form-field select:focus { border-color: #b9822e; box-shadow: 0 0 0 3px rgba(185,130,46,0.15); }
+.form-field input[type="color"] { padding: 0.2rem; height: 2.4rem; cursor: pointer; }
+.btn-row { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.5rem; }
+button { padding: 0.55rem 1.4rem; border-radius: 2rem; font-family: "Noto Serif TC", serif; font-size: 0.8rem; letter-spacing: 0.06em; cursor: pointer; transition: 0.15s; border: 1px solid rgba(178,133,69,0.4); background: rgba(255,249,237,0.9); color: #6d5437; }
+body.dark button { background: rgba(50,44,34,0.9); border-color: rgba(180,140,80,0.4); color: #d8c8a8; }
+button.primary { background: rgba(221,184,108,0.35); border-color: rgba(185,130,46,0.6); color: #5b3d1d; font-weight: 600; }
+body.dark button.primary { background: rgba(221,184,108,0.2); border-color: rgba(185,130,46,0.6); color: #f0e0c0; }
+button.primary:hover { background: rgba(221,184,108,0.55); }
+body.dark button.primary:hover { background: rgba(221,184,108,0.35); }
+button.danger { border-color: rgba(168,80,60,0.35); color: #a8503c; }
+body.dark button.danger { border-color: rgba(200,110,90,0.5); color: #e08060; }
+button.danger:hover { background: rgba(168,80,60,0.1); border-color: #a8503c; }
+body.dark button.danger:hover { background: rgba(168,80,60,0.2); }
+button:hover { background: rgba(221,184,108,0.2); }
+body.dark button:hover { background: rgba(221,184,108,0.15); }
+button.small { padding: 0.3rem 0.9rem; font-size: 0.7rem; }
+.event-list { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+.event-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; background: rgba(255,249,237,0.7); border-radius: 8px; border-left: 4px solid #b9822e; flex-wrap: wrap; transition: background .2s, border-color .2s; }
+body.dark .event-item { background: rgba(50,44,34,0.7); }
+.event-item.editing { background: rgba(221,184,108,0.15); }
+body.dark .event-item.editing { background: rgba(221,184,108,0.1); }
+.event-item .ev-title { flex: 1 1 160px; font-size: 0.92rem; font-weight: 600; font-family: "Noto Serif TC", serif; }
+.event-item .ev-dates { font-size: 0.72rem; color: #947957; font-family: Georgia, serif; letter-spacing: 0.04em; }
+body.dark .event-item .ev-dates { color: #b09a7a; }
+.event-item .ev-color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.15); }
+.event-item .ev-order { display: flex; flex-direction: column; gap: 2px; }
+.event-item .ev-order button { padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.6rem; line-height: 1; min-width: 0; }
+.event-item .ev-order button:disabled { opacity: 0.3; cursor: default; }
+.event-item .ev-edit-input { padding: 0.35rem 0.6rem; border: 1px solid rgba(178,133,69,0.4); border-radius: 5px; background: rgba(255,249,237,0.95); font-family: "Noto Serif TC", serif; font-size: 0.8rem; color: #5b3d1d; outline: none; }
+body.dark .event-item .ev-edit-input { background: rgba(50,44,34,0.95); border-color: rgba(180,140,80,0.4); color: #e8dcc8; }
+.event-item .ev-edit-input:focus { border-color: #b9822e; box-shadow: 0 0 0 2px rgba(185,130,46,0.15); }
+.event-item .ev-edit-input[type="color"] { padding: 0.1rem; width: 42px; height: 1.9rem; cursor: pointer; }
+.event-item .ev-edit-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; width: 100%; }
+.tag-selector-block { border: 1px dashed rgba(178,133,69,0.45); border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 1rem; }
+body.dark .tag-selector-block { border-color: rgba(180,140,80,0.45); }
+.tag-selector-header { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.tag-selector-title { font-size: 0.7rem; letter-spacing: 0.15em; color: #947957; text-transform: uppercase; font-family: Georgia, serif; }
+body.dark .tag-selector-title { color: #b09a7a; }
+.tag-selector-hint { font-size: 0.7rem; color: #947957; font-style: italic; }
+body.dark .tag-selector-hint { color: #b09a7a; }
+.tag-selector-current { font-size: 0.72rem; color: #5b3d1d; }
+body.dark .tag-selector-current { color: #e8dcc8; }
+.tag-list-inline { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.65rem; border-radius: 1rem; font-size: 0.72rem; font-family: "Noto Serif TC", serif; color: #fff9ed; white-space: nowrap; transition: 0.12s; }
+.tag-chip.pickable { cursor: pointer; opacity: 0.4; border: 1px solid transparent; }
+.tag-chip.pickable.selected { opacity: 1; border-color: rgba(255,249,237,0.85); box-shadow: 0 0 0 2px rgba(185,130,46,0.45); }
+.tag-chip.pickable:hover { opacity: 0.75; }
+.tag-manager { display: flex; flex-direction: column; gap: 0.7rem; }
+.tag-manager-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+.tag-manager-row input[type="text"] { padding: 0.45rem 0.7rem; border: 1px solid rgba(178,133,69,0.4); border-radius: 6px; background: rgba(255,249,237,0.9); font-family: "Noto Serif TC", serif; font-size: 0.82rem; color: #5b3d1d; outline: none; }
+body.dark .tag-manager-row input[type="text"] { background: rgba(50,44,34,0.9); border-color: rgba(180,140,80,0.4); color: #e8dcc8; }
+.tag-manager-row input[type="color"] { padding: 0.1rem; width: 44px; height: 2rem; border: 1px solid rgba(178,133,69,0.4); border-radius: 6px; background: transparent; cursor: pointer; }
+.tag-manager-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag-manager-item { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.5rem 0.25rem 0.65rem; border-radius: 1rem; font-size: 0.72rem; font-family: "Noto Serif TC", serif; color: #fff9ed; cursor: pointer; transition: 0.12s; }
+.tag-manager-item:hover { filter: brightness(1.1); }
+.tag-manager-item button { padding: 0 0.35rem; border: none; background: transparent; color: inherit; font-size: 0.8rem; line-height: 1; border-radius: 50%; cursor: pointer; }
+.tag-manager-item button:hover { background: rgba(0,0,0,0.18); }
+.tag-edit-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding: 0.5rem 0.7rem; border: 1px dashed rgba(178,133,69,0.5); border-radius: 10px; }
+body.dark .tag-edit-row { border-color: rgba(180,140,80,0.5); }
+.tag-edit-row input[type="text"] { padding: 0.4rem 0.6rem; border: 1px solid rgba(178,133,69,0.4); border-radius: 6px; background: rgba(255,249,237,0.9); font-family: "Noto Serif TC", serif; font-size: 0.8rem; color: #5b3d1d; outline: none; flex: 1 1 140px; }
+body.dark .tag-edit-row input[type="text"] { background: rgba(50,44,34,0.9); border-color: rgba(180,140,80,0.4); color: #e8dcc8; }
+.tag-edit-row input[type="color"] { padding: 0.1rem; width: 44px; height: 1.9rem; border: 1px solid rgba(178,133,69,0.4); border-radius: 6px; background: transparent; cursor: pointer; }
+.tag-filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; padding: 0.7rem 0.9rem; border: 1px dashed rgba(178,133,69,0.45); border-radius: 10px; }
+body.dark .tag-filter-bar { border-color: rgba(180,140,80,0.45); }
+.tag-filter-label { font-size: 0.7rem; letter-spacing: 0.15em; color: #947957; text-transform: uppercase; font-family: Georgia, serif; margin-right: 0.3rem; }
+body.dark .tag-filter-label { color: #b09a7a; }
+.timeline-stack { display: flex; flex-direction: column; gap: 1.2rem; }
+.timeline-block { border: 1px solid rgba(178,133,69,0.25); border-radius: 10px; padding: 0.8rem 1rem 0.6rem; background: rgba(255,249,237,0.35); transition: background .2s, border-color .2s; }
+body.dark .timeline-block { background: rgba(50,44,34,0.35); border-color: rgba(180,140,80,0.25); }
+.timeline-block-title { font-family: Georgia, serif; font-size: 0.72rem; color: #947957; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+body.dark .timeline-block-title { color: #b09a7a; }
+.timeline-block-title.today { color: #b9822e; font-weight: 700; }
+body.dark .timeline-block-title.today { color: #e0b060; }
+.timeline-wrapper { overflow-x: auto; padding-bottom: 0.3rem; }
+.timeline-grid { display: grid; grid-template-columns: 90px 1fr; min-width: 520px; }
+.timeline-header { grid-column: 1 / -1; display: grid; grid-template-columns: 90px 1fr; margin-bottom: 0.4rem; }
+.timeline-header-days { display: grid; gap: 0; }
+.day-header { text-align: center; font-size: 0.58rem; color: #947957; padding: 0.3rem 0; border-left: 1px solid rgba(133,91,39,0.15); font-family: Georgia, serif; }
+body.dark .day-header { color: #b09a7a; border-left-color: rgba(180,140,80,0.15); }
+.day-header .day-name { display: block; font-size: 0.48rem; opacity: 0.7; }
+.day-header .day-num { display: block; font-size: 0.75rem; font-weight: 600; }
+.day-header.today { color: #b9822e; font-weight: 700; }
+body.dark .day-header.today { color: #e0b060; }
+.track-label { display: flex; align-items: center; padding: 0.6rem 0.5rem 0.6rem 0; font-family: "Noto Serif TC", serif; font-size: 0.75rem; font-weight: 600; color: #5b3d1d; border-bottom: 1px solid rgba(133,91,39,0.15); }
+body.dark .track-label { color: #e8dcc8; border-bottom-color: rgba(180,140,80,0.15); }
+.track-label .dot { width: 9px; height: 9px; border-radius: 50%; margin-right: 0.4rem; flex-shrink: 0; }
+.track-bars { position: relative; border-bottom: 1px solid rgba(133,91,39,0.15); display: flex; flex-direction: column; padding: 0.3rem 0; min-height: 44px; }
+body.dark .track-bars { border-bottom-color: rgba(180,140,80,0.15); }
+.day-grid { position: absolute; top: 0; bottom: 0; left: 0; right: 0; display: grid; pointer-events: none; z-index: 0; }
+.day-grid > div { border-left: 1px solid rgba(185,130,46,0.08); }
+body.dark .day-grid > div { border-left-color: rgba(180,140,80,0.08); }
+.day-grid > div.today { background: rgba(221,184,108,0.08); }
+body.dark .day-grid > div.today { background: rgba(221,184,108,0.06); }
+.ms-bar { position: relative; height: 24px; border-radius: 12px; margin: 2px 0; display: flex; align-items: center; padding: 0 0.7rem; font-size: 0.66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: grab; z-index: 2; font-family: "Noto Serif TC", serif; border: 1px solid rgba(255,249,237,0.3); box-shadow: 0 2px 6px rgba(105,72,31,0.15); }
+.ms-bar:active { cursor: grabbing; }
+.ms-bar:hover { filter: brightness(0.92); }
+.ms-bar.drag-over { box-shadow: 0 0 0 2px #b9822e, 0 4px 10px rgba(185,130,46,0.4); }
+.today-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(168,80,60,0.5); z-index: 1; pointer-events: none; }
+.empty-state { text-align: center; padding: 1.2rem; color: #947957; font-style: italic; font-size: 0.8rem; }
+body.dark .empty-state { color: #b09a7a; }
+.toolbar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.filter-label { font-size: 0.7rem; letter-spacing: 0.15em; color: #947957; text-transform: uppercase; font-family: Georgia, serif; }
+body.dark .filter-label { color: #b09a7a; }
+.custom-select { padding: 0.35rem 0.7rem; border-radius: 1.5rem; border: 1px solid rgba(178,133,69,0.4); background: rgba(255,249,237,0.9); font-family: "Noto Serif TC", serif; font-size: 0.75rem; color: #5b3d1d; outline: none; cursor: pointer; }
+body.dark .custom-select { background: rgba(50,44,34,0.9); border-color: rgba(180,140,80,0.4); color: #e8dcc8; }
+.toolbar-nav { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.nav-arrow { padding: 0.25rem 0.7rem; border-radius: 50%; font-size: 1rem; line-height: 1; }
+.toolbar-date { font-family: Georgia, serif; font-size: 0.78rem; color: #5b3d1d; min-width: 150px; text-align: center; }
+body.dark .toolbar-date { color: #e8dcc8; }
+.btn-today { padding: 0.35rem 0.9rem; font-size: 0.72rem; }
+.theme-toggle { position: fixed; top: 1rem; right: 1rem; z-index: 100; padding: 0.5rem 0.9rem; border-radius: 2rem; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle">🌙 深色</button>
+<div class="app">
+<div class="panel">
+<h1>新增事件</h1>
+<div class="form-row">
+<div class="form-field"><label>事件標題</label><input type="text" id="evTitle" placeholder="輸入事件名稱..."></div>
+<div class="form-field"><label>開始日期</label><input type="date" id="evStart"></div>
+<div class="form-field"><label>結束日期</label><input type="date" id="evEnd"></div>
+<div class="form-field" style="flex:0 0 90px;"><label>顏色</label><input type="color" id="evColor" value="#b9822e"></div>
+</div>
+<div class="tag-selector-block">
+  <div class="tag-selector-header">
+    <span class="tag-selector-title">選擇標籤</span>
+    <span class="tag-selector-current" id="evTagCurrent">目前：無標籤</span>
+  </div>
+  <div class="tag-list-inline" id="evTagPicker"></div>
+</div>
+<div class="btn-row">
+<button class="primary" id="addBtn">新增事件</button>
+<button class="danger" id="clearAllBtn">清空所有事件</button>
+</div>
+<div class="event-list" id="eventList"></div>
+</div>
+
+<div class="panel">
+<h2>標籤管理</h2>
+<div class="tag-manager">
+  <div class="tag-manager-row">
+    <input type="text" id="newTagName" placeholder="新標籤名稱...">
+    <input type="color" id="newTagColor" value="#6b8e9e">
+    <button class="primary small" id="addTagBtn">新增標籤</button>
+    <button class="small" id="editTagBtn">編輯標籤</button>
+  </div>
+  <div id="tagEditArea"></div>
+  <div class="tag-manager-list" id="tagManagerList"></div>
+</div>
+</div>
+
+<div class="panel">
+<h1>時間軸</h1>
+<div class="tag-filter-bar">
+  <span class="tag-filter-label">標籤篩選</span>
+  <div class="tag-list-inline" id="tagFilterPicker"></div>
+  <button class="small" id="tagFilterClear">全部顯示</button>
+</div>
+<div class="toolbar">
+<span class="filter-label">View</span>
+<button class="view-tab active" data-tl-view="week">週</button>
+<button class="view-tab" data-tl-view="month">月</button>
+<button class="view-tab" data-tl-view="quarter">三個月</button>
+<button class="view-tab" data-tl-view="halfyear">半年</button>
+<button class="view-tab" data-tl-view="year">一年</button>
+<span class="filter-label" id="tlCountLabel" style="margin-left:1rem;">週數</span>
+<select id="tlCountSelect" class="custom-select">
+<option value="1">1 週</option>
+</select>
+<div class="toolbar-nav">
+<button class="nav-arrow" id="tlPrev">‹</button>
+<span class="toolbar-date" id="tlDateRange"></span>
+<button class="nav-arrow" id="tlNext">›</button>
+<button class="btn-today" id="tlToday">今天</button>
+</div>
+</div>
+<div id="timelineContent"></div>
+</div>
+</div>
+
+<script>
+(function() {
+let events = [];
+let tags = [];
+const STORAGE_KEY = 'timeline_events_v1';
+const TAGS_KEY = 'timeline_tags_v1';
+let tlView = 'week';
+let tlWeekCount = 1;
+let tlMonthCount = 1;
+let tlQuarterCount = 1;
+let tlHalfYearCount = 1;
+let tlYearCount = 1;
+let tlAnchor = new Date();
+let dragIndex = -1;
+let editingId = null;
+let editingTagId = null;
+let selectedFilterTagIds = [];
+let pendingEventTagIds = [];
+let pendingEditTagIds = [];
+let editModeActive = false;
+
+function loadEvents() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) events = JSON.parse(raw); } catch(e) { events = []; }
+  events = events.map(ev => ({ ...ev, color: ev.color || '#b9822e', tags: Array.isArray(ev.tags) ? ev.tags : [] }));
+}
+function loadTags() {
+  try { const raw = localStorage.getItem(TAGS_KEY); if (raw) tags = JSON.parse(raw); } catch(e) { tags = []; }
+  if (!Array.isArray(tags)) tags = [];
+  tags = tags.map(t => ({ id: t.id || generateId(), name: t.name || '未命名', color: t.color || '#6b8e9e' }));
+}
+function saveEvents() { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); }
+function saveTags() { localStorage.setItem(TAGS_KEY, JSON.stringify(tags)); }
+function generateId() { return Date.now() + Math.random().toString(36).substring(2, 9); }
+function parseDate(str) { if (!str) return null; const d = new Date(str + 'T00:00:00'); if (isNaN(d.getTime())) return null; return d; }
+function dateKey(d) { const dt = new Date(d); return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0'); }
+function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate() + n); return d; }
+function addMonths(date, n) { const d = new Date(date); d.setMonth(d.getMonth() + n); return d; }
+function startOfWeek(date) { const d = new Date(date); const day = d.getDay(); const diff = d.getDate() - day + (day === 0 ? -6 : 1); d.setDate(diff); d.setHours(0,0,0,0); return d; }
+function startOfMonth(date) { return new Date(date.getFullYear(), date.getMonth(), 1); }
+function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text == null ? '' : text; return div.innerHTML; }
+function getTagById(id) { return tags.find(t => t.id === id); }
+function getContrastText(hex) {
+  if (!hex || hex.charAt(0) !== '#') return '#fff9ed';
+  const c = hex.substring(1);
+  const full = c.length === 3 ? c.split('').map(x => x + x).join('') : c;
+  const r = parseInt(full.substr(0, 2), 16);
+  const g = parseInt(full.substr(2, 2), 16);
+  const b = parseInt(full.substr(4, 2), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? '#3a2a14' : '#fff9ed';
+}
+
+function getVisibleEvents() {
+  if (selectedFilterTagIds.length === 0) return events;
+  return events.filter(ev => ev.tags && ev.tags.some(id => selectedFilterTagIds.includes(id)));
+}
+
+window.moveEvent = function(index, dir) {
+  const newIndex = index + dir;
+  if (newIndex < 0 || newIndex >= events.length) return;
+  const tmp = events[index];
+  events[index] = events[newIndex];
+  events[newIndex] = tmp;
+  saveEvents();
+  renderAll();
+};
+window.deleteEvent = function(id) { events = events.filter(ev => ev.id !== id); saveEvents(); renderAll(); };
+window.startEdit = function(id) {
+  editingId = id;
+  const ev = events.find(e => e.id === id);
+  pendingEditTagIds = ev && Array.isArray(ev.tags) ? ev.tags.slice() : [];
+  renderEventList();
+};
+window.cancelEdit = function() { editingId = null; pendingEditTagIds = []; renderEventList(); };
+window.saveEdit = function(id) {
+  const item = document.querySelector('.event-item[data-id="' + id + '"]');
+  if (!item) return;
+  const title = item.querySelector('.edit-title').value.trim();
+  const start = item.querySelector('.edit-start').value;
+  const end = item.querySelector('.edit-end').value;
+  const color = item.querySelector('.edit-color').value || '#b9822e';
+  if (!title) { alert('請輸入事件標題'); return; }
+  if (!start || !end) { alert('請輸入開始與結束日期'); return; }
+  if (new Date(start) > new Date(end)) { alert('開始日期不能晚於結束日期'); return; }
+  const ev = events.find(e => e.id === id);
+  if (!ev) return;
+  ev.title = title; ev.start = start; ev.end = end; ev.color = color; ev.tags = pendingEditTagIds.slice();
+  editingId = null;
+  pendingEditTagIds = [];
+  saveEvents();
+  renderAll();
+};
+window.toggleEditTag = function(tagId) {
+  const idx = pendingEditTagIds.indexOf(tagId);
+  if (idx >= 0) pendingEditTagIds.splice(idx, 1); else pendingEditTagIds.push(tagId);
+  renderEventList();
+};
+window.toggleAddTag = function(tagId) {
+  const idx = pendingEventTagIds.indexOf(tagId);
+  if (idx >= 0) pendingEventTagIds.splice(idx, 1); else pendingEventTagIds.push(tagId);
+  renderEvTagPicker();
+};
+window.toggleFilterTag = function(tagId) {
+  const idx = selectedFilterTagIds.indexOf(tagId);
+  if (idx >= 0) selectedFilterTagIds.splice(idx, 1); else selectedFilterTagIds.push(tagId);
+  renderTagFilterPicker();
+  renderTimeline();
+};
+window.deleteTag = function(tagId, event) {
+  if (event) event.stopPropagation();
+  if (!confirm('刪除此標籤？事件上的此標籤也會一併移除。')) return;
+  tags = tags.filter(t => t.id !== tagId);
+  events = events.map(ev => ({ ...ev, tags: (ev.tags || []).filter(id => id !== tagId) }));
+  selectedFilterTagIds = selectedFilterTagIds.filter(id => id !== tagId);
+  pendingEventTagIds = pendingEventTagIds.filter(id => id !== tagId);
+  pendingEditTagIds = pendingEditTagIds.filter(id => id !== tagId);
+  if (editingTagId === tagId) editingTagId = null;
+  saveTags(); saveEvents();
+  renderTagManager();
+  renderEvTagPicker();
+  renderTagFilterPicker();
+  renderAll();
+};
+window.startEditTag = function(tagId) { editingTagId = tagId; editModeActive = true; renderTagManager(); };
+window.cancelEditTag = function() { editingTagId = null; editModeActive = false; renderTagManager(); };
+window.saveTagEdit = function(tagId) {
+  const row = document.querySelector('.tag-edit-row[data-tag-id="' + tagId + '"]');
+  if (!row) return;
+  const name = row.querySelector('.tag-edit-name').value.trim();
+  const color = row.querySelector('.tag-edit-color').value || '#6b8e9e';
+  if (!name) { alert('請輸入標籤名稱'); return; }
+  if (tags.some(t => t.id !== tagId && t.name === name)) { alert('已有同名標籤'); return; }
+  const tag = tags.find(t => t.id === tagId);
+  if (!tag) return;
+  tag.name = name;
+  tag.color = color;
+  editingTagId = null;
+  editModeActive = false;
+  saveTags();
+  renderTagManager();
+  renderEvTagPicker();
+  renderTagFilterPicker();
+  renderEventList();
+  renderTimeline();
+};
+window.toggleEditMode = function() {
+  editModeActive = !editModeActive;
+  if (!editModeActive) editingTagId = null;
+  renderTagManager();
+};
+
+function renderEvTagPicker() {
+  const el = document.getElementById('evTagPicker');
+  const cur = document.getElementById('evTagCurrent');
+  if (tags.length === 0) {
+    el.innerHTML = '<span class="tag-selector-hint">尚未建立標籤，可先到下方「標籤管理」新增。</span>';
+    cur.textContent = '目前：無標籤';
+    return;
+  }
+  let html = '';
+  tags.forEach(t => {
+    const selected = pendingEventTagIds.includes(t.id);
+    html += `<span class="tag-chip pickable${selected ? ' selected' : ''}" style="background:${t.color};color:${getContrastText(t.color)};" onclick="window.toggleAddTag('${t.id}')">${escapeHtml(t.name)}</span>`;
+  });
+  el.innerHTML = html;
+  if (pendingEventTagIds.length === 0) {
+    cur.textContent = '目前：無標籤';
+  } else {
+    const names = pendingEventTagIds.map(id => { const t = getTagById(id); return t ? t.name : ''; }).filter(Boolean);
+    cur.textContent = '目前：' + names.join('、');
+  }
+}
+
+function renderTagFilterPicker() {
+  const el = document.getElementById('tagFilterPicker');
+  if (tags.length === 0) { el.innerHTML = '<span class="empty-state" style="padding:0.2rem;">尚無標籤</span>'; return; }
+  let html = '';
+  tags.forEach(t => {
+    const selected = selectedFilterTagIds.includes(t.id);
+    html += `<span class="tag-chip pickable${selected ? ' selected' : ''}" style="background:${t.color};color:${getContrastText(t.color)};" onclick="window.toggleFilterTag('${t.id}')">${escapeHtml(t.name)}</span>`;
+  });
+  el.innerHTML = html;
+}
+
+function renderTagManager() {
+  const listEl = document.getElementById('tagManagerList');
+  const editEl = document.getElementById('tagEditArea');
+  const editBtn = document.getElementById('editTagBtn');
+  editBtn.textContent = editModeActive ? '完成編輯' : '編輯標籤';
+  editBtn.classList.toggle('primary', editModeActive);
+  if (tags.length === 0) {
+    listEl.innerHTML = '<span class="empty-state" style="padding:0.2rem;">尚未建立任何標籤。</span>';
+    editEl.innerHTML = '';
+    return;
+  }
+  let listHtml = '';
+  tags.forEach(t => {
+    const border = editModeActive ? 'outline:2px dashed rgba(185,130,46,0.55);outline-offset:2px;' : '';
+    listHtml += `<span class="tag-manager-item" style="background:${t.color};color:${getContrastText(t.color)};${border}" onclick="window.startEditTag('${t.id}')">${escapeHtml(t.name)}<button title="刪除" onclick="window.deleteTag('${t.id}', event)">×</button></span>`;
+  });
+  listEl.innerHTML = listHtml;
+  if (editingTagId) {
+    const tag = getTagById(editingTagId);
+    if (!tag) { editingTagId = null; editEl.innerHTML = ''; return; }
+    editEl.innerHTML = `<div class="tag-edit-row" data-tag-id="${tag.id}">
+      <span style="font-size:0.7rem;color:#947957;">編輯標籤：</span>
+      <input type="text" class="tag-edit-name" value="${escapeHtml(tag.name)}" placeholder="標籤名稱">
+      <input type="color" class="tag-edit-color" value="${tag.color}">
+      <button class="primary small" onclick="window.saveTagEdit('${tag.id}')">儲存</button>
+      <button class="small" onclick="window.cancelEditTag()">取消</button>
+    </div>`;
+  } else {
+    editEl.innerHTML = editModeActive ? '<span class="empty-state" style="padding:0.2rem;">點擊上方任一標籤即可編輯。</span>' : '';
+  }
+}
+
+function renderEventList() {
+  const container = document.getElementById('eventList');
+  if (events.length === 0) { container.innerHTML = '<div class="empty-state">尚未新增任何事件。</div>'; return; }
+  let html = '';
+  events.forEach((ev, i) => {
+    const color = ev.color || '#b9822e';
+    const evTags = (ev.tags || []).map(id => getTagById(id)).filter(Boolean);
+    if (ev.id === editingId) {
+      let tagPickerHtml = '';
+      if (tags.length === 0) tagPickerHtml = '<span class="tag-selector-hint">尚無標籤</span>';
+      else tags.forEach(t => {
+        const sel = pendingEditTagIds.includes(t.id);
+        tagPickerHtml += `<span class="tag-chip pickable${sel ? ' selected' : ''}" style="background:${t.color};color:${getContrastText(t.color)};" onclick="window.toggleEditTag('${t.id}')">${escapeHtml(t.name)}</span>`;
+      });
+      html += `<div class="event-item editing" data-id="${ev.id}" style="border-left-color:${color};">
+        <div class="ev-edit-row">
+          <input class="ev-edit-input edit-title" type="text" value="${escapeHtml(ev.title)}" placeholder="事件名稱" style="flex:1 1 150px;">
+          <input class="ev-edit-input edit-start" type="date" value="${ev.start || ''}">
+          <input class="ev-edit-input edit-end" type="date" value="${ev.end || ''}">
+          <input class="ev-edit-input edit-color" type="color" value="${color}">
+          <button class="primary small" onclick="window.saveEdit('${ev.id}')">儲存</button>
+          <button class="small" onclick="window.cancelEdit()">取消</button>
+        </div>
+        <div class="ev-edit-row" style="margin-top:0.35rem;">
+          <span style="font-size:0.68rem;color:#947957;">標籤：</span>
+          <div class="tag-list-inline">${tagPickerHtml}</div>
+        </div>
+      </div>`;
+    } else {
+      let tagChips = '';
+      if (evTags.length === 0) {
+        tagChips = '<span class="tag-selector-hint">無標籤</span>';
+      } else {
+        evTags.forEach(t => { tagChips += `<span class="tag-chip" style="background:${t.color};color:${getContrastText(t.color)};">${escapeHtml(t.name)}</span>`; });
+      }
+      html += `<div class="event-item" data-id="${ev.id}" style="border-left-color:${color};">
+        <span class="ev-color-dot" style="background:${color};"></span>
+        <span class="ev-title">${escapeHtml(ev.title)}</span>
+        <span class="ev-dates">${ev.start || '未設定'} → ${ev.end || '未設定'}</span>
+        <span class="tag-list-inline">${tagChips}</span>
+        <span class="ev-order">
+          <button ${i === 0 ? 'disabled' : ''} onclick="window.moveEvent(${i}, -1)">▲</button>
+          <button ${i === events.length - 1 ? 'disabled' : ''} onclick="window.moveEvent(${i}, 1)">▼</button>
+        </span>
+        <button class="small" onclick="window.startEdit('${ev.id}')">編輯</button>
+        <button class="danger small" onclick="window.deleteEvent('${ev.id}')">刪除</button>
+      </div>`;
+    }
+  });
+  container.innerHTML = html;
+}
+
+function addEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  const start = document.getElementById('evStart').value;
+  const end = document.getElementById('evEnd').value;
+  const color = document.getElementById('evColor').value || '#b9822e';
+  if (!title) { alert('請輸入事件標題'); return; }
+  if (!start || !end) { alert('請輸入開始與結束日期'); return; }
+  if (new Date(start) > new Date(end)) { alert('開始日期不能晚於結束日期'); return; }
+  events.push({ id: generateId(), title, start, end, color, tags: pendingEventTagIds.slice() });
+  saveEvents();
+  document.getElementById('evTitle').value = '';
+  document.getElementById('evStart').value = '';
+  document.getElementById('evEnd').value = '';
+  document.getElementById('evColor').value = '#b9822e';
+  pendingEventTagIds = [];
+  renderEvTagPicker();
+  renderAll();
+}
+
+function addTag() {
+  const name = document.getElementById('newTagName').value.trim();
+  const color = document.getElementById('newTagColor').value || '#6b8e9e';
+  if (!name) { alert('請輸入標籤名稱'); return; }
+  if (tags.some(t => t.name === name)) { alert('已有同名標籤'); return; }
+  tags.push({ id: generateId(), name, color });
+  saveTags();
+  document.getElementById('newTagName').value = '';
+  renderTagManager();
+  renderEvTagPicker();
+  renderTagFilterPicker();
+}
+
+function updateTlCountSelect() {
+  const label = document.getElementById('tlCountLabel');
+  const sel = document.getElementById('tlCountSelect');
+  const config = {
+    week: { label: '週數', suffix: '週', max: 6 },
+    month: { label: '月數', suffix: '個月', max: 6 },
+    quarter: { label: '季數', suffix: '季', max: 6 },
+    halfyear: { label: '半年數', suffix: '半年', max: 6 },
+    year: { label: '年數', suffix: '年', max: 6 }
+  };
+  const c = config[tlView];
+  label.style.display = ''; sel.style.display = '';
+  label.textContent = c.label;
+  let opts = '';
+  for (let i = 1; i <= c.max; i++) opts += `<option value="${i}">${i} ${c.suffix}</option>`;
+  sel.innerHTML = opts;
+  sel.value = tlView === 'week' ? tlWeekCount : tlView === 'month' ? tlMonthCount : tlView === 'quarter' ? tlQuarterCount : tlView === 'halfyear' ? tlHalfYearCount : tlYearCount;
+}
+
+function buildStackBlocks() {
+  const blocks = [];
+  if (tlView === 'week') {
+    const baseStart = startOfWeek(tlAnchor);
+    for (let w = 0; w < tlWeekCount; w++) {
+      const start = addDays(baseStart, w * 7);
+      const end = addDays(start, 6);
+      blocks.push({ start, end, unit: 'day', label: `${start.getFullYear()}年${start.getMonth()+1}月${start.getDate()}日 – ${end.getFullYear()}年${end.getMonth()+1}月${end.getDate()}日` });
+    }
+  } else if (tlView === 'month') {
+    const baseStart = startOfMonth(tlAnchor);
+    for (let m = 0; m < tlMonthCount; m++) {
+      const start = addMonths(baseStart, m);
+      const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+      blocks.push({ start, end, unit: 'day', label: `${start.getFullYear()}年${start.getMonth()+1}月` });
+    }
+  } else if (tlView === 'quarter') {
+    const baseStart = startOfMonth(tlAnchor);
+    for (let q = 0; q < tlQuarterCount; q++) {
+      const start = addMonths(baseStart, q * 3);
+      const end = new Date(start.getFullYear(), start.getMonth() + 3, 0);
+      blocks.push({ start, end, unit: 'month', label: `${start.getFullYear()}年 ${start.getMonth()+1}月–${end.getMonth()+1}月` });
+    }
+  } else if (tlView === 'halfyear') {
+    const baseStart = startOfMonth(tlAnchor);
+    for (let h = 0; h < tlHalfYearCount; h++) {
+      const start = addMonths(baseStart, h * 6);
+      const end = new Date(start.getFullYear(), start.getMonth() + 6, 0);
+      blocks.push({ start, end, unit: 'month', label: `${start.getFullYear()}年 ${start.getMonth()+1}月–${end.getMonth()+1}月` });
+    }
+  } else if (tlView === 'year') {
+    const baseStart = startOfMonth(tlAnchor);
+    for (let y = 0; y < tlYearCount; y++) {
+      const start = addMonths(baseStart, y * 12);
+      const end = new Date(start.getFullYear(), start.getMonth() + 12, 0);
+      blocks.push({ start, end, unit: 'month', label: `${start.getFullYear()}年${start.getMonth()+1}月 – ${end.getFullYear()}年${end.getMonth()+1}月` });
+    }
+  }
+  return blocks;
+}
+
+function dayFractionInMonth(date, monthStart) {
+  const daysInMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+  return (new Date(date).getDate() - 1) / daysInMonth;
+}
+function endFractionInMonth(date, monthStart) {
+  const daysInMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+  return new Date(date).getDate() / daysInMonth;
+}
+
+function renderDayBlock(block, container, visibleEvents) {
+  const days = [];
+  for (let d = new Date(block.start); d <= block.end; d = addDays(d, 1)) days.push(new Date(d));
+  const todayKey = dateKey(new Date());
+  const dayNames = ['日','一','二','三','四','五','六'];
+  let html = '<div class="timeline-wrapper"><div class="timeline-grid">';
+  html += '<div class="timeline-header"><div></div><div class="timeline-header-days" style="grid-template-columns: repeat(' + days.length + ', 1fr);">';
+  days.forEach(d => {
+    const isToday = dateKey(d) === todayKey;
+    const showNum = days.length <= 14 || d.getDate() === 1 || d.getDate() % Math.ceil(days.length / 10) === 0;
+    html += '<div class="day-header ' + (isToday ? 'today' : '') + '"><span class="day-name">' + dayNames[d.getDay()] + '</span><span class="day-num">' + (showNum ? d.getDate() : '') + '</span></div>';
+  });
+  html += '</div></div>';
+  const gridCols = 'repeat(' + days.length + ', 1fr)';
+  html += '<div class="track-label"><span class="dot" style="background:#b9822e;"></span>事件</div><div class="track-bars">';
+  html += '<div class="day-grid" style="grid-template-columns: ' + gridCols + ';">';
+  days.forEach(d => { html += '<div class="' + (dateKey(d) === todayKey ? 'today' : '') + '"></div>'; });
+  html += '</div>';
+  const todayIndex = days.findIndex(d => dateKey(d) === todayKey);
+  if (todayIndex >= 0) html += '<div class="today-line" style="left: ' + ((todayIndex + 0.5) / days.length * 100) + '%;"></div>';
+  const firstKey = dateKey(days[0]);
+  const lastKey = dateKey(days[days.length - 1]);
+  const barItems = [];
+  visibleEvents.forEach(ev => {
+    const evStart = parseDate(ev.start);
+    const evEnd = parseDate(ev.end);
+    if (!evStart || !evEnd) return;
+    const evStartKey = dateKey(evStart);
+    const evEndKey = dateKey(evEnd);
+    if (evEndKey < firstKey || evStartKey > lastKey) return;
+    let startIdx = -1, endIdx = -1;
+    days.forEach((d, i) => {
+      const k = dateKey(d);
+      if (startIdx === -1 && evStartKey <= k) startIdx = i;
+      if (evEndKey >= k) endIdx = i;
+    });
+    if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return;
+    barItems.push({ startIdx, endIdx, ev, evIndex: events.indexOf(ev) });
+  });
+  if (barItems.length === 0) {
+    html += '<div class="empty-state" style="position:relative;z-index:2;">沒有符合的事件</div>';
+  } else {
+    html += '<div class="bars-layer" style="position:relative; z-index:2; min-height:' + (barItems.length * 28 + 6) + 'px;">';
+    barItems.forEach((item, row) => {
+      const leftPct = (item.startIdx / days.length) * 100;
+      const widthPct = ((item.endIdx - item.startIdx + 1) / days.length) * 100;
+      const top = row * 28 + 3;
+      const bg = item.ev.color || '#b9822e';
+      const fg = getContrastText(bg);
+      html += '<div class="ms-bar" draggable="true" data-ev-index="' + item.evIndex + '" style="position:absolute; top:' + top + 'px; left:' + leftPct + '%; width:' + widthPct + '%; background:' + bg + '; color:' + fg + ';">' + escapeHtml(item.ev.title) + '</div>';
+    });
+    html += '</div>';
+  }
+  html += '</div></div></div>';
+  container.innerHTML = html;
+  attachDragListeners(container);
+}
+
+function renderMonthBlock(block, container, visibleEvents) {
+  const months = [];
+  let cur = new Date(block.start.getFullYear(), block.start.getMonth(), 1);
+  const endMonth = new Date(block.end.getFullYear(), block.end.getMonth(), 1);
+  while (cur <= endMonth) {
+    months.push(new Date(cur));
+    cur = addMonths(cur, 1);
+  }
+  const todayKey = dateKey(new Date());
+  let html = '<div class="timeline-wrapper"><div class="timeline-grid">';
+  html += '<div class="timeline-header"><div></div><div class="timeline-header-days" style="grid-template-columns: repeat(' + months.length + ', 1fr);">';
+  months.forEach(m => {
+    const mStartKey = dateKey(new Date(m.getFullYear(), m.getMonth(), 1));
+    const mEndKey = dateKey(new Date(m.getFullYear(), m.getMonth() + 1, 0));
+    const isToday = todayKey >= mStartKey && todayKey <= mEndKey;
+    html += '<div class="day-header ' + (isToday ? 'today' : '') + '"><span class="day-name">' + m.getFullYear() + '</span><span class="day-num">' + (m.getMonth()+1) + '月</span></div>';
+  });
+  html += '</div></div>';
+  const gridCols = 'repeat(' + months.length + ', 1fr)';
+  html += '<div class="track-label"><span class="dot" style="background:#b9822e;"></span>事件</div><div class="track-bars">';
+  html += '<div class="day-grid" style="grid-template-columns: ' + gridCols + ';">';
+  months.forEach(m => {
+    const mStartKey = dateKey(new Date(m.getFullYear(), m.getMonth(), 1));
+    const mEndKey = dateKey(new Date(m.getFullYear(), m.getMonth() + 1, 0));
+    html += '<div class="' + ((todayKey >= mStartKey && todayKey <= mEndKey) ? 'today' : '') + '"></div>';
+  });
+  html += '</div>';
+  const todayIdx = months.findIndex(m => {
+    const s = dateKey(new Date(m.getFullYear(), m.getMonth(), 1));
+    const e = dateKey(new Date(m.getFullYear(), m.getMonth() + 1, 0));
+    return todayKey >= s && todayKey <= e;
+  });
+  if (todayIdx >= 0) {
+    const monthStart = months[todayIdx];
+    const daysInMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0).getDate();
+    const dayOffset = (new Date().getDate() - 0.5) / daysInMonth;
+    html += '<div class="today-line" style="left: ' + (((todayIdx + dayOffset) / months.length) * 100) + '%;"></div>';
+  }
+  const rangeStart = new Date(block.start.getFullYear(), block.start.getMonth(), 1);
+  const rangeEnd = new Date(block.end.getFullYear(), block.end.getMonth() + 1, 0);
+  const barItems = [];
+  visibleEvents.forEach(ev => {
+    const evStart = parseDate(ev.start);
+    const evEnd = parseDate(ev.end);
+    if (!evStart || !evEnd) return;
+    const visStart = evStart < rangeStart ? rangeStart : evStart;
+    const visEnd = evEnd > rangeEnd ? rangeEnd : evEnd;
+    if (visStart > visEnd) return;
+    const startMonth = new Date(visStart.getFullYear(), visStart.getMonth(), 1);
+    const endMonth = new Date(visEnd.getFullYear(), visEnd.getMonth(), 1);
+    const startMonthIdx = months.findIndex(m => m.getFullYear() === startMonth.getFullYear() && m.getMonth() === startMonth.getMonth());
+    const endMonthIdx = months.findIndex(m => m.getFullYear() === endMonth.getFullYear() && m.getMonth() === endMonth.getMonth());
+    if (startMonthIdx === -1 || endMonthIdx === -1) return;
+    const startFrac = dayFractionInMonth(visStart, startMonth);
+    const endFrac = endFractionInMonth(visEnd, endMonth);
+    const leftPct = ((startMonthIdx + startFrac) / months.length) * 100;
+    const rightPct = ((endMonthIdx + endFrac) / months.length) * 100;
+    barItems.push({ leftPct, rightPct, ev, evIndex: events.indexOf(ev) });
+  });
+  if (barItems.length === 0) {
+    html += '<div class="empty-state" style="position:relative;z-index:2;">沒有符合的事件</div>';
+  } else {
+    html += '<div class="bars-layer" style="position:relative; z-index:2; min-height:' + (barItems.length * 28 + 6) + 'px;">';
+    barItems.forEach((item, row) => {
+      const top = row * 28 + 3;
+      const bg = item.ev.color || '#b9822e';
+      const fg = getContrastText(bg);
+      const widthPct = Math.max(item.rightPct - item.leftPct, 0.8);
+      html += '<div class="ms-bar" draggable="true" data-ev-index="' + item.evIndex + '" style="position:absolute; top:' + top + 'px; left:' + item.leftPct + '%; width:' + widthPct + '%; background:' + bg + '; color:' + fg + ';">' + escapeHtml(item.ev.title) + '</div>';
+    });
+    html += '</div>';
+  }
+  html += '</div></div></div>';
+  container.innerHTML = html;
+  attachDragListeners(container);
+}
+
+function renderTimeline() {
+  const el = document.getElementById('timelineContent');
+  const blocks = buildStackBlocks();
+  const visibleEvents = getVisibleEvents();
+  if (blocks.length === 0) { el.innerHTML = '<div class="empty-state">無法顯示時間軸。</div>'; return; }
+  const first = blocks[0].label;
+  const last = blocks[blocks.length - 1].label;
+  document.getElementById('tlDateRange').textContent = blocks.length > 1 ? (first + ' – ' + last) : first;
+  let html = '<div class="timeline-stack">';
+  const todayKey = dateKey(new Date());
+  blocks.forEach(block => {
+    const isTodayBlock = todayKey >= dateKey(block.start) && todayKey <= dateKey(block.end);
+    html += '<div class="timeline-block">';
+    html += '<div class="timeline-block-title' + (isTodayBlock ? ' today' : '') + '">' + escapeHtml(block.label) + (isTodayBlock ? ' · 今天' : '') + '</div>';
+    html += '<div class="block-content"></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+  const blockEls = el.querySelectorAll('.block-content');
+  blocks.forEach((block, i) => {
+    const target = blockEls[i];
+    if (block.unit === 'day') renderDayBlock(block, target, visibleEvents);
+    else renderMonthBlock(block, target, visibleEvents);
+  });
+}
+
+function attachDragListeners(container) {
+  const bars = container.querySelectorAll('.ms-bar');
+  bars.forEach(bar => {
+    bar.addEventListener('dragstart', function(e) {
+      dragIndex = parseInt(this.dataset.evIndex);
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.dataset.evIndex);
+    });
+    bar.addEventListener('dragend', function() {
+      this.classList.remove('dragging');
+      container.querySelectorAll('.ms-bar.drag-over').forEach(el => el.classList.remove('drag-over'));
+    });
+    bar.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (parseInt(this.dataset.evIndex) !== dragIndex) this.classList.add('drag-over');
+    });
+    bar.addEventListener('dragleave', function() { this.classList.remove('drag-over'); });
+    bar.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      const targetIndex = parseInt(this.dataset.evIndex);
+      if (dragIndex === -1 || targetIndex === dragIndex) return;
+      const moved = events.splice(dragIndex, 1)[0];
+      events.splice(targetIndex, 0, moved);
+      dragIndex = -1;
+      saveEvents();
+      renderAll();
+    });
+  });
+}
+
+function renderAll() { renderEventList(); renderTimeline(); }
+
+document.querySelectorAll('[data-tl-view]').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('[data-tl-view]').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    tlView = this.dataset.tlView;
+    updateTlCountSelect();
+    renderTimeline();
+  });
+});
+
+document.getElementById('tlCountSelect').addEventListener('change', function() {
+  const val = parseInt(this.value) || 1;
+  if (tlView === 'week') tlWeekCount = val;
+  else if (tlView === 'month') tlMonthCount = val;
+  else if (tlView === 'quarter') tlQuarterCount = val;
+  else if (tlView === 'halfyear') tlHalfYearCount = val;
+  else if (tlView === 'year') tlYearCount = val;
+  renderTimeline();
+});
+
+document.getElementById('tlPrev').addEventListener('click', function() {
+  if (tlView === 'week') tlAnchor = addDays(tlAnchor, -7);
+  else tlAnchor = addMonths(tlAnchor, -1);
+  renderTimeline();
+});
+document.getElementById('tlNext').addEventListener('click', function() {
+  if (tlView === 'week') tlAnchor = addDays(tlAnchor, 7);
+  else tlAnchor = addMonths(tlAnchor, 1);
+  renderTimeline();
+});
+document.getElementById('tlToday').addEventListener('click', function() { tlAnchor = new Date(); renderTimeline(); });
+
+document.getElementById('addBtn').addEventListener('click', addEvent);
+document.getElementById('addTagBtn').addEventListener('click', addTag);
+document.getElementById('editTagBtn').addEventListener('click', function() { window.toggleEditMode(); });
+document.getElementById('tagFilterClear').addEventListener('click', function() {
+  selectedFilterTagIds = [];
+  renderTagFilterPicker();
+  renderTimeline();
+});
+document.getElementById('clearAllBtn').addEventListener('click', function() {
+  if (events.length === 0) return;
+  if (confirm('確定清空所有事件？')) { events = []; saveEvents(); renderAll(); }
+});
+
+function applyTheme(dark) {
+  document.body.classList.toggle('dark', dark);
+  document.getElementById('themeToggle').textContent = dark ? '☀️ 淺色' : '🌙 深色';
+  localStorage.setItem('timeline_theme', dark ? 'dark' : 'light');
+}
+document.getElementById('themeToggle').addEventListener('click', function() {
+  applyTheme(!document.body.classList.contains('dark'));
+});
+const savedTheme = localStorage.getItem('timeline_theme');
+if (savedTheme === 'dark') applyTheme(true);
+
+loadEvents();
+loadTags();
+updateTlCountSelect();
+renderTagManager();
+renderEvTagPicker();
+renderTagFilterPicker();
+renderAll();
+})();
+</script>
+</body>
+</html>
