@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>邮票月历</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +31,6 @@
     padding-bottom: 0.5rem;
     text-align: center;
   }
-
   .page-inner {
     width: 100%;
     max-width: 1400px;
@@ -39,7 +38,6 @@
     flex-direction: column;
     align-items: center;
   }
-
   .control-panel {
     display: flex;
     flex-wrap: wrap;
@@ -97,29 +95,6 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.1), 0 0 0 1px #b9a58e;
     color: #2f1f10;
   }
-  .upload-area {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #fffcf7;
-    padding: 0.3rem 1rem 0.3rem 0.8rem;
-    border-radius: 40px;
-    border: 1px solid #cbbcaa;
-  }
-  .upload-area i { color: #7f6b56; }
-  .upload-btn {
-    background: #b09b84;
-    border: none;
-    color: white;
-    padding: 0.45rem 1rem;
-    border-radius: 30px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .upload-btn:hover { background: #9a846d; }
-  #fileInput { display: none; }
   .range-note { font-size: 0.75rem; color: #6b5a4a; white-space: nowrap; }
 
   .calendar-collection {
@@ -206,12 +181,14 @@
     align-items: center;
     justify-content: center;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+    cursor: pointer;
   }
   .date-cell.empty {
     background: #ece3d9;
     opacity: 0.4;
     pointer-events: none;
     box-shadow: none;
+    cursor: default;
   }
   .stamp {
     width: 100%;
@@ -223,6 +200,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
   }
   .stamp img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .placeholder-day {
@@ -234,6 +212,20 @@
     align-items: center;
     justify-content: center;
   }
+
+  .note-indicator {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b09b84;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
+    z-index: 5;
+    display: none;
+  }
+  .date-cell.has-note .note-indicator { display: block; }
 
   .delete-btn {
     position: absolute;
@@ -257,12 +249,8 @@
     padding: 0;
     font-family: sans-serif;
   }
-  .date-cell:hover .delete-btn {
-    opacity: 1;
-  }
-  .delete-btn:hover {
-    background: rgba(180, 60, 40, 0.9);
-  }
+  .date-cell:hover .delete-btn { opacity: 1; }
+  .delete-btn:hover { background: rgba(180, 60, 40, 0.9); }
 
   .continuous-card {
     background: #faf6f0;
@@ -312,13 +300,15 @@
     top: 2px;
     right: 2px;
   }
+  .continuous-grid .note-indicator {
+    width: 6px;
+    height: 6px;
+    bottom: 2px;
+    left: 3px;
+  }
 
-  .date-cell.alt-bg {
-    background: #faf3ea;
-  }
-  .date-cell.alt-bg .stamp {
-    background: #faf3ea;
-  }
+  .date-cell.alt-bg { background: #faf3ea; }
+  .date-cell.alt-bg .stamp { background: #faf3ea; }
 
   .no-months-message {
     text-align: center;
@@ -333,22 +323,184 @@
   }
   .footer-note { margin-top: 2rem; color: #9a8875; font-size: 0.8rem; text-align: center; }
 
-  /* ===== 手机端：强制所有元素不超过视口 ===== */
+  /* ===== 记录弹窗 ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(40, 30, 20, 0.45);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .record-modal {
+    background: #fdfaf5;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(40, 30, 20, 0.3), 0 0 0 1px #e0d4c4;
+    width: 100%;
+    max-width: 460px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 1.4rem 1.3rem 1.3rem;
+    transform: translateY(10px);
+    transition: transform 0.2s;
+    position: relative;
+  }
+  .modal-overlay.open .record-modal {
+    transform: translateY(0);
+  }
+  .modal-close {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.9rem;
+    border: none;
+    background: transparent;
+    font-size: 1.3rem;
+    color: #9a8875;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.2rem;
+    border-radius: 50%;
+  }
+  .modal-close:hover { color: #5e4e3c; background: #f0e8dd; }
+
+  .modal-date-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #3e2c1b;
+    margin-bottom: 0.2rem;
+    padding-right: 2rem;
+  }
+  .modal-date-sub {
+    font-size: 0.75rem;
+    color: #9a8875;
+    margin-bottom: 1rem;
+  }
+
+  .modal-photo-area {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #f2ebe2;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.7rem;
+    position: relative;
+    border: 1px dashed #d6c9b8;
+  }
+  .modal-photo-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .modal-photo-empty {
+    color: #b09b84;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .modal-photo-empty i { font-size: 1.6rem; opacity: 0.7; }
+
+  .photo-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .photo-btn {
+    flex: 1 1 auto;
+    border: 1px solid #cbbcaa;
+    background: #fffcf7;
+    color: #5e4e3c;
+    padding: 0.5rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .photo-btn:hover { background: #f0e8dd; }
+  .photo-btn.danger {
+    color: #a0523c;
+    border-color: #d9b3a8;
+  }
+  .photo-btn.danger:hover { background: #f7e8e3; }
+
+  .modal-note-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5e4e3c;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    display: block;
+  }
+  .modal-note-input {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    border: 1px solid #cbbcaa;
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #2f2419;
+    background: #fffcf9;
+    outline: none;
+    margin-bottom: 1rem;
+  }
+  .modal-note-input:focus {
+    border-color: #b09b84;
+    box-shadow: 0 0 0 3px rgba(176, 155, 132, 0.2);
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+  }
+  .modal-btn {
+    border: none;
+    padding: 0.55rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .modal-btn.secondary {
+    background: #ede4d9;
+    color: #5e4e3c;
+  }
+  .modal-btn.secondary:hover { background: #e0d4c4; }
+  .modal-btn.primary {
+    background: #b09b84;
+    color: #fff;
+  }
+  .modal-btn.primary:hover { background: #9a846d; }
+
   @media (max-width: 800px) {
-    body {
-      padding: 1rem 0.75rem;
-      align-items: stretch;
-      overflow-x: hidden; /* 防止微信横向溢出 */
-    }
+    body { padding: 1rem 0.75rem; align-items: stretch; overflow-x: hidden; }
     h1 { font-size: 1.7rem; }
     .subhead { margin-bottom: 1rem; font-size: 0.8rem; }
+    .page-inner { max-width: 100%; align-items: stretch; }
 
-    .page-inner {
-      max-width: 100%;
-      align-items: stretch;
-    }
-
-    /* 控制栏：等于视口宽度减去左右 padding */
     .control-panel {
       width: calc(100vw - 1.5rem);
       max-width: 100%;
@@ -362,35 +514,11 @@
       margin-bottom: 1.2rem;
     }
     .input-group { width: 100%; }
-    .input-group input[type="date"] {
-      width: 100%;
-      min-width: 0;
-      font-size: 0.85rem;
-    }
-    .view-options {
-      width: 100%;
-      justify-content: stretch;
-      flex-wrap: nowrap;
-    }
-    .view-btn, .dir-btn {
-      flex: 1 1 0;
-      text-align: center;
-      padding: 0.45rem 0.2rem;
-      font-size: 0.72rem;
-    }
-    .upload-area {
-      width: 100%;
-      justify-content: center;
-      flex-wrap: nowrap;
-    }
-    .upload-btn {
-      flex: 1;
-      max-width: 160px;
-      padding: 0.45rem 0.8rem;
-    }
+    .input-group input[type="date"] { width: 100%; min-width: 0; font-size: 0.85rem; }
+    .view-options { width: 100%; justify-content: stretch; flex-wrap: nowrap; }
+    .view-btn, .dir-btn { flex: 1 1 0; text-align: center; padding: 0.45rem 0.2rem; font-size: 0.72rem; }
     .range-note { display: none; }
 
-    /* 日历容器 */
     .calendar-collection {
       width: calc(100vw - 1.5rem);
       max-width: 100%;
@@ -400,14 +528,9 @@
       justify-content: flex-start;
       flex-wrap: wrap;
     }
-    .calendar-collection.vertical {
-      align-items: stretch;
-    }
-    .calendar-collection.horizontal-scroll {
-      padding-bottom: 0.8rem;
-    }
+    .calendar-collection.vertical { align-items: stretch; }
+    .calendar-collection.horizontal-scroll { padding-bottom: 0.8rem; }
 
-    /* 单月卡片：直接按视口计算，不依赖父容器 */
     .month-card.large-view,
     .month-card.small-view {
       width: calc(100vw - 1.5rem);
@@ -417,8 +540,6 @@
       flex: 0 0 auto;
       padding: 0.6rem;
     }
-
-    /* 多月连续卡片 */
     .continuous-card {
       width: calc(100vw - 1.5rem);
       max-width: calc(100vw - 1.5rem);
@@ -436,6 +557,8 @@
     .month-card.large-view .placeholder-day,
     .month-card.small-view .placeholder-day { font-size: 0.85rem; }
     .delete-btn { width: 16px; height: 16px; font-size: 10px; top: 2px; right: 2px; }
+
+    .record-modal { padding: 1.2rem 1rem 1rem; max-height: 90vh; }
   }
 
   @media (max-width: 420px) {
@@ -494,21 +617,53 @@
           <button class="dir-btn" data-size="small">小视图</button>
         </div>
       </div>
-      <div class="upload-area">
-        <i class="fas fa-camera"></i>
-        <button class="upload-btn" id="uploadBtn">上传图片</button>
-        <input type="file" id="fileInput" accept="image/*">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
         <span class="range-note" id="rangeNote"></span>
       </div>
     </div>
 
     <div class="calendar-collection" id="calendarCollection"></div>
-    <div class="footer-note">点击任意日期格子即可上传图片，再次点击可更换；悬停可点击右上角 × 删除</div>
+    <div class="footer-note">点击任意日期格子可查看/编辑当天记录；有记录的格子左下角会有小圆点</div>
+  </div>
+
+  <!-- 记录弹窗 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="record-modal" id="recordModal">
+      <button class="modal-close" id="modalClose" title="关闭">×</button>
+      <div class="modal-date-title" id="modalDateTitle">日期</div>
+      <div class="modal-date-sub" id="modalDateSub"></div>
+
+      <div class="modal-photo-area" id="modalPhotoArea">
+        <div class="modal-photo-empty">
+          <i class="fas fa-camera"></i>
+          <span>还没有照片</span>
+        </div>
+      </div>
+
+      <div class="photo-actions">
+        <button class="photo-btn" id="photoUploadBtn">
+          <i class="fas fa-upload"></i> 上传/更换照片
+        </button>
+        <button class="photo-btn danger" id="photoDeleteBtn" style="display:none;">
+          <i class="fas fa-trash-alt"></i> 删除照片
+        </button>
+      </div>
+      <input type="file" id="modalFileInput" accept="image/*" style="display:none;">
+
+      <label class="modal-note-label" for="modalNoteInput">当天记录</label>
+      <textarea class="modal-note-input" id="modalNoteInput" placeholder="记录今天发生的事、心情、想法……"></textarea>
+
+      <div class="modal-footer">
+        <button class="modal-btn secondary" id="modalCancelBtn">取消</button>
+        <button class="modal-btn primary" id="modalSaveBtn">保存</button>
+      </div>
+    </div>
   </div>
 
 <script>
 (function() {
   const STORAGE_KEY = 'stamp_calendar_images';
+  const NOTES_STORAGE_KEY = 'stamp_calendar_notes';
   const LEGACY_KEYS = [
     'stamp_calendar_images_v10',
     'stamp_calendar_images_v9',
@@ -523,6 +678,7 @@
   ];
 
   let imageStore = loadImages();
+  let noteStore = loadNotes();
 
   function migrateLegacyKeys() {
     let current = null;
@@ -564,6 +720,18 @@
     return map;
   }
 
+  function loadNotes() {
+    const map = new Map();
+    try {
+      const raw = localStorage.getItem(NOTES_STORAGE_KEY);
+      if (raw) {
+        const obj = JSON.parse(raw);
+        Object.keys(obj).forEach(k => map.set(k, obj[k]));
+      }
+    } catch {}
+    return map;
+  }
+
   function saveImagesToStorage() {
     try {
       const obj = {};
@@ -571,6 +739,16 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
     } catch {
       alert('本地存储空间不足，部分图片可能无法保存。');
+    }
+  }
+
+  function saveNotesToStorage() {
+    try {
+      const obj = {};
+      noteStore.forEach((v, k) => obj[k] = v);
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(obj));
+    } catch {
+      alert('本地存储空间不足，部分文字记录可能无法保存。');
     }
   }
 
@@ -640,14 +818,18 @@
   function buildStampCell(y, m, d, altBg) {
     const key = dateKey(y, m + 1, d);
     const img = imageStore.get(key);
+    const note = noteStore.get(key);
     const hasImg = !!img;
+    const hasNote = note && note.trim().length > 0;
+
     const inner = hasImg
       ? `<div class="stamp"><img src="${img}" loading="lazy"></div>`
       : `<div class="stamp"><div class="placeholder-day">${d}</div></div>`;
+    const noteDot = `<span class="note-indicator"></span>`;
     const delBtn = hasImg
-      ? `<button class="delete-btn" data-delete="${key}" title="删除这张图片">×</button>`
+      ? `<button class="delete-btn" data-delete="${key}" title="删除照片">×</button>`
       : '';
-    return `<div class="date-cell${altBg ? ' alt-bg' : ''}" data-date="${key}">${inner}${delBtn}</div>`;
+    return `<div class="date-cell${altBg ? ' alt-bg' : ''}${hasNote ? ' has-note' : ''}" data-date="${key}">${inner}${noteDot}${delBtn}</div>`;
   }
 
   function createMonthCard(year, month, size) {
@@ -746,6 +928,128 @@
     }
   }
 
+  // ===== 弹窗逻辑 =====
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalDateTitle = document.getElementById('modalDateTitle');
+  const modalDateSub = document.getElementById('modalDateSub');
+  const modalPhotoArea = document.getElementById('modalPhotoArea');
+  const modalNoteInput = document.getElementById('modalNoteInput');
+  const modalFileInput = document.getElementById('modalFileInput');
+  const photoUploadBtn = document.getElementById('photoUploadBtn');
+  const photoDeleteBtn = document.getElementById('photoDeleteBtn');
+  const modalSaveBtn = document.getElementById('modalSaveBtn');
+  const modalCancelBtn = document.getElementById('modalCancelBtn');
+  const modalClose = document.getElementById('modalClose');
+
+  let editingDateKey = null;
+  let pendingImageData = null;   // null 表示不修改，'' 表示删除，其他为 dataURL
+  let pendingNote = null;
+
+  function openModal(key) {
+    editingDateKey = key;
+    pendingImageData = undefined;
+    pendingNote = undefined;
+
+    const parts = key.split('-');
+    const y = Number(parts[0]);
+    const m = Number(parts[1]) - 1;
+    const d = Number(parts[2]);
+    const dateObj = new Date(y, m, d);
+    const weekdayNames = ['日','一','二','三','四','五','六'];
+    modalDateTitle.textContent = `${y}年${m+1}月${d}日`;
+    modalDateSub.textContent = `星期${weekdayNames[dateObj.getDay()]}`;
+
+    const existingImg = imageStore.get(key);
+    const existingNote = noteStore.get(key) || '';
+
+    renderModalPhoto(existingImg);
+    modalNoteInput.value = existingNote;
+
+    modalOverlay.classList.add('open');
+  }
+
+  function renderModalPhoto(dataURL) {
+    if (dataURL) {
+      modalPhotoArea.innerHTML = `<img src="${dataURL}" alt="当天照片">`;
+      photoDeleteBtn.style.display = '';
+    } else {
+      modalPhotoArea.innerHTML = `<div class="modal-photo-empty"><i class="fas fa-camera"></i><span>还没有照片</span></div>`;
+      photoDeleteBtn.style.display = 'none';
+    }
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove('open');
+    editingDateKey = null;
+    pendingImageData = undefined;
+    pendingNote = undefined;
+    modalFileInput.value = '';
+  }
+
+  photoUploadBtn.addEventListener('click', () => {
+    modalFileInput.click();
+  });
+
+  modalFileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('请选择图片文件');
+      e.target.value = '';
+      return;
+    }
+    try {
+      const dataURL = await compressImage(file, 600, 0.7);
+      pendingImageData = dataURL;
+      renderModalPhoto(dataURL);
+    } catch {
+      alert('图片处理失败');
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  photoDeleteBtn.addEventListener('click', () => {
+    pendingImageData = '';
+    renderModalPhoto(null);
+  });
+
+  modalSaveBtn.addEventListener('click', () => {
+    if (!editingDateKey) return;
+    const key = editingDateKey;
+
+    if (pendingImageData !== undefined) {
+      if (pendingImageData === '') {
+        imageStore.delete(key);
+      } else {
+        imageStore.set(key, pendingImageData);
+      }
+      saveImagesToStorage();
+    }
+
+    const noteText = modalNoteInput.value.trim();
+    if (noteText) {
+      noteStore.set(key, noteText);
+    } else {
+      noteStore.delete(key);
+    }
+    saveNotesToStorage();
+
+    closeModal();
+    renderCalendar();
+  });
+
+  modalCancelBtn.addEventListener('click', closeModal);
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal();
+  });
+
+  // ===== 日历点击 =====
   function initDateClickDelegate() {
     calendarContainer.addEventListener('click', e => {
       const delBtn = e.target.closest('.delete-btn');
@@ -764,35 +1068,8 @@
       if (!cell || cell.classList.contains('empty')) return;
       const key = cell.dataset.date;
       if (!key) return;
-      const fileInput = document.getElementById('fileInput');
-      fileInput.dataset.targetDate = key;
-      fileInput.click();
+      openModal(key);
     });
-  }
-
-  async function handleFileUpload(e) {
-    const file = e.target.files[0];
-    const target = e.target.dataset.targetDate;
-    if (!file || !target) {
-      e.target.value = '';
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      alert('请选择图片文件');
-      e.target.value = '';
-      return;
-    }
-    try {
-      const dataURL = await compressImage(file, 600, 0.7);
-      imageStore.set(target, dataURL);
-      saveImagesToStorage();
-      renderCalendar();
-    } catch {
-      alert('图片处理失败');
-    } finally {
-      e.target.value = '';
-      delete e.target.dataset.targetDate;
-    }
   }
 
   function initRangeListeners() {
@@ -847,12 +1124,6 @@
     });
   }
 
-  function initUploadButton() {
-    document.getElementById('uploadBtn').addEventListener('click', () => {
-      alert('请先点击月历中的任意日期格子，再选择图片上传。');
-    });
-  }
-
   function initDateInputs() {
     const today = new Date();
     const start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -868,9 +1139,7 @@
     initViewSwitcher();
     initDirSwitcher();
     initSizeSwitcher();
-    initUploadButton();
     initDateClickDelegate();
-    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
     renderCalendar();
   }
 
