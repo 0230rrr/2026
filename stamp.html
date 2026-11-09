@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邮票月历</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f0ebe4;
+    font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    font-weight: 300;
+    font-size: 2.4rem;
+    letter-spacing: 2px;
+    color: #3e2c1b;
+    margin-bottom: 0.2rem;
+  }
+  .subhead {
+    color: #6b5a4a;
+    margin-bottom: 2rem;
+    font-style: italic;
+    border-bottom: 2px dashed #c8b8a6;
+    padding-bottom: 0.5rem;
+  }
+  .control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1rem;
+    background: #e8dfd3;
+    padding: 1rem 1.8rem;
+    border-radius: 48px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    margin-bottom: 2.5rem;
+    border: 1px solid #d6c9b8;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .input-group label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5e4e3c;
+    font-weight: 600;
+  }
+  .input-group input[type="date"] {
+    padding: 0.5rem 0.9rem;
+    border: 1px solid #cbbcaa;
+    border-radius: 30px;
+    background: #fffcf9;
+    font-size: 0.9rem;
+    color: #2f2419;
+    outline: none;
+    min-width: 150px;
+  }
+  .view-options {
+    display: flex;
+    gap: 0.3rem;
+    background: #ddd2c2;
+    padding: 0.25rem;
+    border-radius: 40px;
+  }
+  .view-btn, .dir-btn {
+    border: none;
+    background: transparent;
+    padding: 0.45rem 1rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #4e3e2e;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .view-btn.active, .dir-btn.active {
+    background: #fffcf7;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1), 0 0 0 1px #b9a58e;
+    color: #2f1f10;
+  }
+  .upload-area {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #fffcf7;
+    padding: 0.3rem 1rem 0.3rem 0.8rem;
+    border-radius: 40px;
+    border: 1px solid #cbbcaa;
+  }
+  .upload-area i { color: #7f6b56; }
+  .upload-btn {
+    background: #b09b84;
+    border: none;
+    color: white;
+    padding: 0.45rem 1rem;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .upload-btn:hover { background: #9a846d; }
+  #fileInput { display: none; }
+  .range-note { font-size: 0.75rem; color: #6b5a4a; white-space: nowrap; }
+
+  .calendar-collection {
+    width: 100%;
+    max-width: 1400px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem 1.8rem;
+  }
+  .calendar-collection.vertical {
+    flex-direction: column;
+    align-items: center;
+  }
+  .calendar-collection.horizontal-scroll {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+
+  .month-card.large-view {
+    width: 760px;
+    padding: 1rem;
+    flex: 0 0 auto;
+  }
+  .month-card.large-view .placeholder-day { font-size: 1.6rem; }
+  .month-card.large-view .weekday-header { font-size: 0.8rem; }
+  .month-card.large-view .stamp-grid { gap: 5px; padding: 5px; }
+
+  .month-card.small-view {
+    width: 620px;
+    padding: 0.8rem;
+    flex: 0 0 auto;
+  }
+  .month-card.small-view .placeholder-day { font-size: 1.1rem; }
+  .month-card.small-view .weekday-header { font-size: 0.65rem; }
+  .month-card.small-view .stamp-grid { gap: 4px; padding: 4px; }
+
+  .month-card {
+    background: #faf6f0;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px -6px rgba(60,40,20,0.15), 0 0 0 1px #e7dcd0;
+    border: 1px solid #d9cdbe;
+  }
+  .month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    padding: 0 0.2rem 0.3rem;
+    border-bottom: 1px dashed #cfbfae;
+  }
+  .month-title { font-size: 1.3rem; font-weight: 600; color: #3e2c1b; }
+  .month-year {
+    font-size: 0.9rem;
+    color: #8b7a68;
+    background: #ede4d9;
+    padding: 0.1rem 0.6rem;
+    border-radius: 20px;
+  }
+  .stamp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f2ebe2;
+    border-radius: 10px;
+  }
+  .weekday-header {
+    font-weight: 600;
+    color: #9a8875;
+    text-align: center;
+    padding: 0.2rem 0;
+  }
+  .date-cell {
+    position: relative;
+    aspect-ratio: 1/1;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .date-cell.empty {
+    background: #ece3d9;
+    opacity: 0.4;
+    pointer-events: none;
+    box-shadow: none;
+  }
+  .stamp {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 0 0 1px rgba(220,200,175,0.7), 1px 1px 3px rgba(80,60,40,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stamp img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .placeholder-day {
+    font-weight: 500;
+    color: #8b7a68;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .delete-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(80, 60, 40, 0.75);
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+    padding: 0;
+    font-family: sans-serif;
+  }
+  .date-cell:hover .delete-btn {
+    opacity: 1;
+  }
+  .delete-btn:hover {
+    background: rgba(180, 60, 40, 0.9);
+  }
+
+  .continuous-card {
+    background: #faf6f0;
+    border-radius: 16px;
+    padding: 0.7rem;
+    box-shadow: 0 8px 16px -6px rgba(60,40,20,0.15), 0 0 0 1px #e7dcd0;
+    border: 1px solid #d9cdbe;
+    width: 100%;
+    max-width: 760px;
+  }
+  .continuous-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    padding: 0 0.2rem 0.3rem;
+    border-bottom: 1px dashed #cfbfae;
+  }
+  .continuous-title { font-size: 1rem; font-weight: 600; color: #3e2c1b; }
+  .continuous-range {
+    font-size: 0.75rem;
+    color: #8b7a68;
+    background: #ede4d9;
+    padding: 0.1rem 0.6rem;
+    border-radius: 20px;
+  }
+  .continuous-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    padding: 3px;
+    background: #f2ebe2;
+    border-radius: 10px;
+  }
+  .continuous-grid .weekday-header {
+    font-size: 0.55rem;
+    padding: 0.1rem 0;
+  }
+  .continuous-grid .placeholder-day {
+    font-size: 0.8rem;
+  }
+  .continuous-grid .delete-btn {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    top: 2px;
+    right: 2px;
+  }
+
+  .date-cell.alt-bg {
+    background: #faf3ea;
+  }
+  .date-cell.alt-bg .stamp {
+    background: #faf3ea;
+  }
+
+  .no-months-message {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #e8dfd3;
+    border-radius: 40px;
+    color: #7f6b56;
+    font-size: 1.1rem;
+    border: 1px dashed #b09b84;
+    width: 100%;
+  }
+  .footer-note { margin-top: 2rem; color: #9a8875; font-size: 0.8rem; }
+
+  @media (max-width: 800px) {
+    .control-panel { flex-direction: column; align-items: stretch; border-radius: 30px; }
+    .view-options { justify-content: center; }
+    .month-card.large-view { width: 100%; min-width: 480px; }
+    .month-card.small-view { width: 100%; min-width: 380px; }
+    .continuous-card { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <h1>✧ 邮票月历 ✧</h1>
+  <div class="subhead">压印小纸片 · 拼贴时光</div>
+
+  <div class="control-panel">
+    <div class="input-group">
+      <label for="startDate">起始日期</label>
+      <input type="date" id="startDate">
+    </div>
+    <div class="input-group">
+      <label for="endDate">结束日期</label>
+      <input type="date" id="endDate">
+    </div>
+    <div class="input-group" style="min-width:auto;">
+      <label>视图模式</label>
+      <div class="view-options" id="viewOptions">
+        <button class="view-btn active" data-view="single">单月</button>
+        <button class="view-btn" data-view="multi">多月</button>
+      </div>
+    </div>
+    <div class="input-group" style="min-width:auto;" id="dirGroup">
+      <label>单月方向</label>
+      <div class="view-options" id="dirOptions">
+        <button class="dir-btn active" data-dir="vertical">纵向</button>
+        <button class="dir-btn" data-dir="horizontal">横向</button>
+      </div>
+    </div>
+    <div class="input-group" style="min-width:auto;" id="sizeGroup">
+      <label>单月大小</label>
+      <div class="view-options" id="sizeOptions">
+        <button class="dir-btn active" data-size="large">大视图</button>
+        <button class="dir-btn" data-size="small">小视图</button>
+      </div>
+    </div>
+    <div class="upload-area">
+      <i class="fas fa-camera"></i>
+      <button class="upload-btn" id="uploadBtn">上传图片</button>
+      <input type="file" id="fileInput" accept="image/*">
+      <span class="range-note" id="rangeNote"></span>
+    </div>
+  </div>
+
+  <div class="calendar-collection" id="calendarCollection"></div>
+  <div class="footer-note">点击任意日期格子即可上传图片，再次点击可更换；悬停在有图片的格子上可点击右上角 × 删除</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'stamp_calendar_images';
+  const LEGACY_KEYS = [
+    'stamp_calendar_images_v10',
+    'stamp_calendar_images_v9',
+    'stamp_calendar_images_v8',
+    'stamp_calendar_images_v7',
+    'stamp_calendar_images_v6',
+    'stamp_calendar_images_v5',
+    'stamp_calendar_images_v4',
+    'stamp_calendar_images_v3',
+    'stamp_calendar_images_v2',
+    'stamp_calendar_images_v1'
+  ];
+
+  let imageStore = loadImages();
+
+  function migrateLegacyKeys() {
+    let current = null;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) current = JSON.parse(raw);
+    } catch {}
+    if (current && Object.keys(current).length > 0) return current;
+
+    const merged = current && typeof current === 'object' ? current : {};
+    let changed = false;
+    LEGACY_KEYS.forEach(k => {
+      try {
+        const raw = localStorage.getItem(k);
+        if (!raw) return;
+        const obj = JSON.parse(raw);
+        Object.keys(obj).forEach(date => {
+          if (!merged[date]) {
+            merged[date] = obj[date];
+            changed = true;
+          }
+        });
+      } catch {}
+    });
+    if (changed) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      } catch {}
+    }
+    return merged;
+  }
+
+  function loadImages() {
+    const data = migrateLegacyKeys();
+    const map = new Map();
+    if (data && typeof data === 'object') {
+      Object.keys(data).forEach(k => map.set(k, data[k]));
+    }
+    return map;
+  }
+
+  function saveImagesToStorage() {
+    try {
+      const obj = {};
+      imageStore.forEach((v, k) => obj[k] = v);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    } catch {
+      alert('本地存储空间不足，部分图片可能无法保存。');
+    }
+  }
+
+  function compressImage(file, maxSize = 600, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = Math.round(height * maxSize / width);
+              width = maxSize;
+            } else {
+              width = Math.round(width * maxSize / height);
+              height = maxSize;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function formatDate(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function dateKey(y, m, d) {
+    return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  }
+
+  function updateRangeNote() {
+    const s = document.getElementById('startDate').value;
+    const e = document.getElementById('endDate').value;
+    document.getElementById('rangeNote').textContent = (s && e) ? `${s} ~ ${e}` : '';
+  }
+
+  const calendarContainer = document.getElementById('calendarCollection');
+  const MONTH_NAMES = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  const WEEKDAYS = ['日','一','二','三','四','五','六'];
+
+  let currentView = 'single';
+  let singleDir = 'vertical';
+  let singleSize = 'large';
+
+  function getMonthsBetween(start, end) {
+    const months = [];
+    let cur = new Date(start.getFullYear(), start.getMonth(), 1);
+    const last = new Date(end.getFullYear(), end.getMonth(), 1);
+    while (cur <= last) {
+      months.push({ year: cur.getFullYear(), month: cur.getMonth() });
+      cur.setMonth(cur.getMonth() + 1);
+    }
+    return months;
+  }
+
+  function buildStampCell(y, m, d, altBg) {
+    const key = dateKey(y, m + 1, d);
+    const img = imageStore.get(key);
+    const hasImg = !!img;
+    const inner = hasImg
+      ? `<div class="stamp"><img src="${img}" loading="lazy"></div>`
+      : `<div class="stamp"><div class="placeholder-day">${d}</div></div>`;
+    const delBtn = hasImg
+      ? `<button class="delete-btn" data-delete="${key}" title="删除这张图片">×</button>`
+      : '';
+    return `<div class="date-cell${altBg ? ' alt-bg' : ''}" data-date="${key}">${inner}${delBtn}</div>`;
+  }
+
+  function createMonthCard(year, month, size) {
+    const firstDow = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    let cells = WEEKDAYS.map(w => `<div class="weekday-header">${w}</div>`).join('');
+    for (let i = 0; i < firstDow; i++) cells += `<div class="date-cell empty"></div>`;
+    for (let d = 1; d <= days; d++) cells += buildStampCell(year, month, d, false);
+    const total = firstDow + days;
+    const rem = total % 7;
+    if (rem !== 0) for (let i = 0; i < 7 - rem; i++) cells += `<div class="date-cell empty"></div>`;
+
+    const cls = size === 'small' ? 'month-card small-view' : 'month-card large-view';
+    return `
+      <div class="${cls}">
+        <div class="month-header">
+          <span class="month-title">${MONTH_NAMES[month]}</span>
+          <span class="month-year">${year}</span>
+        </div>
+        <div class="stamp-grid">${cells}</div>
+      </div>
+    `;
+  }
+
+  function createContinuousCard(start, end) {
+    let cells = WEEKDAYS.map(w => `<div class="weekday-header">${w}</div>`).join('');
+
+    let cur = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+    const firstDow = cur.getDay();
+    for (let i = 0; i < firstDow; i++) cells += `<div class="date-cell empty"></div>`;
+
+    let lastMonthKey = null;
+    let altToggle = false;
+
+    while (cur <= last) {
+      const y = cur.getFullYear();
+      const m = cur.getMonth();
+      const monthKey = `${y}-${m}`;
+      if (monthKey !== lastMonthKey) {
+        if (lastMonthKey !== null) altToggle = !altToggle;
+        lastMonthKey = monthKey;
+      }
+      cells += buildStampCell(y, m, cur.getDate(), altToggle);
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    const lastDow = last.getDay();
+    if (lastDow !== 6) {
+      for (let i = 0; i < 6 - lastDow; i++) cells += `<div class="date-cell empty"></div>`;
+    }
+
+    return `
+      <div class="continuous-card">
+        <div class="continuous-header">
+          <span class="continuous-title">多月连续</span>
+          <span class="continuous-range">${formatDate(start)} ~ ${formatDate(end)}</span>
+        </div>
+        <div class="continuous-grid">${cells}</div>
+      </div>
+    `;
+  }
+
+  function renderCalendar() {
+    const s = document.getElementById('startDate').value;
+    const e = document.getElementById('endDate').value;
+    if (!s || !e) {
+      calendarContainer.innerHTML = `<div class="no-months-message">请选择日期范围</div>`;
+      return;
+    }
+    const start = new Date(s);
+    const end = new Date(e);
+    if (start > end) {
+      calendarContainer.innerHTML = `<div class="no-months-message">起始日期不能晚于结束日期</div>`;
+      return;
+    }
+
+    if (currentView === 'single') {
+      const months = getMonthsBetween(start, end);
+      if (!months.length) {
+        calendarContainer.innerHTML = `<div class="no-months-message">范围内没有月份</div>`;
+        return;
+      }
+      let cls = 'calendar-collection';
+      if (singleDir === 'vertical') {
+        cls += ' vertical';
+      } else {
+        cls += ' horizontal-scroll';
+      }
+      calendarContainer.className = cls;
+      calendarContainer.innerHTML = months.map(({ year, month }) => createMonthCard(year, month, singleSize)).join('');
+    } else {
+      calendarContainer.className = 'calendar-collection';
+      calendarContainer.innerHTML = createContinuousCard(start, end);
+    }
+  }
+
+  function initDateClickDelegate() {
+    calendarContainer.addEventListener('click', e => {
+      const delBtn = e.target.closest('.delete-btn');
+      if (delBtn) {
+        e.stopPropagation();
+        const key = delBtn.dataset.delete;
+        if (key && imageStore.has(key)) {
+          imageStore.delete(key);
+          saveImagesToStorage();
+          renderCalendar();
+        }
+        return;
+      }
+
+      const cell = e.target.closest('.date-cell');
+      if (!cell || cell.classList.contains('empty')) return;
+      const key = cell.dataset.date;
+      if (!key) return;
+      const fileInput = document.getElementById('fileInput');
+      fileInput.dataset.targetDate = key;
+      fileInput.click();
+    });
+  }
+
+  async function handleFileUpload(e) {
+    const file = e.target.files[0];
+    const target = e.target.dataset.targetDate;
+    if (!file || !target) {
+      e.target.value = '';
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      alert('请选择图片文件');
+      e.target.value = '';
+      return;
+    }
+    try {
+      const dataURL = await compressImage(file, 600, 0.7);
+      imageStore.set(target, dataURL);
+      saveImagesToStorage();
+      renderCalendar();
+    } catch {
+      alert('图片处理失败');
+    } finally {
+      e.target.value = '';
+      delete e.target.dataset.targetDate;
+    }
+  }
+
+  function initRangeListeners() {
+    const s = document.getElementById('startDate');
+    const e = document.getElementById('endDate');
+    const update = () => {
+      if (s.value && e.value) {
+        if (new Date(s.value) > new Date(e.value)) {
+          alert('起始日期不能晚于结束日期');
+          return;
+        }
+        updateRangeNote();
+        renderCalendar();
+      }
+    };
+    s.addEventListener('change', update);
+    e.addEventListener('change', update);
+  }
+
+  function initViewSwitcher() {
+    document.getElementById('viewOptions').addEventListener('click', e => {
+      const btn = e.target.closest('.view-btn');
+      if (!btn) return;
+      document.querySelectorAll('#viewOptions .view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      document.getElementById('dirGroup').style.display = currentView === 'single' ? '' : 'none';
+      document.getElementById('sizeGroup').style.display = currentView === 'single' ? '' : 'none';
+      renderCalendar();
+    });
+  }
+
+  function initDirSwitcher() {
+    document.getElementById('dirOptions').addEventListener('click', e => {
+      const btn = e.target.closest('.dir-btn');
+      if (!btn) return;
+      document.querySelectorAll('#dirOptions .dir-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      singleDir = btn.dataset.dir;
+      renderCalendar();
+    });
+  }
+
+  function initSizeSwitcher() {
+    document.getElementById('sizeOptions').addEventListener('click', e => {
+      const btn = e.target.closest('.dir-btn');
+      if (!btn) return;
+      document.querySelectorAll('#sizeOptions .dir-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      singleSize = btn.dataset.size;
+      renderCalendar();
+    });
+  }
+
+  function initUploadButton() {
+    document.getElementById('uploadBtn').addEventListener('click', () => {
+      alert('请先点击月历中的任意日期格子，再选择图片上传。');
+    });
+  }
+
+  function initDateInputs() {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 3, 0);
+    document.getElementById('startDate').value = formatDate(start);
+    document.getElementById('endDate').value = formatDate(end);
+    updateRangeNote();
+  }
+
+  function init() {
+    initDateInputs();
+    initRangeListeners();
+    initViewSwitcher();
+    initDirSwitcher();
+    initSizeSwitcher();
+    initUploadButton();
+    initDateClickDelegate();
+    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+    renderCalendar();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
