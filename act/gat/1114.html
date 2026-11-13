@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>台生研究生复试准备及面试技巧 - 总文稿与展示</title>
+<title>台生研究生复试准备及面试技巧</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
 
@@ -14,6 +14,8 @@
         --border-color: #E0E0E0;
         --text-gray: #666666;
         --accent-orange: #E8833A;
+        --z001-color: #6B5B95;
+        --z002-color: #5E7C89;
     }
 
     body {
@@ -282,46 +284,6 @@
     .flow-label-dark { background-color: #555; }
     .flow-label-red { background-color: var(--primary-red); }
 
-    .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        height: 480px;
-    }
-
-    .gallery-item {
-        background-color: var(--bg-gray);
-        border-radius: 4px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .gallery-img {
-        flex: 1;
-        background-color: #CCC;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #777;
-        font-size: 12px;
-        position: relative;
-        box-sizing: border-box;
-        padding: 15px;
-    }
-
-    .vertical-text {
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
-        font-weight: 900;
-        font-size: 15px;
-        color: var(--primary-red);
-        padding: 6px;
-        position: absolute;
-        z-index: 10;
-        letter-spacing: 2px;
-    }
-
     .label-box {
         flex: 0 0 65px;
         background: var(--primary-red);
@@ -361,6 +323,44 @@
         color: #8A6D3B;
         margin-bottom: 12px;
         line-height: 1.5;
+    }
+
+    /* 新增 Z001/Z002 对比表格专属样式 */
+    .z-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .z-table th {
+        background-color: var(--z001-color);
+        color: white;
+        padding: 6px 8px;
+        font-weight: bold;
+        border: 1px solid #ddd;
+    }
+    .z-table th:nth-child(2) {
+        background-color: var(--z001-color);
+    }
+    .z-table th:nth-child(3) {
+        background-color: var(--z002-color);
+    }
+    .z-table th:last-child {
+        background-color: #888;
+    }
+    .z-table td {
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        line-height: 1.4;
+    }
+    .z-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .z-table td:first-child {
+        font-weight: bold;
+        background-color: #f4f5f7;
+        text-align: left;
     }
 
 </style>
@@ -500,55 +500,83 @@
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
 
-    <!-- Slide 4: 合并页（Z001/Z002区别 + 备考经验） -->
+    <!-- Slide 4: Z001/Z002 区别与备考经验（合并页） -->
     <div class="ppt-slide">
         <div class="slide-header">Z001与Z002的区别及初试备考经验</div>
 
         <div class="split-layout">
             <div class="split-left">
-                <div class="card" style="margin-bottom: 15px; padding: 12px 16px;">
-                    <div style="font-size: 14px; font-weight: bold; color: var(--primary-red); margin-bottom: 6px;">Z001（综合能力一） vs Z002（综合能力二）</div>
-                    <div style="font-size: 12px; line-height: 1.6; color: #333;">
-                        港澳台联考初试科目分为 Z001（综合能力一）和 Z002（综合能力二）。<b>Z001 适用于报考人文社科、经管、理工等大部分专业</b>（具体以当年招生简章及专业目录为准）。Z001 考试内容涵盖三科：逻辑推理、英文、中华文化。
+                <div class="card" style="margin-bottom: 12px; padding: 12px 16px; background-color: #FFF8E7; border-color: #F0D89A;">
+                    <div style="font-size: 14px; font-weight: bold; color: var(--primary-red); margin-bottom: 6px;">Z001 与 Z002 区别（二选一）</div>
+                    <div style="font-size: 12px; line-height: 1.6; color: #333; margin-bottom: 8px;">
+                        港澳台联考初试科目分为 <b>Z001（综合能力一）</b> 和 <b>Z002（综合能力二）</b>。考生<b>二选一，只考1门</b>（由目标院校招生简章指定）。满分150分，3小时全客观选择题，可选机考/纸笔笔试。
+                    </div>
+                    <table class="z-table">
+                        <tr>
+                            <th style="width: 20%;">三大模块</th>
+                            <th style="width: 40%;">综合能力（一）Z001<br>（偏文科/商科）</th>
+                            <th style="width: 40%;">综合能力（二）Z002<br>（偏理工科）</th>
+                        </tr>
+                        <tr>
+                            <td>中华文化</td>
+                            <td>文化常识 20题 × 2分 = 40分；<br>阅读理解 5题 × 3分 = 15分</td>
+                            <td>文化常识 20题 × 2分 = 40分；<br>阅读理解 5题 × 3分 = 15分</td>
+                        </tr>
+                        <tr>
+                            <td>英语运用</td>
+                            <td>语言知识 20题 × 1分 = 20分；<br>阅读理解 10题 × 3分 = 30分</td>
+                            <td>语言知识 20题 × 1分 = 20分；<br>阅读理解 10题 × 3分 = 30分</td>
+                        </tr>
+                        <tr>
+                            <td>逻辑/数学</td>
+                            <td><b>逻辑推理：</b>15题 × 3分 = 45分</td>
+                            <td><b>数学基础：</b>15题 × 3分 = 45分</td>
+                        </tr>
+                        <tr>
+                            <td>试卷总分</td>
+                            <td>150分</td>
+                            <td>150分</td>
+                        </tr>
+                    </table>
+                    <div style="font-size: 11px; color: #666; line-height: 1.5;">
+                        * 考试成绩采取“立体呈现”方式，既呈现总成绩，也分项呈现各模块单项成绩。<br>
+                        * 目前大部分院校已采用统考科目，部分院校仍自主命题。
                     </div>
                 </div>
 
-                <div class="card" style="margin-bottom: 12px; padding: 12px 16px;">
-                    <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">逻辑推理</div>
-                    <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px;">
-                        <li>满分45分，推荐目标门槛分 <span class="text-highlight">27-30分</span>。</li>
-                        <li>推荐B站课程：<b>李焕的逻辑72计</b>。</li>
-                        <li>上完课后细心做题，难度不是特别大。</li>
-                    </ul>
-                </div>
-
-                <div class="card" style="padding: 12px 16px;">
-                    <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">英文</div>
-                    <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px;">
-                        <li>难度介于四到六级之间。</li>
-                        <li>推荐工具：<b>扇贝单词、扇贝阅读</b>，搭配陌陌、不背单词等APP混搭使用。</li>
-                        <li>用 Goodnote 做文法补充笔记。</li>
-                        <li>推荐目标门槛要过 <span class="text-highlight">30分线</span>。</li>
-                        <li><b>阅读题：</b>可以刷英语二的真题，阅读题不难，考试的时间足够进行全篇通读。</li>
-                        <li><b>语法题：</b>一大部分是词义辨析题，还有一部分考察语法知识。语法知识部分可以刷一些语法选择题库，在学校图书馆借语法书做题。</li>
-                    </ul>
+                <div class="card" style="padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                        <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">中华文化（Z001/Z002 通用，55分）</div>
+                        <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px;">
+                            <li>知识点最散，不一定能精确复习到。考的不只是历史，还包括艺术、哲学等细节（如顾恺之、展子虔、中国制图之父等）。</li>
+                            <li>25年考了好几题诗词题，跟24年的考法完全不一样。建议看B站考公相关知识点课程。</li>
+                            <li>针对诗词曲格律部分可看《中华文化史概要》这本书，并结合网络视频学习。</li>
+                            <li>有学长姐反馈：练了几千题但实际没考几道，备考范围确实很广。</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">英语运用（Z001/Z002 通用，50分）</div>
+                        <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px;">
+                            <li>难度介于四到六级之间。推荐工具：<b>扇贝单词、扇贝阅读</b>，搭配陌陌、不背单词等APP混搭使用。用 Goodnote 做文法补充笔记。</li>
+                            <li><b>语言知识：</b>一大部分是词义辨析题，还有一部分考察语法知识。语法知识部分可以刷一些语法选择题库，在学校图书馆借语法书做题。</li>
+                            <li><b>阅读理解：</b>可以刷英语二的真题，阅读题不难，考试的时间足够进行全篇通读。</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <div class="split-right">
-                <div class="card" style="padding: 15px; height: 100%; display: flex; flex-direction: column; gap: 12px;">
+                <div class="card" style="padding: 15px; height: 100%; display: flex; flex-direction: column; gap: 15px;">
                     <div>
-                        <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">中华文化（难度最高、知识点最散）</div>
-                        <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px; margin-bottom: 8px;">
-                            <li>不一定能精确复习到考试内容，考的不只是历史，还包括艺术、哲学等细节（如顾恺之、展子虔、中国制图之父等）。</li>
-                            <li>科目范围无穷无尽，25年考了好几题诗词题，跟24年的考法完全不一样。</li>
-                            <li>建议看B站考公相关知识点课程。</li>
-                            <li>针对诗词曲格律部分可看《中华文化史概要》这本书，并结合网络上的视频学习。</li>
-                            <li>也有学长姐反馈过：中华文化练了几千题，但实际没考几道，备考范围确实很广。</li>
+                        <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">逻辑推理（仅Z001，45分）</div>
+                        <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px;">
+                            <li>满分45分，推荐目标门槛分 <span class="text-highlight">27-30分</span>。</li>
+                            <li>推荐B站课程：<b>李焕的逻辑72计</b>。</li>
+                            <li>上完课后细心做题，难度不是特别大。</li>
                         </ul>
                     </div>
-                    <div>
-                        <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">数学基础</div>
+                    <div style="border-top: 1px dashed #ddd; padding-top: 15px;">
+                        <div style="font-weight: bold; font-size: 14px; color: var(--primary-red); margin-bottom: 6px;">数学基础（仅Z002，45分）</div>
                         <ul style="font-size: 12px; line-height: 1.6; padding-left: 15px;">
                             <li>这一部分主要考察微积分，包括一元函数微分学，一元函数积分学，多元函数微分学。</li>
                             <li>题目考察得很基础，主要是一些定义，还有一些细节，建议可以直接把本科课本课后题做通透了。</li>
@@ -950,65 +978,6 @@
                     <ul style="font-size: 12px; line-height: 1.4; padding-left: 15px;">
                         <li>不必过分正式，整洁舒适为主</li>
                     </ul>
-                </div>
-            </div>
-        </div>
-        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
-    </div>
-
-    <!-- Slide 9: 生活分享 -->
-    <div class="ppt-slide">
-        <div class="slide-header">交通大学台生研究生生活分享</div>
-
-        <div class="vertical-text" style="top: 85px; left: 15px;">徐汇区台生聚餐</div>
-        <div class="vertical-text" style="top: 85px; left: 415px;">医学院开学聚餐</div>
-        <div class="vertical-text" style="top: 85px; right: 415px;">台湾校友会及台生会活动</div>
-        <div class="vertical-text" style="top: 85px; right: 15px;">研究生实习讲座</div>
-
-        <div style="margin-left: 60px; height: calc(100% - 85px); box-sizing: border-box; margin-right: 60px;">
-            <div class="gallery-grid" style="box-sizing: border-box;">
-                <div class="gallery-item" style="grid-row: span 2;">
-                    <div class="gallery-img">聚餐合影占位</div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-img">活动合影占位</div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-img">聚餐合影占位</div>
-                </div>
-                <div class="gallery-item">
-                    <div class="gallery-img">开学聚餐占位</div>
-                </div>
-                <div class="gallery-item" style="grid-column: span 2; display: flex; flex-direction: row;">
-                    <div class="gallery-img" style="flex: 1; border-right: 1px solid #ddd; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 15px;">
-                        <div style="text-align: left; width: 100%;">
-                            <div style="font-weight: bold; margin-bottom: 6px; font-size: 13px; color: #333;">个人简介</div>
-                            <div style="font-size: 11px; text-align: left; line-height: 1.6; color: #555;">
-                                <b>学习经历</b><br>
-                                • 16级上海交大安泰<br>
-                                • 14级上海交大密西根<br>
-                                <b>实习经历</b><br>
-                                • 中银国际证券投行部<br>
-                                • 兴业证券投资银行<br>
-                                <b>项目经验</b><br>
-                                • 参与沪深IPO项目财务核查及芯片半导体可转债
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gallery-img" style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 15px;">
-                        <div style="text-align: left; width: 100%;">
-                            <div style="font-weight: bold; margin-bottom: 6px; font-size: 13px; color: #333;">个人简介</div>
-                            <div style="font-size: 11px; text-align: left; line-height: 1.6; color: #555;">
-                                <b>经历</b><br>
-                                • 本科：台湾政治大学<br>
-                                • 硕士：上海交大安泰经管学院<br>
-                                <b>实习</b><br>
-                                • 麦肯锡咨询公司<br>
-                                • 中信建投证券研究所<br>
-                                • 上海交大高级金融学院
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
