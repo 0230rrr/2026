@@ -14,20 +14,22 @@
         --border-color: #E0E0E0;
         --text-gray: #666666;
         --accent-orange: #E8833A;
-        --z001-color: #6B5B95;
-        --z002-color: #5E7C89;
+        --z001-color: #555555; 
+        --z002-color: #A04040; 
+        --sjtu-red: #B01F24; 
+        --zju-blue: #003F88; 
     }
 
     body {
         background-color: #D1D5DB;
         font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
-        padding: 30px 0;
+        padding: 20px 0;
         color: var(--primary-dark);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 35px;
+        gap: 25px;
     }
 
     .ppt-slide {
@@ -38,15 +40,15 @@
         position: relative;
         overflow: hidden;
         box-sizing: border-box;
-        padding: 38px 55px 62px 55px;
+        padding: 25px 45px 45px 45px; /* 整体压缩内边距 */
     }
 
     .slide-header {
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 900;
         color: var(--primary-red);
-        margin-bottom: 16px;
-        padding-bottom: 10px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
         border-bottom: 2px solid var(--primary-red);
         display: flex;
         align-items: center;
@@ -61,13 +63,27 @@
         background-color: #444;
         padding: 3px 8px;
         border-radius: 10px;
-        margin-right: 15px;
+        margin-right: 12px;
         letter-spacing: 1px;
+    }
+
+    /* 标题下方的极低透明度水印 */
+    .slide-header::after {
+        content: "© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有";
+        position: absolute;
+        top: 70px;
+        left: 45px;
+        font-size: 12px;
+        font-weight: 400;
+        color: #999;
+        opacity: 0.15;
+        letter-spacing: 0px;
+        pointer-events: none;
     }
 
     .slide-footer {
         position: absolute;
-        bottom: 10px;
+        bottom: 8px;
         left: 0;
         width: 100%;
         text-align: center;
@@ -84,22 +100,16 @@
         color: white;
         font-size: 16px;
         font-weight: 700;
-        padding: 6px 16px;
+        padding: 5px 14px;
         display: inline-block;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
         border-radius: 2px;
-    }
-
-    .flex-row {
-        display: flex;
-        gap: 18px;
-        margin-bottom: 16px;
     }
 
     .card {
         background-color: var(--bg-gray);
         border: 1px solid var(--border-color);
-        padding: 12px;
+        padding: 10px 14px;
         border-radius: 4px;
         box-sizing: border-box;
         word-break: break-word;
@@ -107,11 +117,10 @@
 
     .text-highlight {
         color: var(--primary-red);
-        font-weight: 700;
     }
 
     .text-small {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--text-gray);
         line-height: 1.5;
     }
@@ -119,25 +128,26 @@
     ul {
         margin: 0;
         padding-left: 18px;
-        font-size: 12px;
-        line-height: 1.6;
+        font-size: 13px;
+        line-height: 1.5;
     }
 
     li {
-        margin-bottom: 5px;
+        margin-bottom: 4px;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 12px;
-        margin-bottom: 12px;
+        font-size: 13px;
+        margin-bottom: 10px;
     }
 
     th, td {
         border: 1px solid var(--border-color);
-        padding: 8px 12px;
+        padding: 6px 10px;
         text-align: left;
+        line-height: 1.4;
     }
 
     th {
@@ -152,7 +162,7 @@
     .grid-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 25px;
+        gap: 15px;
         height: 100%;
     }
 
@@ -166,7 +176,6 @@
         text-align: center;
         line-height: 18px;
         font-size: 11px;
-        font-weight: bold;
         margin-right: 6px;
         flex-shrink: 0;
     }
@@ -174,7 +183,7 @@
     .split-layout {
         display: flex;
         height: calc(100% - 10px);
-        gap: 25px;
+        gap: 20px;
     }
 
     .split-left {
@@ -194,11 +203,11 @@
         align-items: center;
         justify-content: center;
         color: #999;
-        font-size: 11px;
-        height: 80px;
-        margin-bottom: 10px;
+        font-size: 12px;
+        height: 70px;
+        margin-bottom: 8px;
         box-sizing: border-box;
-        padding: 6px;
+        padding: 5px;
         text-align: center;
     }
 
@@ -206,7 +215,7 @@
         display: flex;
         justify-content: space-between;
         position: relative;
-        margin: 16px 0;
+        margin: 12px 0;
     }
     .timeline::before {
         content: '';
@@ -235,33 +244,32 @@
         box-sizing: border-box;
     }
     .timeline-title {
+        font-size: 13px;
         font-weight: 700;
-        font-size: 12px;
     }
     .timeline-date {
-        font-size: 11px;
+        font-size: 12px;
         color: var(--primary-red);
-        font-weight: 700;
         margin-top: 2px;
     }
 
     .flow-row {
         display: flex;
         align-items: stretch;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .flow-label {
         background-color: var(--accent-orange);
         color: white;
         padding: 8px 12px;
-        font-weight: 700;
         width: 75px;
         text-align: center;
         clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
         margin-right: -10px;
         z-index: 2;
         font-size: 13px;
+        font-weight: 700;
         box-sizing: border-box;
         flex-shrink: 0;
         display: flex;
@@ -271,9 +279,9 @@
 
     .flow-content {
         background-color: var(--bg-gray);
-        padding: 8px 12px 8px 22px;
+        padding: 8px 12px 8px 20px;
         flex: 1;
-        font-size: 11px;
+        font-size: 12px;
         line-height: 1.5;
         z-index: 1;
         box-sizing: border-box;
@@ -289,9 +297,9 @@
         background: var(--primary-red);
         color: white;
         text-align: center;
-        padding: 12px 0;
-        font-weight: bold;
+        padding: 10px 0;
         font-size: 13px;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -301,13 +309,13 @@
 
     .inner-tag {
         flex: 0 0 55px;
-        font-weight: bold;
         background: #888;
         color: white;
         text-align: center;
         border-radius: 2px;
-        padding: 4px;
+        padding: 5px;
         font-size: 12px;
+        font-weight: 700;
         height: fit-content;
         display: flex;
         align-items: center;
@@ -317,19 +325,18 @@
     .notice-box {
         background-color: #FFF8E7;
         border: 1px solid #F0D89A;
-        padding: 8px 14px;
+        padding: 6px 12px;
         border-radius: 4px;
-        font-size: 11px;
+        font-size: 12px;
         color: #8A6D3B;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         line-height: 1.5;
     }
 
-    /* Z001/Z002 对比表格专属样式 */
     .z-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 12px;
+        font-size: 13px;
         margin-bottom: 12px;
         text-align: center;
     }
@@ -337,9 +344,8 @@
         background-color: var(--z001-color);
         color: white;
         padding: 8px 10px;
-        font-weight: bold;
         border: 1px solid #ddd;
-        font-size: 13px;
+        font-size: 14px;
     }
     .z-table th:nth-child(2) {
         background-color: var(--z001-color);
@@ -359,7 +365,6 @@
         background-color: #f9f9f9;
     }
     .z-table td:first-child {
-        font-weight: bold;
         background-color: #f4f5f7;
         text-align: left;
     }
@@ -367,8 +372,8 @@
     .z-info-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 12px;
+        gap: 10px;
+        margin-bottom: 10px;
     }
     
     .z-info-box {
@@ -379,168 +384,165 @@
         font-size: 12px;
         line-height: 1.5;
     }
+
+    .score-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        height: calc(100% - 10px);
+    }
+    .score-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    .score-table th {
+        background-color: var(--primary-dark);
+        color: white;
+        padding: 8px 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+    .score-table td {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        line-height: 1.4;
+    }
+    .score-table td:first-child {
+        text-align: center;
+        width: 25%;
+        color: var(--primary-red);
+    }
+    .score-table td:last-child {
+        text-align: left;
+        padding-left: 15px;
+    }
+    .score-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .compare-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        height: calc(100% - 30px);
+        padding-top: 5px;
+    }
+    .compare-side {
+        width: 46%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .compare-logo-placeholder {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #fff;
+        margin-bottom: 10px;
+        background-color: #eee;
+        border: 2px solid #ddd;
+    }
+    .compare-title {
+        font-size: 32px;
+        margin-bottom: 20px;
+        font-family: 'KaiTi', 'STKaiti', serif;
+    }
+    .compare-list {
+        width: 100%;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .compare-list li {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+        font-size: 16px;
+        line-height: 1.4;
+        margin-bottom: 0;
+    }
+    .compare-list li::before {
+        content: "●";
+        font-size: 10px;
+        margin-right: 12px;
+    }
+
+    /* 示例边框样式 */
+    .example-box {
+        border: 1px dashed #aaa;
+        padding: 10px;
+        border-radius: 4px;
+        position: relative;
+        margin-top: 12px;
+    }
+    .example-badge {
+        position: absolute;
+        top: -10px;
+        left: 15px;
+        background: #fff;
+        color: #555;
+        font-size: 11px;
+        padding: 0 6px;
+        border: 1px solid #aaa;
+        border-radius: 10px;
+    }
+
+    /* 大纲与经验对照样式 */
+    .syllabus-card {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+    }
+    .syllabus-title {
+        font-size: 14px;
+        color: var(--primary-red);
+        font-weight: 700;
+        margin-bottom: 6px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+    }
+    .syllabus-content {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #333;
+    }
+    .exp-card {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+    }
+    .exp-title {
+        font-size: 14px;
+        color: var(--primary-red);
+        font-weight: 700;
+        margin-bottom: 6px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 4px;
+    }
 </style>
 </head>
 <body>
 
-    <!-- Slide 1: 考试方式（现行） -->
-    <div class="ppt-slide">
-        <div class="slide-header">港澳台研究生招生考试方式（现行）</div>
-
-        <div class="section-title">报名手续</div>
-        <p style="font-size: 13px; margin: 0 0 12px 0;">全程<span class="text-highlight">网上报名</span>，无现场确认环节。考生登录“面向港澳台招生信息网”完成报名及缴费。</p>
-
-        <table class="table-center" style="margin-bottom: 12px;">
-            <tr><th>报考地点</th><th>负责单位</th></tr>
-            <tr><td>北京</td><td>北京理工大学（研究生院）</td></tr>
-            <tr><td>广州</td><td>广东省教育考试院</td></tr>
-            <tr><td>上海</td><td>同济大学</td></tr>
-            <tr><td>香港</td><td>京港学术交流中心</td></tr>
-            <tr><td>澳门</td><td>澳门高等教育辅助办公室</td></tr>
-        </table>
-        <div class="text-small" style="margin-bottom: 15px;">*往年考点及负责单位仅供参考</div>
-
-        <div class="section-title">考试内容（材料学院）</div>
-        <table class="table-center" style="margin-bottom: 12px;">
-            <tr><th style="width: 15%;"> </th><th style="width: 42.5%;">现行安排</th></tr>
-            <tr><td style="font-weight: bold;">初试</td><td>统考笔试（机考/传统笔试），科目通常为“综合能力（一）”</td></tr>
-            <tr><td style="font-weight: bold;">复试</td><td>科研计划 + 面试（各学院自行组织）</td></tr>
-        </table>
-
-        <div style="display: flex; align-items: stretch; font-size: 11px; border: 1px solid #eee; padding: 8px; box-sizing: border-box;">
-            <div style="flex: 0 0 45px; background: #eee; padding: 4px; text-align: center; font-weight: bold; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd;">260</div>
-            <div style="flex: 0 0 90px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center; padding: 0 4px;">材料科学与工程学院</div>
-            <div style="flex: 0 0 60px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">专业型</div>
-            <div style="flex: 0 0 60px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">0852</div>
-            <div style="flex: 0 0 70px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">工程硕士</div>
-            <div style="flex: 0 0 70px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">085204</div>
-            <div style="flex: 0 0 90px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">*材料工程</div>
-            <div style="flex: 1; padding-left: 12px; font-size: 11px; line-height: 1.4; box-sizing: border-box; display: flex; align-items: center;">
-                <div>
-                    不区分研究方向<br>
-                    ①201英语一 ②302数学二 ③836材料科学基础<br>
-                    笔试加面试
-                </div>
-            </div>
-        </div>
-        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
-    </div>
-
-    <!-- Slide 2: Z001与Z002的区别（精简版） -->
-    <div class="ppt-slide">
-        <div class="slide-header">Z001 与 Z002 的区别及报考须知</div>
-
-        <div class="card" style="margin-bottom: 15px; padding: 12px 18px; background-color: #FFF8E7; border-color: #F0D89A;">
-            <div style="font-size: 14px; line-height: 1.6; color: #333;">
-                港澳台联考初试由教育部统一命题，考生根据目标院校要求，在 <b>Z001（综合能力一）</b> 和 <b>Z002（综合能力二）</b> 中<b>二选一</b>。两科满分均为 150 分，考试时长 180 分钟（3 小时），<b>全部为单项选择题（客观题）</b>。
-            </div>
-        </div>
-
-        <table class="z-table">
-            <tr>
-                <th style="width: 15%;">三大模块</th>
-                <th style="width: 42.5%;">综合能力（一）Z001<br>（偏文科/商科）</th>
-                <th style="width: 42.5%;">综合能力（二）Z002<br>（偏理工科）</th>
-            </tr>
-            <tr>
-                <td>中华文化</td>
-                <td>文化常识 20题 × 2分 = 40分；<br>阅读理解 5题 × 3分 = 15分</td>
-                <td>文化常识 20题 × 2分 = 40分；<br>阅读理解 5题 × 3分 = 15分</td>
-            </tr>
-            <tr>
-                <td>英语运用</td>
-                <td>语言知识 20题 × 1分 = 20分；<br>阅读理解 10题 × 3分 = 30分</td>
-                <td>语言知识 20题 × 1分 = 20分；<br>阅读理解 10题 × 3分 = 30分</td>
-            </tr>
-            <tr>
-                <td>逻辑/数学</td>
-                <td><b>逻辑推理：</b>15题 × 3分 = 45分</td>
-                <td><b>数学基础：</b>15题 × 3分 = 45分</td>
-            </tr>
-            <tr>
-                <td>试卷总分</td>
-                <td>150分</td>
-                <td>150分</td>
-            </tr>
-        </table>
-
-        <div class="z-info-grid">
-            <div class="z-info-box">
-                <div style="font-weight: bold; color: var(--z001-color); margin-bottom: 4px;">Z001 适用专业方向</div>
-                主要面向文科、社科、教育、传媒、艺术、管理类等方向（如文学、法学、教育学、新闻与传播等）。
-            </div>
-            <div class="z-info-box">
-                <div style="font-weight: bold; color: var(--z002-color); margin-bottom: 4px;">Z002 适用专业方向</div>
-                主要面向理工科、计算机、电子、数理类，以及部分经管类专业（如数学、物理、计算机科学与技术、部分金融或应用统计方向）。
-            </div>
-        </div>
-
-        <div style="font-size: 12.5px; color: #333; line-height: 1.6; background-color: #fee; padding: 12px 15px; border-radius: 4px; border: 1px solid #fcc;">
-            <b style="color: var(--primary-red);">⚠ 核心注意事项：</b><br>
-            1. <b>以目标院校招生简章为准：</b>同一个专业在不同学校可能会要求考不同的科目（例如部分院校的经管类可能要求考 Z002，而另一些院校可能要求考 Z001）。在确定报考目标后，务必去该院校的研究生院官网查看最新的招生专业目录，确认其要求的考试科目代码。<br>
-            2. <b>注意考位抢报：</b>港澳台考研的报名通常在每年 1 月左右在“内地（祖国大陆）高校面向港澳台招生信息网”进行，考位（尤其是内地考点如广州、上海等）非常紧张，建议系统开放时准时蹲守抢位。<br>
-            3. <b>复试准备：</b>初试只考综合卷，没有单独的专业课笔试，专业课的压力会转移到复试阶段。初试结束后应立刻准备复试的专业面试和科研经历梳理。
-        </div>
-        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
-    </div>
-
-    <!-- Slide 3: 初试各科备考经验分享 -->
-    <div class="ppt-slide">
-        <div class="slide-header">初试各科备考经验分享</div>
-
-        <div class="grid-2">
-            <div>
-                <div class="card" style="padding: 15px; margin-bottom: 15px; flex: 1;">
-                    <div style="font-weight: bold; font-size: 15px; color: var(--primary-red); margin-bottom: 8px;">中华文化（Z001/Z002 通用，55分）</div>
-                    <ul style="font-size: 13px; line-height: 1.7; padding-left: 15px;">
-                        <li>知识点最散，不一定能精确复习到。考的不只是历史，还包括艺术、哲学等细节（如顾恺之、展子虔、中国制图之父等）。</li>
-                        <li>25年考了好几题诗词题，跟24年的考法完全不一样。建议看B站考公相关知识点课程。</li>
-                        <li>针对诗词曲格律部分可看《中华文化史概要》这本书，并结合网络视频学习。</li>
-                        <li>有学长姐反馈：练了几千题但实际没考几道，备考范围确实很广。</li>
-                    </ul>
-                </div>
-                <div class="card" style="padding: 15px; flex: 1;">
-                    <div style="font-weight: bold; font-size: 15px; color: var(--primary-red); margin-bottom: 8px;">英语运用（Z001/Z002 通用，50分）</div>
-                    <ul style="font-size: 13px; line-height: 1.7; padding-left: 15px;">
-                        <li>难度介于四到六级之间。推荐工具：<b>扇贝单词、扇贝阅读</b>，搭配陌陌、不背单词等APP混搭使用。用 Goodnote 做文法补充笔记。</li>
-                        <li><b>语言知识：</b>一大部分是词义辨析题，还有一部分考察语法知识。语法知识部分可以刷一些语法选择题库，在学校图书馆借语法书做题。</li>
-                        <li><b>阅读理解：</b>可以刷英语二的真题，阅读题不难，考试的时间足够进行全篇通读。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div>
-                <div class="card" style="padding: 15px; margin-bottom: 15px; flex: 1;">
-                    <div style="font-weight: bold; font-size: 15px; color: var(--primary-red); margin-bottom: 8px;">逻辑推理（仅Z001，45分）</div>
-                    <ul style="font-size: 13px; line-height: 1.7; padding-left: 15px;">
-                        <li>满分45分，推荐目标门槛分 <span class="text-highlight">27-30分</span>。</li>
-                        <li>推荐B站课程：<b>李焕的逻辑72计</b>。</li>
-                        <li>上完课后细心做题，难度不是特别大。</li>
-                    </ul>
-                </div>
-                <div class="card" style="padding: 15px; flex: 1;">
-                    <div style="font-weight: bold; font-size: 15px; color: var(--primary-red); margin-bottom: 8px;">数学基础（仅Z002，45分）</div>
-                    <ul style="font-size: 13px; line-height: 1.7; padding-left: 15px;">
-                        <li>这一部分主要考察微积分，包括一元函数微分学，一元函数积分学，多元函数微分学。</li>
-                        <li>题目考察得很基础，主要是一些定义，还有一些细节，建议可以直接把本科课本课后题做通透了。</li>
-                        <li>针对考纲上要求的内容看了武忠祥的考研数学课，做了660&880，最后考试的时候也没有那么难。</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
-    </div>
-
-    <!-- Slide 4: 上海交大 -->
+    <!-- Slide 1 -->
     <div class="ppt-slide">
         <div class="slide-header">上海交通大学台生研究生申请总览</div>
 
         <div class="split-layout">
             <div class="split-left">
                 <div class="section-title">申请信息</div>
-                <div class="card" style="margin-bottom: 16px; padding: 10px 14px;">
-                    <div style="font-weight: bold; font-size: 13px; margin-bottom: 5px;">报名网址：</div>
-                    <a href="https://www.gatzs.com.cn/" style="color: #0055CC; font-size: 13px; text-decoration: none; word-break: break-all;">https://www.gatzs.com.cn/</a>
+                <div class="card" style="margin-bottom: 12px; padding: 10px 15px;">
+                    <div style="font-size: 14px; margin-bottom: 5px;">报名网址：</div>
+                    <a href="https://www.gatzs.com.cn/" style="color: #0055CC; font-size: 14px; text-decoration: none; word-break: break-all;">https://www.gatzs.com.cn/</a>
                 </div>
 
                 <div class="section-title">申请流程（参考往年）</div>
@@ -583,10 +585,10 @@
                 <div class="notice-box">
                     ⚠ 2027级港澳台招生全国统一时间安排尚未公布。以下为参考往年（2026级）的时间节点，具体日期请以教育部及交大研招网正式公告为准。
                 </div>
-                <div class="card" style="margin-bottom: 16px; padding: 12px;">
-                    <div style="font-weight: bold; font-size: 12px; margin-bottom: 4px; line-height: 1.5;">上海交通大学2027年港澳台招生简章尚未发布。<br>请持续关注交大研招网：<br><span style="color: #0055CC; font-size: 11px;">https://yzb.sjtu.edu.cn</span></div>
+                <div class="card" style="margin-bottom: 12px; padding: 10px 12px;">
+                    <div style="font-size: 12px; margin-bottom: 4px; line-height: 1.5;">上海交通大学2027年港澳台招生简章尚未发布。<br>请持续关注交大研招网：<br><span style="color: #0055CC; font-size: 11px;">https://yzb.sjtu.edu.cn</span></div>
                 </div>
-                <div style="font-size: 11px; font-weight: bold; text-align: center; margin-bottom: 8px;">2026级港澳台研究生参考时间节点</div>
+                <div style="font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 8px;">2026级港澳台研究生参考时间节点</div>
                 <div class="timeline">
                     <div class="timeline-node">
                         <div class="timeline-dot"></div>
@@ -611,38 +613,268 @@
                 </div>
 
                 <div class="section-title">申请提交内容</div>
-                <div style="font-size: 12px; line-height: 1.8;">
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">1</span><span class="text-highlight">证件：</span>台胞证</div>
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">2</span><span class="text-highlight">学历证明：</span>学历/学位证书或国[境]外学历学位认证书原件</div>
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">3</span><span class="text-highlight">推荐信：</span>两位与专业相关的副教授（以上）推荐信</div>
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">4</span><span class="text-highlight">成绩单：</span>大学四年成绩单</div>
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">5</span><span class="text-highlight">简历自传：</span>格式与字数以学院要求为主</div>
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">6</span><span class="text-highlight">毕业论文：</span>以学院要求为主</div>
-                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">7</span><span class="text-highlight">科研成果：</span>以学院要求为主</div>
+                <div style="font-size: 13px; line-height: 1.8;">
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">1</span><span>证件：</span>台胞证</div>
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">2</span><span>学历证明：</span>学历/学位证书或国[境]外学历学位认证书原件</div>
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">3</span><span>推荐信：</span>两位与专业相关的副教授（以上）推荐信</div>
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">4</span><span>成绩单：</span>大学四年成绩单</div>
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">5</span><span>简历自传：</span>格式与字数以学院要求为主</div>
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">6</span><span>毕业论文：</span>以学院要求为主</div>
+                    <div style="display: flex; align-items: flex-start;"><span class="number-circle">7</span><span>科研成果：</span>以学院要求为主</div>
                 </div>
             </div>
         </div>
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
 
-    <!-- Slide 5: 学历学位认证 -->
+    <!-- Slide 2 -->
+    <div class="ppt-slide">
+        <div class="slide-header">上海交通大学2026年港澳台硕士研究生初试分数线（仅供参考）</div>
+        
+        <div class="score-grid">
+            <table class="score-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">分数线</th>
+                        <th style="width: 70%;">学院 / 院系</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>110分</td><td>人工智能学院</td></tr>
+                    <tr><td>100分</td><td>凯原法学院</td></tr>
+                    <tr><td>100分</td><td>船舶海洋与建筑工程学院</td></tr>
+                    <tr><td>100分</td><td>自动化与感知学院</td></tr>
+                    <tr><td>95分</td><td>心理学院（含精神卫生）</td></tr>
+                    <tr><td>91分</td><td>计算机学院</td></tr>
+                    <tr><td>80分</td><td>材料科学与工程学院</td></tr>
+                    <tr><td>80分</td><td>马克思主义学院</td></tr>
+                    <tr><td>80分</td><td>上海交大-南加州大学文化创意产业学院</td></tr>
+                    <tr><td>78分</td><td>中美物流研究院（董浩云研究院）</td></tr>
+                    <tr><td>75分</td><td>医学院</td></tr>
+                </tbody>
+            </table>
+
+            <table class="score-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">分数线</th>
+                        <th style="width: 70%;">学院 / 院系</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>75分</td><td>安泰经济与管理学院</td></tr>
+                    <tr><td>75分</td><td>集成电路学院（信息与电子工程学院）</td></tr>
+                    <tr><td>75分</td><td>数学科学学院</td></tr>
+                    <tr><td>75分</td><td>生命科学技术学院</td></tr>
+                    <tr><td>75分</td><td>化学化工学院</td></tr>
+                    <tr><td>75分</td><td>上海高级金融学院</td></tr>
+                    <tr><td>75分</td><td>设计学院</td></tr>
+                    <tr><td>75分</td><td>航空航天学院</td></tr>
+                    <tr><td>75分</td><td>媒体与传播学院</td></tr>
+                    <tr><td>75分</td><td>机械与动力工程学院</td></tr>
+                    <tr><td>75分</td><td>人文学院</td></tr>
+                    <tr><td>75分</td><td>电气工程学院</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="ppt-slide">
+        <div class="slide-header">港澳台研究生招生考试方式（现行）</div>
+
+        <div class="section-title">报名手续</div>
+        <p style="font-size: 14px; margin: 0 0 10px 0; line-height: 1.5;">全程<span class="text-highlight">网上报名</span>，无现场确认环节。考生登录“面向港澳台招生信息网”完成报名及缴费。</p>
+
+        <table class="table-center" style="margin-bottom: 10px;">
+            <tr><th>报考地点</th><th>负责单位</th></tr>
+            <tr><td>北京</td><td>北京理工大学（研究生院）</td></tr>
+            <tr><td>广州</td><td>广东省教育考试院</td></tr>
+            <tr><td>上海</td><td>同济大学</td></tr>
+            <tr><td>香港</td><td>京港学术交流中心</td></tr>
+            <tr><td>澳门</td><td>澳门高等教育辅助办公室</td></tr>
+        </table>
+        <div class="text-small" style="margin-bottom: 12px;">*往年考点及负责单位仅供参考</div>
+
+        <div class="section-title">考试内容</div>
+        <table class="table-center" style="margin-bottom: 10px;">
+            <tr><th style="width: 15%;"> </th><th style="width: 42.5%;">现行安排</th></tr>
+            <tr><td>初试</td><td>统考笔试（机考/传统笔试），科目“综合能力（一）”或者“综合能力（二）”</td></tr>
+            <tr><td>复试</td><td>科研计划 + 面试（各学院自行组织）</td></tr>
+        </table>
+
+        <div class="example-box">
+            <div class="example-badge">范例示例</div>
+            <div style="display: flex; align-items: stretch; font-size: 12px; padding: 5px; box-sizing: border-box;">
+                <div style="flex: 0 0 45px; background: #eee; padding: 5px; text-align: center; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd;">260</div>
+                <div style="flex: 0 0 95px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center; padding: 0 4px;">材料科学与工程学院</div>
+                <div style="flex: 0 0 60px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">专业型</div>
+                <div style="flex: 0 0 60px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">0852</div>
+                <div style="flex: 0 0 70px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">工程硕士</div>
+                <div style="flex: 0 0 70px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">085204</div>
+                <div style="flex: 0 0 80px; border-right: 1px solid #ddd; text-align: center; display: flex; align-items: center; justify-content: center;">*材料工程</div>
+                <div style="flex: 1; padding-left: 10px; font-size: 11px; line-height: 1.4; box-sizing: border-box; display: flex; align-items: center;">
+                    <div>
+                        不区分研究方向<br>
+                        ①201英语一 ②302数学二 ③836材料科学基础<br>
+                        笔试加面试
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="ppt-slide">
+        <div class="slide-header">Z001 与 Z002 的区别及报考须知</div>
+
+        <div class="card" style="margin-bottom: 12px; padding: 10px 15px; background-color: #FFF8E7; border-color: #F0D89A;">
+            <div style="font-size: 14px; line-height: 1.6; color: #333;">
+                港澳台联考初试由教育部统一命题，考生根据目标院校要求，在 <b>Z001（综合能力一）</b> 和 <b>Z002（综合能力二）</b> 中<b>二选一</b>。两科满分均为 150 分，考试时长 180 分钟（3 小时），<b>全部为单项选择题（客观题）</b>。
+            </div>
+        </div>
+
+        <table class="z-table">
+            <tr>
+                <th style="width: 15%;">三大模块</th>
+                <th style="width: 42.5%;">综合能力（一）Z001</th>
+                <th style="width: 42.5%;">综合能力（二）Z002</th>
+            </tr>
+            <tr>
+                <td>中华文化</td>
+                <td>文化常识 20题 × 2分 = 40分；<br>阅读理解 5题 × 3分 = 15分</td>
+                <td>文化常识 20题 × 2分 = 40分；<br>阅读理解 5题 × 3分 = 15分</td>
+            </tr>
+            <tr>
+                <td>英语运用</td>
+                <td>语言知识 20题 × 1分 = 20分；<br>阅读理解 10题 × 3分 = 30分</td>
+                <td>语言知识 20题 × 1分 = 20分；<br>阅读理解 10题 × 3分 = 30分</td>
+            </tr>
+            <tr>
+                <td>逻辑/数学</td>
+                <td>逻辑推理：15题 × 3分 = 45分</td>
+                <td>数学基础：15题 × 3分 = 45分</td>
+            </tr>
+            <tr>
+                <td>试卷总分</td>
+                <td>150分</td>
+                <td>150分</td>
+            </tr>
+        </table>
+
+        <div class="z-info-grid">
+            <div class="z-info-box">
+                <div style="color: var(--z001-color); margin-bottom: 4px; font-weight: 700;">Z001 适用专业方向</div>
+                主要面向文科、社科、教育、传媒、艺术、管理类等方向（如文学、法学、教育学、新闻与传播等）。
+            </div>
+            <div class="z-info-box">
+                <div style="color: var(--z002-color); margin-bottom: 4px; font-weight: 700;">Z002 适用专业方向</div>
+                主要面向理工科、计算机、电子、数理类，以及部分经管类专业（如数学、物理、计算机科学与技术、部分金融或应用统计方向）。
+            </div>
+        </div>
+
+        <div style="font-size: 13px; color: #333; line-height: 1.6; background-color: #fee; padding: 10px 15px; border-radius: 4px; border: 1px solid #fcc;">
+            <span style="color: var(--primary-red); font-weight: 700;">⚠ 核心注意事项：</span><br>
+            1. 以目标院校招生简章为准：同一个专业在不同学校可能会要求考不同的科目。在确定报考目标后，务必去该院校的研究生院官网查看最新的招生专业目录，确认其要求的考试科目代码。<br>
+            2. 注意考位抢报：港澳台考研的报名通常在每年 1 月左右在“内地（祖国大陆）高校面向港澳台招生信息网”进行，考位（尤其是内地考点如广州、上海等）非常紧张，建议系统开放时准时蹲守抢位。<br>
+            3. 复试准备：初试只考综合卷，没有单独的专业课笔试，专业课的压力会转移到复试阶段。初试结束后应立刻准备复试的专业面试和科研经历梳理。
+        </div>
+        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="ppt-slide">
+        <div class="slide-header">Z001 考查大纲与初试备考经验分享</div>
+        
+        <div class="grid-2" style="gap: 15px; height: calc(100% - 10px);">
+            <!-- 左列：考查大纲 -->
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="syllabus-card" style="flex: 1;">
+                    <div class="syllabus-title">一、中华文化（55分）</div>
+                    <div class="syllabus-content">
+                        考查基本知识和核心理念。含：中国哲学常识（先秦诸子百家、后代学派及宗教流变）、中国历史学常识（职官科举、礼俗称谓、衣食住行、军事经济、图书文物、近现代史）、中国文学常识（文体流变、代表作家作品、流派、总集、史诗）、中国艺术常识（书、画、雕塑、建筑、音乐、戏剧、民俗）、古代科技常识（天文历算、地理、水利、医学、发明）。
+                    </div>
+                </div>
+                <div class="syllabus-card" style="flex: 1;">
+                    <div class="syllabus-title">二、英语运用（50分）</div>
+                    <div class="syllabus-content">
+                        考查语言知识和阅读技能。<br>
+                        1. 语言知识：掌握 5500 个左右单词（含构词法、搭配、语义关系）；语法、语用（指词、词组、分句、句子的类别、构成和功能，特定语境中的言语功能等）。<br>
+                        2. 阅读理解：读懂多话题材料，概括主旨、理解信息、判断推理、理解结构和逻辑。
+                    </div>
+                </div>
+                <div class="syllabus-card" style="flex: 1;">
+                    <div class="syllabus-title">三、逻辑推理（45分）</div>
+                    <div class="syllabus-content">
+                        不考查逻辑学专业知识，考查分析综合与逻辑思维能力。<br>
+                        1. 概念（种类、关系、定义、划分）<br>
+                        2. 判断（种类、关系）<br>
+                        3. 推理（演绎、归纳、类比、综合）<br>
+                        4. 论证（方式分析、评价：加强/削弱/解释、谬误识别：混淆概念/转移论题/自相矛盾/模棱两可/不当类比/以偏概全等）。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右列：备考经验 -->
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="exp-card" style="flex: 1;">
+                    <div class="exp-title">中华文化备考经验</div>
+                    <ul style="font-size: 12px; line-height: 1.5; padding-left: 15px;">
+                        <li>知识点最散，不一定能精确复习到。考的不只是历史，还包括艺术、哲学等细节（如顾恺之、展子虔、中国制图之父等）。</li>
+                        <li>25年考了好几题诗词题，跟24年的考法完全不一样。建议看B站考公相关知识点课程。</li>
+                        <li>针对诗词曲格律部分可看《中华文化史概要》这本书，并结合网络视频学习。</li>
+                        <li>有学长姐反馈：练了几千题但实际没考几道，备考范围确实很广。</li>
+                    </ul>
+                </div>
+                <div class="exp-card" style="flex: 1;">
+                    <div class="exp-title">英语运用备考经验</div>
+                    <ul style="font-size: 12px; line-height: 1.5; padding-left: 15px;">
+                        <li>难度介于四到六级之间。推荐工具：扇贝单词、扇贝阅读，搭配陌陌、不背单词等APP混搭使用。用 Goodnote 做文法补充笔记。</li>
+                        <li>语言知识：一大部分是词义辨析题，还有一部分考察语法知识。语法知识部分可以刷一些语法选择题库，在学校图书馆借语法书做题。</li>
+                        <li>阅读理解：可以刷英语二的真题，阅读题不难，考试的时间足够进行全篇通读。</li>
+                    </ul>
+                </div>
+                <div class="exp-card" style="flex: 1;">
+                    <div class="exp-title">逻辑推理备考经验</div>
+                    <ul style="font-size: 12px; line-height: 1.5; padding-left: 15px;">
+                        <li>满分45分，推荐目标门槛分 27-30分。</li>
+                        <li>推荐课程：老吕逻辑800练、李焕72技（B站可看）。</li>
+                        <li>上完课后细心做题，难度不是特别大。</li>
+                    </ul>
+                </div>
+                <div class="exp-card" style="flex: 1;">
+                    <div class="exp-title">数学基础备考经验（仅Z002）</div>
+                    <ul style="font-size: 12px; line-height: 1.5; padding-left: 15px;">
+                        <li>主要考察微积分，包括一元函数微分学，一元函数积分学，多元函数微分学。</li>
+                        <li>题目考察得很基础，主要是定义和细节，建议把本科课本课后题做通透了。</li>
+                        <li>针对考纲要求看了武忠祥的考研数学课，做了660&880，最后考试也没那么难。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
+    </div>
+
+    <!-- Slide 6 -->
     <div class="ppt-slide">
         <div class="slide-header">学历学位认证</div>
 
         <div class="split-layout">
             <div class="split-left">
                 <div class="section-title">申请信息</div>
-                <div class="card" style="margin-bottom: 16px; padding: 12px; display: flex; gap: 15px; align-items: center;">
+                <div class="card" style="margin-bottom: 12px; padding: 10px 12px; display: flex; gap: 15px; align-items: center;">
                     <div style="flex: 1;">
-                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 5px;">办理网址：</div>
+                        <div style="font-size: 13px; margin-bottom: 5px;">办理网址：</div>
                         <div style="font-size: 13px; margin-bottom: 5px; line-height: 1.4;">中国留学网，国（境）外学历学位认证系统</div>
                         <a href="http://zwfw.cscse.edu.cn/" style="color: #0055CC; font-size: 12px; text-decoration: none; word-break: break-all;">http://zwfw.cscse.edu.cn/</a>
                     </div>
-                    <div class="img-placeholder" style="width: 90px; height: 60px; flex-shrink: 0; margin: 0;">系统截图</div>
+                    <div class="img-placeholder" style="width: 80px; height: 55px; flex-shrink: 0; margin: 0;">系统截图</div>
                 </div>
 
                 <div class="section-title">注意事项</div>
-                <ul style="font-size: 12px; line-height: 1.5; padding-left: 15px; margin-bottom: 12px;">
+                <ul style="font-size: 13px; line-height: 1.5; padding-left: 15px; margin-bottom: 10px;">
                     <li><span class="text-highlight">留学服务中心为学历认证唯一官方办理途径，不存在授权代办</span></li>
                     <li><span class="text-highlight">学历认证自2019年6月28日起启用新版系统，线上完成认证</span></li>
                     <li>文凭证书核查授权声明模板请至【申请材料 - 材料详情】下载</li>
@@ -650,19 +882,19 @@
                     <li>申请者视不同情况可能需要提供辅助材料<br>例如在学期间成绩单（详见申请材料要求）</li>
                     <li><span class="text-highlight">获得学位证书后即可申请认证，无时间限制</span></li>
                 </ul>
-                <div class="img-placeholder" style="width: 120px; height: 80px; margin-top: 0;">声明书模板占位</div>
+                <div class="img-placeholder" style="width: 110px; height: 70px; margin-top: 0;">声明书模板占位</div>
             </div>
 
             <div class="split-right">
                 <div class="section-title" style="background-color: #555;">认证流程</div>
-                <h3 style="font-size: 15px; font-weight: bold; margin: 8px 0 12px 0;">学历学位认证办理流程</h3>
+                <h3 style="font-size: 15px; margin: 5px 0 10px 0;">学历学位认证办理流程</h3>
 
-                <div style="position: relative; padding-left: 25px; margin-top: 8px;">
-                    <div style="position: absolute; left: 8px; top: 8px; bottom: 15px; width: 2px; background-color: #E0E0E0;"></div>
+                <div style="position: relative; padding-left: 25px; margin-top: 5px;">
+                    <div style="position: absolute; left: 8px; top: 8px; bottom: 10px; width: 2px; background-color: #E0E0E0;"></div>
 
-                    <div style="position: relative; margin-bottom: 14px;">
+                    <div style="position: relative; margin-bottom: 12px;">
                         <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--primary-red); background: #fff; box-sizing: border-box;"></div>
-                        <div style="font-weight: bold; color: var(--primary-red); font-size: 13px; margin-bottom: 5px;">准备材料</div>
+                        <div style="color: var(--primary-red); font-size: 13px; font-weight: 700; margin-bottom: 4px;">准备材料</div>
                         <ol style="font-size: 12px; margin: 0; padding-left: 12px; line-height: 1.5;">
                             <li>需认证的港澳台文凭证书</li>
                             <li>台胞证/身份证个人信息页（或护照及签注）</li>
@@ -672,9 +904,9 @@
                         </ol>
                     </div>
 
-                    <div style="position: relative; margin-bottom: 14px;">
+                    <div style="position: relative; margin-bottom: 12px;">
                         <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--primary-red); background: #fff; box-sizing: border-box;"></div>
-                        <div style="font-weight: bold; color: var(--primary-red); font-size: 13px; margin-bottom: 5px;">在线申请</div>
+                        <div style="color: var(--primary-red); font-size: 13px; font-weight: 700; margin-bottom: 4px;">在线申请</div>
                         <ol style="font-size: 12px; margin: 0; padding-left: 12px; line-height: 1.5;">
                             <li>注册（有效的五年期台胞证；如无，可使用台湾地区身份证）</li>
                             <li>填写申请信息，上传申请材料（原件彩色扫描件）</li>
@@ -682,9 +914,9 @@
                         </ol>
                     </div>
 
-                    <div style="position: relative; margin-bottom: 14px;">
+                    <div style="position: relative; margin-bottom: 12px;">
                         <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--primary-red); background: #fff; box-sizing: border-box;"></div>
-                        <div style="font-weight: bold; color: var(--primary-red); font-size: 13px; margin-bottom: 5px;">评估审核</div>
+                        <div style="color: var(--primary-red); font-size: 13px; font-weight: 700; margin-bottom: 4px;">评估审核</div>
                         <ol style="font-size: 12px; margin: 0; padding-left: 12px; line-height: 1.5;">
                             <li>10-20个工作日完成评估审核</li>
                             <li>可通过学历认证系统查询申请进度</li>
@@ -693,7 +925,7 @@
 
                     <div style="position: relative;">
                         <div style="position: absolute; left: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--primary-red); background: #fff; box-sizing: border-box;"></div>
-                        <div style="font-weight: bold; color: var(--primary-red); font-size: 13px; margin-bottom: 5px;">完成认证</div>
+                        <div style="color: var(--primary-red); font-size: 13px; font-weight: 700; margin-bottom: 4px;">完成认证</div>
                         <ol style="font-size: 12px; margin: 0; padding-left: 12px; line-height: 1.5;">
                             <li>取得（电子）证照</li>
                             <li>可通过学历认证系统在线查验</li>
@@ -705,20 +937,20 @@
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
 
-    <!-- Slide 6: 学硕 VS 专硕 -->
+    <!-- Slide 7 -->
     <div class="ppt-slide">
         <div class="slide-header">学硕 VS 专硕</div>
 
-        <div style="margin-bottom: 16px;">
-            <h3 style="font-size: 17px; color: var(--primary-red); margin: 0 0 8px 0;">学硕与专硕的差别——以材料学院为例</h3>
-            <p style="font-size: 13px; margin: 0;">最直观的差别即为毕业要求，但各专业不一定相同</p>
+        <div style="margin-bottom: 12px;">
+            <h3 style="font-size: 17px; color: var(--primary-red); margin: 0 0 6px 0;">学硕与专硕的差别——以材料学院为例</h3>
+            <p style="font-size: 14px; margin: 0;">最直观的差别即为毕业要求，但各专业不一定相同</p>
         </div>
 
-        <div class="card" style="margin-bottom: 14px; padding: 15px;">
+        <div class="card" style="margin-bottom: 12px; padding: 12px;">
             <div style="display: flex; align-items: flex-start;">
-                <div style="flex: 0 0 80px; font-size: 24px; font-weight: 900; color: var(--primary-red);">专硕</div>
+                <div style="flex: 0 0 70px; font-size: 22px; color: var(--primary-red); font-weight: 900;">专硕</div>
                 <div>
-                    <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px;">专业实践环节</div>
+                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">专业实践环节</div>
                     <div class="text-small" style="color: #333; line-height: 1.6;">
                         专业实践是专业学位研究生培养的必修环节，一般应与学位论文研究相结合，需在第3学年秋季学期结束前完成。专业学位研究生获得专业实践学分后，方能进入学位论文答辩环节。专业实践环节4学分。具有2年及以上企业工作经历的工程类硕士专业学位研究生参加专业实践应不少于6个月，不具有2年企业工作经历的工程类硕士专业学位研究生专业参加专业实践应不少于1年。实践可采用集中实践和分段实践相结合的方式进行，包含以下这些形式：
                     </div>
@@ -726,11 +958,11 @@
             </div>
         </div>
 
-        <div class="card" style="margin-bottom: 16px; padding: 15px;">
+        <div class="card" style="margin-bottom: 15px; padding: 12px;">
             <div style="display: flex; align-items: flex-start;">
-                <div style="flex: 0 0 80px; font-size: 24px; font-weight: 900; color: var(--primary-red);">学硕</div>
+                <div style="flex: 0 0 70px; font-size: 22px; color: var(--primary-red); font-weight: 900;">学硕</div>
                 <div>
-                    <div style="font-weight: bold; font-size: 13px; margin-bottom: 6px;">读书(学术、实践)报告</div>
+                    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">读书(学术、实践)报告</div>
                     <div class="text-small" style="color: #333; line-height: 1.6;">
                         要求在读期间提交读书报告4篇，其中至少在学科或学院的学术论坛公开做读书报告1次，或参加国际或全国会议作口头学术报告1次；参加学院组织的学术讲座至少4次。<span class="text-highlight" style="text-decoration: underline;">学术学位硕士生参加学院组织的学术成果墙报(poster)展示至少1次。</span>硕士研究生必须在第三学年冬学期前完成全部读书报告环节，并向学院研究生科上交相应材料审核。读书报告考核通过计2学分。
                     </div>
@@ -740,43 +972,43 @@
 
         <div style="font-size: 14px; color: #333; line-height: 1.6;">
             上述部分是学院的最低要求，实际上大部分老师的要求更严格，以个人课题组为例：<br>
-            <span style="font-weight: bold; margin-right: 25px;">学硕：至少发表一篇<span class="text-highlight">文章</span></span>
-            <span style="font-weight: bold;">专硕：至少发表一篇<span class="text-highlight">文章或一项专利</span></span>
+            <span style="margin-right: 20px;">学硕：至少发表一篇<span class="text-highlight">文章</span></span>
+            <span>专硕：至少发表一篇<span class="text-highlight">文章或一项专利</span></span>
         </div>
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
 
-    <!-- Slide 7: 安泰经管 -->
+    <!-- Slide 8 -->
     <div class="ppt-slide">
         <div class="slide-header">安泰经管学院台生研究生复试准备及面试技巧</div>
 
         <div class="grid-2">
             <div>
                 <div class="section-title">复试准备思路</div>
-                <div style="font-size: 13px; font-weight: bold; margin-bottom: 10px;">从安泰学院官网了解准备材料及参考书目</div>
+                <div style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">从安泰学院官网了解准备材料及参考书目</div>
 
-                <div style="display: flex; margin-bottom: 16px;">
+                <div style="display: flex; margin-bottom: 12px;">
                     <div class="label-box" style="flex: 0 0 60px;">准备<br>材料</div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding-left: 8px;">
-                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 11px;">
-                            <span style="flex: 0 0 85px; font-weight: bold;">本科成绩单</span> <span>➔ 对本科成绩不高的科目拟一套合理说辞</span>
+                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 12px;">
+                            <span style="flex: 0 0 85px; font-weight: 700;">本科成绩单</span> <span>➔ 对本科成绩不高的科目拟一套合理说辞</span>
                         </div>
-                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 11px;">
-                            <span style="flex: 0 0 85px; font-weight: bold;">履历自传</span> <span>➔ 对自己写的经历熟悉，中英文都要准备</span>
+                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 12px;">
+                            <span style="flex: 0 0 85px; font-weight: 700;">履历自传</span> <span>➔ 对自己写的经历熟悉，中英文都要准备</span>
                         </div>
-                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 11px;">
-                            <span style="flex: 0 0 85px; font-weight: bold;">毕业论文</span> <span>➔ 熟悉及掌握本科论文内容</span>
+                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 12px;">
+                            <span style="flex: 0 0 85px; font-weight: 700;">毕业论文</span> <span>➔ 熟悉及掌握本科论文内容</span>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: flex; margin-bottom: 16px;">
+                <div style="display: flex; margin-bottom: 12px;">
                     <div class="label-box" style="flex: 0 0 60px;">考试<br>准备</div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding-left: 8px;">
-                        <div class="card" style="padding: 10px; display: flex; align-items: flex-start; font-size: 11px;">
-                            <span class="inner-tag" style="flex: 0 0 40px; font-size: 11px;">初试</span>
+                        <div class="card" style="padding: 10px; display: flex; align-items: flex-start; font-size: 12px;">
+                            <span class="inner-tag" style="flex: 0 0 45px; font-size: 12px;">初试</span>
                             <div style="padding-left: 10px; width: 100%;">
-                                <ul style="padding-left: 12px; margin: 0; font-size: 10px; line-height: 1.5;">
+                                <ul style="padding-left: 12px; margin: 0; font-size: 11px; line-height: 1.5;">
                                     <li><span class="text-highlight">形式：线上面试，一对五</span></li>
                                     <li><span class="text-highlight">时间：30分钟=15分钟初试内容口试+15分钟复试面试内容</span></li>
                                     <li>初试：根据参考书目准备，主要是英文+专业课1+专业课2</li>
@@ -787,8 +1019,8 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 11px;">
-                            <span class="inner-tag" style="flex: 0 0 40px; font-size: 11px;">复试</span>
+                        <div class="card" style="padding: 8px 10px; display: flex; align-items: center; font-size: 12px;">
+                            <span class="inner-tag" style="flex: 0 0 45px; font-size: 12px;">复试</span>
                             <span style="padding-left: 10px;">➔ 同上（参考初试及复试准备内容）</span>
                         </div>
                     </div>
@@ -798,18 +1030,18 @@
             <div>
                 <div class="section-title">临场面试要点</div>
 
-                <div style="display: flex; margin-bottom: 16px; align-items: stretch;">
-                    <div style="flex: 0 0 60px; background: #E8833A; color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 13px; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">研究<br>方向</div>
+                <div style="display: flex; margin-bottom: 12px; align-items: stretch;">
+                    <div style="flex: 0 0 60px; background: #E8833A; color: white; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">研究<br>方向</div>
                     <div style="flex: 1; display: flex; padding-left: 10px; gap: 6px;">
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px; font-weight: bold;">专业型硕士</div>
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px; font-weight: bold;">学术型硕士</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px; font-weight: 700;">专业型硕士</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px; font-weight: 700;">学术型硕士</div>
                         </div>
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px;">金融</div>
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px;">工商管理</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px;">金融</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px;">工商管理</div>
                         </div>
-                        <div style="flex: 1.5; display: flex; flex-direction: column; gap: 3px; font-size: 10px; justify-content: center;">
+                        <div style="flex: 1.5; display: flex; flex-direction: column; gap: 4px; font-size: 11px; justify-content: center;">
                             <div>➔ 投资研究</div>
                             <div>➔ 金融科技</div>
                             <div>➔ 技术经济管理</div>
@@ -820,28 +1052,28 @@
                     </div>
                 </div>
 
-                <div style="display: flex; margin-bottom: 16px; align-items: stretch;">
-                    <div style="flex: 0 0 60px; background: #E8833A; color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 13px; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">相关<br>背景</div>
+                <div style="display: flex; margin-bottom: 12px; align-items: stretch;">
+                    <div style="flex: 0 0 60px; background: #E8833A; color: white; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">相关<br>背景</div>
                     <div style="flex: 1; display: flex; padding-left: 10px; gap: 6px;">
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: center;">
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px;">跨专业</div>
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px;">与本科相同</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px;">跨专业</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px;">与本科相同</div>
                         </div>
                         <div style="flex: 2; display: flex; align-items: center;">
-                            <div style="font-size: 10px;">➔ 申请动机、跨专业的理解</div>
+                            <div style="font-size: 11px;">➔ 申请动机、跨专业的理解</div>
                         </div>
                     </div>
                 </div>
 
                 <div style="display: flex; align-items: stretch;">
-                    <div style="flex: 0 0 60px; background: #E8833A; color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 13px; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">专业<br>问题</div>
+                    <div style="flex: 0 0 60px; background: #E8833A; color: white; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; border-radius: 4px 0 0 4px;">专业<br>问题</div>
                     <div style="flex: 1; display: flex; padding-left: 10px; gap: 6px;">
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center;">
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px; font-weight: bold;">英文</div>
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px; font-weight: bold;">数学</div>
-                            <div class="card" style="padding: 6px; text-align: center; font-size: 11px; font-weight: bold;">专业课</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px; font-weight: 700;">英文</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px; font-weight: 700;">数学</div>
+                            <div class="card" style="padding: 6px; text-align: center; font-size: 12px; font-weight: 700;">专业课</div>
                         </div>
-                        <div style="flex: 2.5; display: flex; flex-direction: column; gap: 10px; justify-content: center; font-size: 10px;">
+                        <div style="flex: 2.5; display: flex; flex-direction: column; gap: 10px; justify-content: center; font-size: 11px;">
                             <div>➔ 履历面中使用英文问相关经历</div>
                             <div>➔ 简单计算题(面试)及概念定义题</div>
                             <div>➔ 依据不同专业科目准备</div>
@@ -853,7 +1085,7 @@
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
 
-    <!-- Slide 8: 凯原法学院 -->
+    <!-- Slide 9 -->
     <div class="ppt-slide">
         <div class="slide-header">凯原法学院台生研究生复试准备及面试技巧</div>
 
@@ -861,15 +1093,15 @@
             <div>
                 <div class="section-title">复试准备思路</div>
 
-                <div style="font-size: 12px; margin-bottom: 12px; line-height: 1.5;">
+                <div style="font-size: 13px; margin-bottom: 10px; line-height: 1.5;">
                     <span class="text-highlight">✓ 书审准备材料：</span>本科成绩单、毕业论文摘要、获奖证明、研究生规划（电子版）<br>
                     <span class="text-highlight">✓ 考科 / 书目</span>
                 </div>
 
-                <div style="display: flex; margin-bottom: 16px;">
+                <div style="display: flex; margin-bottom: 12px;">
                     <div style="flex: 0 0 60px; display: flex; flex-direction: column; gap: 4px;">
-                        <div style="background: var(--primary-red); color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 12px; border-radius: 4px 0 0 4px;">法学<br>硕士</div>
-                        <div style="background: var(--primary-red); color: white; text-align: center; padding: 8px 0; font-weight: bold; font-size: 12px; border-radius: 4px 0 0 4px;">法律<br>硕士</div>
+                        <div style="background: var(--primary-red); color: white; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; border-radius: 4px 0 0 4px;">法学<br>硕士</div>
+                        <div style="background: var(--primary-red); color: white; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 700; border-radius: 4px 0 0 4px;">法律<br>硕士</div>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; padding-left: 8px;">
                         <div style="display: flex; gap: 4px;">
@@ -891,33 +1123,33 @@
                     </div>
                 </div>
 
-                <div style="font-size: 12px; margin-bottom: 12px; line-height: 1.5;">
+                <div style="font-size: 13px; margin-bottom: 10px; line-height: 1.5;">
                     <span class="text-highlight">✓ 参考书目：</span>指定教材、柳林考研笔记、历年真题、学院教授论文、机构法硕考研书（法硕）
                 </div>
 
-                <div style="font-size: 12px; margin-bottom: 8px;">
+                <div style="font-size: 13px; margin-bottom: 6px;">
                     <span class="text-highlight">✓ 学硕 or 法硕</span>
                 </div>
 
                 <div style="display: flex;">
-                    <div style="flex: 0 0 50px; background: var(--primary-red); color: white; text-align: center; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; padding: 8px 0; border-radius: 4px 0 0 4px;">专业<br>对比</div>
+                    <div style="flex: 0 0 50px; background: var(--primary-red); color: white; text-align: center; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; padding: 8px 0; border-radius: 4px 0 0 4px;">专业<br>对比</div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; padding-left: 8px;">
                         <div style="display: flex; border: 1px solid #ddd;">
-                            <div style="flex: 1; padding: 5px; text-align: center; font-size: 11px; border-right: 1px solid #ddd; background: #eee;">学制</div>
-                            <div style="flex: 2; padding: 5px 8px; font-size: 11px; display: flex; align-items: center;">法学专业 / 学位 vs. 非法学专业</div>
+                            <div style="flex: 1; padding: 6px; text-align: center; font-size: 12px; border-right: 1px solid #ddd; background: #eee;">学制</div>
+                            <div style="flex: 2; padding: 6px 8px; font-size: 12px; display: flex; align-items: center;">法学专业 / 学位 vs. 非法学专业</div>
                         </div>
                         <div style="display: flex; border: 1px solid #ddd;">
-                            <div style="flex: 1; padding: 5px; text-align: center; font-size: 11px; border-right: 1px solid #ddd; background: #eee;">学制</div>
-                            <div style="flex: 2; padding: 5px 8px; font-size: 11px; display: flex; align-items: center;">2.5年 vs. 3年</div>
+                            <div style="flex: 1; padding: 6px; text-align: center; font-size: 12px; border-right: 1px solid #ddd; background: #eee;">学制</div>
+                            <div style="flex: 2; padding: 6px 8px; font-size: 12px; display: flex; align-items: center;">2.5年 vs. 3年</div>
                         </div>
                         <div style="display: flex; border: 1px solid #ddd;">
-                            <div style="flex: 1; padding: 5px; text-align: center; font-size: 11px; border-right: 1px solid #ddd; background: #eee;">学分要求</div>
-                            <div style="flex: 2; padding: 5px 8px; font-size: 11px; display: flex; align-items: center;">不低于30 vs. 不低于75</div>
+                            <div style="flex: 1; padding: 6px; text-align: center; font-size: 12px; border-right: 1px solid #ddd; background: #eee;">学分要求</div>
+                            <div style="flex: 2; padding: 6px 8px; font-size: 12px; display: flex; align-items: center;">不低于30 vs. 不低于75</div>
                         </div>
                     </div>
                 </div>
 
-                <div style="font-size: 12px; margin-top: 12px;">
+                <div style="font-size: 13px; margin-top: 10px;">
                     <span class="text-highlight">✓ 司法考试：</span>法考视频，司法考试书籍
                 </div>
             </div>
@@ -925,31 +1157,31 @@
             <div>
                 <div class="section-title">临场面试要点</div>
 
-                <ul style="font-size: 12px; line-height: 1.5; padding-left: 15px; margin-bottom: 16px;">
+                <ul style="font-size: 13px; line-height: 1.5; padding-left: 15px; margin-bottom: 12px;">
                     <li><span class="text-highlight">面试时长：</span>线上面试，20min</li>
                     <li>英语100分，专业课一、专业课二共300分，综合面试200分</li>
                 </ul>
 
-                <div style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; color: #E8833A; font-size: 13px; margin-bottom: 4px;">✓ 自我介绍：</div>
-                    <ul style="font-size: 12px; line-height: 1.4; padding-left: 15px;">
+                <div style="margin-bottom: 12px;">
+                    <div style="color: #E8833A; font-size: 13px; font-weight: 700; margin-bottom: 4px;">✓ 自我介绍：</div>
+                    <ul style="font-size: 13px; line-height: 1.5; padding-left: 15px;">
                         <li>准备1min或3min两个版本的中英文自我介绍</li>
                         <li>可包含：本科经历、读研原因、报考法学原因、未来规划等（重在展现个人特质）（很可能追问，不要给自己挖坑）</li>
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; color: #E8833A; font-size: 13px; margin-bottom: 4px;">✓ 专业面</div>
-                    <ul style="font-size: 12px; line-height: 1.4; padding-left: 15px;">
+                <div style="margin-bottom: 12px;">
+                    <div style="color: #E8833A; font-size: 13px; font-weight: 700; margin-bottom: 4px;">✓ 专业面</div>
+                    <ul style="font-size: 13px; line-height: 1.5; padding-left: 15px;">
                         <li>对考试科目（民、刑、法理）考察</li>
                         <li>回答的逻辑性、体现法感（参考考研机构复试视频）</li>
                         <li>结合本科专业（前沿问题、热点问题、案例）</li>
                     </ul>
                 </div>
 
-                <div style="margin-bottom: 16px;">
-                    <div style="font-weight: bold; color: #E8833A; font-size: 13px; margin-bottom: 4px;">✓ 英文面</div>
-                    <ul style="font-size: 12px; line-height: 1.4; padding-left: 15px;">
+                <div style="margin-bottom: 12px;">
+                    <div style="color: #E8833A; font-size: 13px; font-weight: 700; margin-bottom: 4px;">✓ 英文面</div>
+                    <ul style="font-size: 13px; line-height: 1.5; padding-left: 15px;">
                         <li>对英语能力或本科专业知识的考察</li>
                         <li>表达流畅自然，语速适中，不要着急</li>
                         <li>没听清/没听懂问题不要紧张，礼貌询问</li>
@@ -957,11 +1189,67 @@
                 </div>
 
                 <div>
-                    <div style="font-weight: bold; color: #E8833A; font-size: 13px; margin-bottom: 4px;">✓ 正装仪容</div>
-                    <ul style="font-size: 12px; line-height: 1.4; padding-left: 15px;">
+                    <div style="color: #E8833A; font-size: 13px; font-weight: 700; margin-bottom: 4px;">✓ 正装仪容</div>
+                    <ul style="font-size: 13px; line-height: 1.5; padding-left: 15px;">
                         <li>不必过分正式，整洁舒适为主</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+        <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="ppt-slide" style="padding: 30px 50px;">
+        <div class="slide-header">交通大学 vs 浙江大学</div>
+        
+        <div class="compare-container">
+            <div class="compare-side">
+                <div class="compare-logo-placeholder" style="border-color: var(--sjtu-red); color: var(--sjtu-red); background-color: #fff;">
+                    交大校徽
+                </div>
+                <div class="compare-title" style="color: var(--sjtu-red);">上海交通大学</div>
+                <ul class="compare-list">
+                    <li style="color: var(--sjtu-red); border-bottom-color: #f0d0d0;">
+                        <span style="color: #333;">2026 QS世界大学排名第45，中国内地第4</span>
+                    </li>
+                    <li style="color: var(--sjtu-red); border-bottom-color: #f0d0d0;">
+                        <span style="color: #333;">工科、商科（安泰）实力顶尖，校友资源丰厚</span>
+                    </li>
+                    <li style="color: var(--sjtu-red); border-bottom-color: #f0d0d0;">
+                        <span style="color: #333;">地处上海，实习与就业机会极多（金融、科技）</span>
+                    </li>
+                    <li style="color: var(--sjtu-red); border-bottom-color: #f0d0d0;">
+                        <span style="color: #333;">国际化程度高，校园设施现代化</span>
+                    </li>
+                    <li style="color: var(--sjtu-red); border-bottom-color: #f0d0d0;">
+                        <span style="color: #333;">学风务实，注重产学研结合</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="compare-side">
+                <div class="compare-logo-placeholder" style="border-color: var(--zju-blue); color: var(--zju-blue); background-color: #fff;">
+                    浙大校徽
+                </div>
+                <div class="compare-title" style="color: var(--zju-blue);">浙江大学</div>
+                <ul class="compare-list">
+                    <li style="color: var(--zju-blue); border-bottom-color: #d0e0f0;">
+                        <span style="color: #333;">2026 QS世界大学排名第47，中国内地第5</span>
+                    </li>
+                    <li style="color: var(--zju-blue); border-bottom-color: #d0e0f0;">
+                        <span style="color: #333;">学科门类最齐全，工科、农学、计算机极强</span>
+                    </li>
+                    <li style="color: var(--zju-blue); border-bottom-color: #d0e0f0;">
+                        <span style="color: #333;">地处杭州，互联网/电商氛围浓厚（阿里、网易）</span>
+                    </li>
+                    <li style="color: var(--zju-blue); border-bottom-color: #d0e0f0;">
+                        <span style="color: #333;">校区众多，占地广阔，自然环境优美</span>
+                    </li>
+                    <li style="color: var(--zju-blue); border-bottom-color: #d0e0f0;">
+                        <span style="color: #333;">创新氛围活跃，创业率居高不下</span>
+                    </li>
+                </ul>
             </div>
         </div>
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
