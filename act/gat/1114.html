@@ -329,17 +329,17 @@
     .z-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 13px;
-        margin-bottom: 15px;
+        font-size: 12px;
+        margin-bottom: 12px;
         text-align: center;
     }
     .z-table th {
         background-color: var(--z001-color);
         color: white;
-        padding: 10px 12px;
+        padding: 8px 10px;
         font-weight: bold;
         border: 1px solid #ddd;
-        font-size: 14px;
+        font-size: 13px;
     }
     .z-table th:nth-child(2) {
         background-color: var(--z001-color);
@@ -351,9 +351,9 @@
         background-color: #888;
     }
     .z-table td {
-        padding: 10px 12px;
+        padding: 8px 10px;
         border: 1px solid #ddd;
-        line-height: 1.5;
+        line-height: 1.4;
     }
     .z-table tr:nth-child(even) {
         background-color: #f9f9f9;
@@ -362,6 +362,22 @@
         font-weight: bold;
         background-color: #f4f5f7;
         text-align: left;
+    }
+
+    .z-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 12px;
+    }
+    
+    .z-info-box {
+        background-color: #f9f9f9;
+        border: 1px solid #eee;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 1.5;
     }
 </style>
 </head>
@@ -410,21 +426,21 @@
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
 
-    <!-- Slide 2: Z001与Z002的区别 -->
+    <!-- Slide 2: Z001与Z002的区别（精简版） -->
     <div class="ppt-slide">
-        <div class="slide-header">Z001 与 Z002 的区别</div>
+        <div class="slide-header">Z001 与 Z002 的区别及报考须知</div>
 
-        <div class="card" style="margin-bottom: 20px; padding: 15px 20px; background-color: #FFF8E7; border-color: #F0D89A;">
-            <div style="font-size: 15px; line-height: 1.7; color: #333;">
-                港澳台联考初试科目分为 <b>Z001（综合能力一）</b> 和 <b>Z002（综合能力二）</b>。考生<b>二选一，只考1门</b>（由目标院校招生简章指定）。满分150分，3小时全客观选择题，可选机考/纸笔笔试。
+        <div class="card" style="margin-bottom: 15px; padding: 12px 18px; background-color: #FFF8E7; border-color: #F0D89A;">
+            <div style="font-size: 14px; line-height: 1.6; color: #333;">
+                港澳台联考初试由教育部统一命题，考生根据目标院校要求，在 <b>Z001（综合能力一）</b> 和 <b>Z002（综合能力二）</b> 中<b>二选一</b>。两科满分均为 150 分，考试时长 180 分钟（3 小时），<b>全部为单项选择题（客观题）</b>。
             </div>
         </div>
 
         <table class="z-table">
             <tr>
-                <th style="width: 20%;">三大模块</th>
-                <th style="width: 40%;">综合能力（一）Z001<br>（偏文科/商科）</th>
-                <th style="width: 40%;">综合能力（二）Z002<br>（偏理工科）</th>
+                <th style="width: 15%;">三大模块</th>
+                <th style="width: 42.5%;">综合能力（一）Z001<br>（偏文科/商科）</th>
+                <th style="width: 42.5%;">综合能力（二）Z002<br>（偏理工科）</th>
             </tr>
             <tr>
                 <td>中华文化</td>
@@ -448,10 +464,22 @@
             </tr>
         </table>
 
-        <div style="font-size: 13px; color: #666; line-height: 1.8; margin-top: 20px;">
-            * 考试成绩采取“立体呈现”方式，既呈现总成绩，也分项呈现各模块单项成绩。<br>
-            * 目前大部分院校已采用统考科目，部分院校仍自主命题。<br>
-            * <b>核心差异：</b>Z001 考“逻辑推理”，偏向文科思维；Z002 考“数学基础”，偏向理科思维。但“中华文化”和“英语运用”两科在 Z001 和 Z002 中完全通用，分值占比也相同。
+        <div class="z-info-grid">
+            <div class="z-info-box">
+                <div style="font-weight: bold; color: var(--z001-color); margin-bottom: 4px;">Z001 适用专业方向</div>
+                主要面向文科、社科、教育、传媒、艺术、管理类等方向（如文学、法学、教育学、新闻与传播等）。
+            </div>
+            <div class="z-info-box">
+                <div style="font-weight: bold; color: var(--z002-color); margin-bottom: 4px;">Z002 适用专业方向</div>
+                主要面向理工科、计算机、电子、数理类，以及部分经管类专业（如数学、物理、计算机科学与技术、部分金融或应用统计方向）。
+            </div>
+        </div>
+
+        <div style="font-size: 12.5px; color: #333; line-height: 1.6; background-color: #fee; padding: 12px 15px; border-radius: 4px; border: 1px solid #fcc;">
+            <b style="color: var(--primary-red);">⚠ 核心注意事项：</b><br>
+            1. <b>以目标院校招生简章为准：</b>同一个专业在不同学校可能会要求考不同的科目（例如部分院校的经管类可能要求考 Z002，而另一些院校可能要求考 Z001）。在确定报考目标后，务必去该院校的研究生院官网查看最新的招生专业目录，确认其要求的考试科目代码。<br>
+            2. <b>注意考位抢报：</b>港澳台考研的报名通常在每年 1 月左右在“内地（祖国大陆）高校面向港澳台招生信息网”进行，考位（尤其是内地考点如广州、上海等）非常紧张，建议系统开放时准时蹲守抢位。<br>
+            3. <b>复试准备：</b>初试只考综合卷，没有单独的专业课笔试，专业课的压力会转移到复试阶段。初试结束后应立刻准备复试的专业面试和科研经历梳理。
         </div>
         <div class="slide-footer">© 2026北京大學兩岸文化交流協會、清华大学台生組、上海交通大學台灣校友會、上海交通大學台灣學生聯誼會及浙江大學港澳台學生交流協會版權所有</div>
     </div>
